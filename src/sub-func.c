@@ -241,7 +241,7 @@ validate_netmask (char *in_addr)
 }
 
 int
-getsplitnumv4 (char *buf, u_int32_t * splitmask)
+getsplitnumv4 (char *buf, u_int32_t *splitmask)
 {
 	int x, y;
 	u_int32_t sm;
@@ -376,6 +376,18 @@ numtobitmap (u_int32_t num, u_int32_t prefix_len)
 	return bitmap;
 }
 
+/* Note: Only applicable to netmasks */
+u_int32_t
+numtolen (u_int32_t num)
+{
+        u_int32_t len = 0;
+
+        while ((num <<= 1))
+                len++;
+
+        return len + 1;
+}
+
 int
 parse_addr (struct if_info *ifi)
 {
@@ -472,7 +484,9 @@ parse_addr (struct if_info *ifi)
 int
 get_addrv4 (struct if_info *ifi)
 {
-	int x, y;
+        u_int32_t x, y, z, len;
+        char *rfc = NULL;
+        size_t sz;
 
 	x = 0;
 	if (!ifi->name[0])
@@ -505,41 +519,86 @@ get_addrv4 (struct if_info *ifi)
 	if (y == 2)
 		return -2;
 
-	/*
-	 * network class, class remark and classfull netmask
+	/* network class, class remark and classfull netmask
+         * For details, and a possible RFC URL extension, see http://en.wikipedia.org/wiki/IPv4
 	 */
-	bzero ((char *) ifi->v4ad.class_remark, 64);
-	x = ifi->v4ad.n_haddr >> 24;
+        len = ifi->v4ad.n_nmaskbits;
+	memset (ifi->v4ad.class_remark, 0, sizeof(ifi->v4ad.class_remark));
 	ifi->v4ad.n_cnaddr = 0;
+
+	x = ifi->v4ad.n_haddr >> 24;
+        y = (ifi->v4ad.n_haddr >> 16) & 0xFF;
+        z = (ifi->v4ad.n_haddr >> 8) & 0xFF;
 	if (!(x & 0x80)) {
 		ifi->v4ad.class = 'A';
 		ifi->v4ad.n_cnmask = 0xff000000;
+
+                if (x == 0)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sCurrent network", len < 8 ? "In Part " : ""), rfc = "RFC1700";
+                if (x == 10)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 8 ? "In Part " : ""), rfc = "RFC1928";
+                if (x == 127)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sLoopback network", len < 8 ? "In Part " : ""), rfc = "RFC5735";
 	}
 	if ((x & 0xc0) == 0x80) {
 		ifi->v4ad.class = 'B';
 		ifi->v4ad.n_cnmask = 0xffff0000;
+
+                if (x == 169 && y == 254)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sLink-Local", len < 16 ? "In Part " : ""), rfc = "RFC3927";
+                if (x == 172 && (y & 0xF0) == 16)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 12 ? "In Part " : ""), rfc = "RFC1918";
 	}
 	if ((x & 0xe0) == 0xc0) {
 		ifi->v4ad.class = 'C';
 		ifi->v4ad.n_cnmask = 0xffffff00;
-                y = ifi->v4ad.n_haddr >> 16;
+
                 if (x == 192 && (y & 0xF8) == 168)
-                   snprintf (ifi->v4ad.class_remark, 64, ", Private intranet");
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 16 ? "In Part " : ""), rfc = "RFC1918";
+                if (x == 192 && y == 88 && z == 99)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sIPv6 to IPv4 relay", len < 24 ? "In Part " : ""), rfc = "RFC3068";
+                if (x == 192 && y == 0 && z == 0)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sReserved, IANA", len < 24 ? "In Part " : ""), rfc = "RFC5735";
+                if (x == 192 && y == 0 && z == 2)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-1, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5735";
+                if (x == 198 && y == 18 && z == 0)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sNetwork benchmark tests", len < 15 ? "In Part " : ""), rfc = "RFC2544";
+                if (x == 198 && y == 51 && z == 100)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-2, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
+                if (x == 203 && y == 0 && z == 113)
+                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-3, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
 	}
 	if ((x & 0xf0) == 0xe0) {
 		ifi->v4ad.class = 'D';
-		snprintf (ifi->v4ad.class_remark, 64, ", Multicast");
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
+
+		snprintf (ifi->v4ad.class_remark, 64, ", Multicast"), rfc = "RFC3171";
 	}
 	if ((x & 0xf8) == 0xf0) {
 		ifi->v4ad.class = 'E';
-		snprintf (ifi->v4ad.class_remark, 64, ", Reserved for future use");
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
+
+		snprintf (ifi->v4ad.class_remark, 64, ", Reserved for future use"), rfc = "RFC1700";
 	}
-	if (ifi->v4ad.class == '\0') {
+        if (x == 255) {
+		ifi->v4ad.class = 'I';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
+
+		snprintf (ifi->v4ad.class_remark, 64, ", Broadcast"), rfc = "RFC919";
+        }
+
+	if (ifi->v4ad.class == '\0') {
+		ifi->v4ad.class = 'I'; /* MAX Classes! */
+		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
+		ifi->v4ad.n_cnmask = 0xffffffff;
 		snprintf (ifi->v4ad.class_remark, 64, ", Nonexistent");
 	}
+
+        sz = strlen (ifi->v4ad.class_remark);
+        if (len == 31 && rfc)
+                snprintf (&ifi->v4ad.class_remark[sz], 64 - sz, ", PtP Link (%s, RFC3021)", rfc);
+        else if (rfc)
+                snprintf (&ifi->v4ad.class_remark[sz], 64 - sz, " (%s)", rfc);
 
 	/*
 	 * network address (classfull + cidr)

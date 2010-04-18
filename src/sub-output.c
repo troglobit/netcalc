@@ -41,77 +41,23 @@ static const char rcsid[] = "$Id: sub-output.c,v 1.32 2003/03/19 12:33:56 simius
 #include "sub.h"
 
 void
-show_c_wildcard_info_v4 (struct if_info *ifi)
-{
-	u_int32_t mask;
-	int bitcount;
-	int x;
-
-	mask = ifi->v4ad.n_haddr ^ 0xffffffff;
-	bitcount = 0;
-	for (x = 0; x < 32; x++) {
-		if ((mask >> x) & 1)
-			bitcount++;
-	}
-
-	printf ("[WILDCARD]\n");
-	printf ("Wildcard		- %s\n",
-		numtoquad (ifi->v4ad.n_haddr));
-	printf ("Network mask		- %s\n",
-		numtoquad (mask));
-	printf ("Network mask (bits)	- %d\n",
-		bitcount);
-	printf ("\n");
-/*
-	printf ("Host address		- %s\n", numtoquad (ifi->v4ad.n_haddr));
-	printf ("Host address (decimal)	- %u\n", ifi->v4ad.n_haddr);
-	printf ("Host address (hex)	- %X\n", ifi->v4ad.n_haddr);
-	printf ("Network address		- %s\n",
-		numtoquad (ifi->v4ad.n_naddr));
-	printf ("Network mask		- %s\n", numtoquad (ifi->v4ad.n_nmask));
-	printf ("Network mask (bits)	- %d\n", ifi->v4ad.n_nmaskbits);
-	printf ("Network mask (hex)	- %X\n", ifi->v4ad.n_nmask);
-	printf ("Broadcast address	- %s\n",
-		numtoquad (ifi->v4ad.n_broadcast));
-	printf ("Cisco wildcard		- %s\n",
-		numtoquad (ifi->v4ad.n_nmask ^ 0xffffffff));
-	if (!ifi->v4ad.n_nmask)
-		printf ("Addresses in network	- %u\n",
-			(ifi->v4ad.n_broadcast) - (ifi->v4ad.n_naddr));
-	else
-		printf ("Addresses in network	- %u\n",
-			(ifi->v4ad.n_broadcast) - (ifi->v4ad.n_naddr) + 1);
-	printf ("Network range		- %s - ", numtoquad (ifi->v4ad.n_naddr));
-	printf ("%s\n", numtoquad (ifi->v4ad.n_broadcast));
-	if (ifi->v4ad.n_naddr + 1 <= ifi->v4ad.n_broadcast - 1) {
-		printf ("Usable range		- %s - ",
-			numtoquad (ifi->v4ad.n_naddr + 1));
-		printf ("%s\n", numtoquad (ifi->v4ad.n_broadcast - 1));
-	}
-	printf ("\n");
-*/
-
-	return;
-}
-
-
-void
 show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, struct misc_args m_argv4)
 {
 	u_int32_t diff, start, end;
-	int x;
 	struct if_info ifi_tmp;
 	int v4args_tmp;
+        size_t maxlen;
 
 	v4args_tmp = 0;
 
 	if ((v4args & V4VERBSPLIT) == V4VERBSPLIT)
-		printf ("[Split network - verbose]\n");
+		printf ("[Split network/%d - verbose]\n", numtolen (splitmask));
 	else
-		printf ("[Split network]\n");
+		printf ("[Split network/%d]\n", numtolen (splitmask));
 
 	if (splitmask < ifi->v4ad.n_nmask) {
-		printf ("-[ERR : Oversized splitmask]\n\n");
+		fprintf (stderr, "Cannot subnet to /%d with this base network, use a prefix len > /%d\n", 
+                         numtolen (splitmask), numtolen (ifi->v4ad.n_nmask));
 		return;
 	}
 	diff = 0xffffffff - splitmask + 1;
@@ -126,13 +72,32 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
 			v4args_tmp = V4_INFO;
 		ifi_tmp.next = NULL;
 	}
+        else {
+                /* Figure out max width of a network string. */
+                while (1) {
+                        char buf[30];
+                        size_t len;
 
-	x = 0;
-	while (!x) {
+                        len = snprintf (buf, sizeof(buf), "%s", numtoquad (start));
+                        if (len > maxlen)
+                                maxlen = len;
+                        
+                        start += diff;
+                        if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
+                                break;
+                        end += diff;
+                }
+        }
+
+	start = ifi->v4ad.n_naddr;
+	end = ifi->v4ad.n_naddr + diff - 1;
+	while (1) {
 		if ((v4args & V4VERBSPLIT) != V4VERBSPLIT) {
-			printf ("Network			- %-15s - ",
-				numtoquad (start));
-			printf ("%s\n", numtoquad (end));
+                        char buf[30];
+
+                        snprintf (buf, sizeof(buf), "%s", numtoquad (start));
+                        printf ("Network  : \e[34m%-*s - %-15s\e[0m", maxlen, buf, numtoquad (end));
+                        printf ("Netmask: \e[34m%s\e[0m\n", numtoquad (splitmask));
 		}
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
 			bzero ((char *) ifi_tmp.p_v4addr, 19);
@@ -143,7 +108,7 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
 		}
 		start += diff;
 		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
-			x = 1;
+                        break;
 		end += diff;
 
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT)
@@ -158,33 +123,58 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
 int
 show_networks_v4 (struct if_info *ifi, int count)
 {
-	u_int32_t diff, start, end;
-	int x;
+        int lcount = count;
+        size_t startlen = 0, endlen = 0;
+	u_int32_t diff, start, end, len;
+        u_int32_t lstart, lend;
 
-	printf ("[Networks]\n");
 	diff = 0xffffffff - ifi->v4ad.n_nmask + 1;
-	if (ifi->v4ad.n_nmask > 0xffffff00 && count == -1) {
-		start = ifi->v4ad.n_naddr & 0xffffff00;
-		end = (ifi->v4ad.n_broadcast & 0xffffff00) + diff - 1;
+        len = ifi->v4ad.n_nmaskbits;
+	if (len >= 31) {
+		start = ifi->v4ad.n_naddr & ifi->v4ad.n_nmask;
+                end = start;
+                if (len == 31) end++;
 	} else {
 		start = ifi->v4ad.n_naddr;
 		end = ifi->v4ad.n_broadcast;
 	}
+        lstart = start;
+        lend = end;
 
-	x = 0;
-	while (!x && count) {
-		printf ("Network			- %-15s - ",
-			numtoquad (start));
-		printf ("%s", numtoquad (end));
-		if (start == ifi->v4ad.n_naddr)
-			printf (" (current)\n");
-		else
-			printf ("\n");
+        /* Figure out max width of a network string. */
+	while (lcount) {
+                char buf[30];
+                size_t len;
+
+                len = snprintf (buf, sizeof(buf), "%s", numtoquad (lstart));
+                if (len > startlen)
+                        startlen = len;
+
+                len = snprintf (buf, sizeof(buf), "%s", numtoquad (lend));
+                if (len > endlen)
+                        endlen = len;
+
+		lstart += diff;
+		if (lend == 0xffffffff)
+			break;
+		if ((lend & 0x000000ff) == 0xff && lcount == -1)
+                        break;
+		lend += diff;
+		if (lcount > 0)
+			lcount--;
+	}
+
+	printf ("[Networks/%d]\n", len);
+	while (count) {
+                printf ("Network  : \e[34m%-*s - ", startlen, numtoquad (start));
+                printf ("%-*s\e[0m", endlen, numtoquad (end));
+                printf ("  Netmask: \e[34m%s\e[0m\n", numtoquad (ifi->v4ad.n_nmask));
+
 		start += diff;
 		if (end == 0xffffffff)
-			x = 1;
+			break;
 		if ((end & 0x000000ff) == 0xff && count == -1)
-			x = 1;
+                        break;
 		end += diff;
 		if (count > 0)
 			count--;
@@ -207,7 +197,6 @@ print_cf_info_v4 (struct if_info *ifi)
         if (len > 30) {
                 if (len == 31) {
                         num = 2;
-                        strncat (ifi->v4ad.class_remark, ", PtP Link RFC 3021", 64 - strlen (ifi->v4ad.class_remark));
                         min = ifi->v4ad.n_naddr;
                         max = min + 1;
                 }
@@ -234,7 +223,7 @@ print_cf_info_v4 (struct if_info *ifi)
         snprintf (temp, sizeof(temp), "%s/%d", numtoquad (ifi->v4ad.n_cnaddr), ifi->v4ad.n_nmaskbits);
 	if (num >= 2) {
                 size_t clen = ifi->v4ad.class - 'A' + 1;
-                char buf[5] = { 0 };
+                char buf['Z' - 'A'] = { 0 };
                 char *net = numtobitmap (ifi->v4ad.n_cnaddr, len);
 
                 strncpy (buf, net, clen);
@@ -251,7 +240,12 @@ print_cf_info_v4 (struct if_info *ifi)
                        numtobitmap (ifi->v4ad.n_cnaddr, len));
         }
 
-        printf ("Hosts/Net: \e[34m%-20u\e[0m  \e[35mClass %c\e[0m%s\n", num, ifi->v4ad.class, ifi->v4ad.class_remark);
+        printf ("Hosts/Net: \e[34m%-20u\e[0m  ", num);
+        if (ifi->v4ad.class == 'I') /* Invalid */
+                printf ("\e[35mClass Invalid", ifi->v4ad.class);
+        else
+                printf ("\e[35mClass %c", ifi->v4ad.class);
+        printf ("\e[0m%s\n", ifi->v4ad.class_remark);
 	printf ("\n");
 }
 
@@ -670,8 +664,6 @@ print_help ()
 	printf ("IPv4 options:\n");
 	printf ("  -s, --v4split=MASK\t\tSplit the current network into subnets\n");
 	printf ("\t\t\t\tof MASK size.\n");
-	printf ("  -w, --wildcard\t\tDisplay information for a wildcard\n");
-	printf ("\t\t\t\t(inverse mask).\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e, --v4inv6\t\t\tIPv4 compatible IPv6 information.\n");
@@ -679,19 +671,14 @@ print_help ()
 	printf ("  -S, --v6split=MASK\t\tSplit the current network into subnets\n\t\t\t\tof MASK size.\n");
 	printf ("  -t, --v6-standard\t\tStandard IPv6. (default)\n");
 	printf ("\n");
-	printf ("Address must be in the \"standard\" dotted quad format.\n");
-	printf ("Netmask can be given in three different ways:\n");
-	printf (" - Number of bits    [/nn]\n");
-	printf (" - Dotted quad       [nnn.nnn.nnn.nnn]\n");
-	printf (" - Hex               [0xnnnnnnnn | nnnnnnnn]\n");
-	printf ("\n");
-	printf ("Interface must be a valid network interface on the system.\n");
-	printf ("\n");
-	printf ("Replacing address/interface with '-' will use stdin for reading further\n");
-	printf ("arguments.\n");
-	printf ("==============================================================================\n");
-	printf ("%s %s\n", NAME, VERSION);
-	printf ("Report bugs to <simon@routemeister.net>.\n");
+	printf ("Address must be in dotted quad forma, but the netmask can be given in three\n"
+                "different ways:\n"
+                " - Number of bits    [/nn]\n"
+                " - Dotted quad       [nnn.nnn.nnn.nnn]\n"
+                " - Hex               [0xnnnnnnnn | nnnnnnnn]\n"
+                "\n"
+                "Interface must be a valid network interface on the system.  Replacing address,\n"
+                "or interface, with '-' will use stdin for reading further arguments.\n");
 
 	return;
 }
@@ -715,7 +702,6 @@ print_help ()
 	printf ("\n");
 	printf ("IPv4 options:\n");
 	printf ("  -s\t\tSplit the current network into subnets of MASK size.\n");
-	printf ("  -w\t\tDisplay information for a wildcard (inverse mask).\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e\t\tIPv4 compatible IPv6 information.\n");
@@ -723,23 +709,18 @@ print_help ()
 	printf ("  -S\t\tSplit the current network into subnets of MASK size.\n");
 	printf ("  -t\t\tStandard IPv6. (default)\n");
 	printf ("\n");
-	printf ("Address must be in the \"standard\" dotted quad format.\n");
-	printf ("Netmask can be given in three different ways:\n");
-	printf (" - Number of bits    [/nn]\n");
-	printf (" - Dotted quad       [nnn.nnn.nnn.nnn]\n");
-	printf (" - Hex               [0xnnnnnnnn | nnnnnnnn]\n");
-	printf ("\n");
-	printf ("Interface must be a valid network interface on the system.\n");
-	printf ("\n");
-	printf ("Replacing address/interface with '-' will use stdin for reading further\n");
-	printf ("arguments.\n");
-	printf ("==============================================================================\n");
-	printf ("%s %s\n", NAME, VERSION);
-	printf ("Report bugs to <simon@routemeister.net>.\n");
+	printf ("Address must be in dotted quad forma, but the netmask can be given in three\n"
+                "different ways:\n"
+                " - Number of bits    [/nn]\n"
+                " - Dotted quad       [nnn.nnn.nnn.nnn]\n"
+                " - Hex               [0xnnnnnnnn | nnnnnnnn]\n"
+                "\n"
+                "Interface must be a valid network interface on the system.  Replacing address,\n"
+                "or interface, with '-' will use stdin for reading further arguments.\n");
 
 	return;
 }
-#endif				/* HAVE_GETOPT_LONG */
+#endif  /* HAVE_GETOPT_LONG */
 
 void
 print_short_help ()
@@ -753,11 +734,9 @@ void
 print_version ()
 {
 	printf ("%s %s\n", NAME, VERSION);
-	printf ("Written by Simon Ekstrand.\n");
-	printf ("\n");
-	printf ("Copyright (C) 2003-2005 Simon Ekstrand.\n");
-	printf
-	    ("This is free software; see the source for copying conditions.  There is NO\n");
-	printf
-	    ("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+	printf ("Copyright (C) 2003-2005 Simon Ekstrand.\n"
+                "Copyright (C) 2010 Joachim Nilsson.\n"
+                "License under the 3-Clause BSD <http://en.wikipedia.org/wiki/BSD_license>\n"
+                "This is free software: you are free to change and redistribute it.\n"
+                "There is NO WARRANTY, to the extent permitted by law.\n");
 }

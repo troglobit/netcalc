@@ -106,8 +106,6 @@ out_cmdline (struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 			show_networks_v4 (ifarg_cur, m_argv4.numnets);
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4 (ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
-		if ((v4args & C_WILDCARD) == C_WILDCARD)
-			show_c_wildcard_info_v4 (ifarg_cur);
 	}
 
 	if (ifarg_cur->type == IFT_V6 || ifarg_cur->type == IFT_INTV6) {
@@ -629,16 +627,13 @@ parse_abox (struct argbox *abox, struct if_info *if_start)
 					snprintf(ifarg_cur->errorstr, sizeof(ifarg_cur->errorstr), "Unparsable argument.");
 					ifarg_cur->type = IFT_UNKWN;
 				}
-
 			}
-
 		}
 
 		abox = abox->next;
 		ifarg_old = ifarg_cur;
 		ifarg_cur = new_if (ifarg_cur);
 	}
-
 
 	ifarg_old->next = NULL;
 	free (ifarg_cur);
@@ -681,7 +676,6 @@ main (int argc, char *argv[])
 		{"v6rev", no_argument, 0, 'r'},
 		{"split-verbose", no_argument, 0, 'u'},
 		{"resolve", no_argument, 0, 'd'},
-		{"wildcard", no_argument, 0, 'w'},
 		{0, 0, 0, 0}
 	};
 #endif
@@ -720,80 +714,72 @@ main (int argc, char *argv[])
 	abox_cur->resolv = 0;
 	abox_cur->next = NULL;
 
-
 	/*
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
 #ifdef HAVE_GETOPT_LONG
 	while ((ch =
-		getopt_long (argc, argv, "adehHI:n:rs:S:tuvVw4:6:", l_o,
+		getopt_long (argc, argv, "adehHI:n:rs:S:tuvV4:6:", l_o,
 			     NULL)) != -1) {
 #else
-	while ((ch = getopt (argc, argv, "adehHI:n:rs:S:tuvVw4:6:")) != -1) {
+        while ((ch = getopt (argc, argv, "adehHI:n:rs:S:tuvV4:6:")) != -1) {
 #endif
 		switch (ch) {
 		case 'a':
 			v4args |= V4_INFO | NET_INFO;
 			v6args |= V6_INFO | V4INV6 | V6REV;
 			break;
+
 		case 'd':
 			resolve = 1;
 #if (!defined(HAVE_GETHOSTBYNAME2) && !defined(HAVE_GETADDRINFO)) || !defined(HAVE_INET_NTOP)
 			printf("-[INFO : IPv6 address resolution will fail due to lack of OS support]\n");
 #endif
 			break;
+
 		case 'e':
 			v6args |= V4INV6;
 			break;
-		case 'h':
-		case 'H':
-			print_help ();
-			return 0;
+
 		case 'n':
 			v4args |= NET_INFO;
 			m_argv4.numnets = atoi (optarg);
 			break;
+
 		case 'r':
 			v6args |= V6REV;
 			break;
+
 		case 's':
 			y = getsplitnumv4 (optarg, &m_argv4.splitmask);
 			if (!y) {
 				v4args |= V4SPLIT;
 			} else {
-				printf
-				    ("-[ERR : Invalid IPv4 splitmask, unable to split]\n");
+				fprintf (stderr, "Invalid IPv4 splitmask, unable to split.\n");
 				split_errv4 = 1;
 			}
 			break;
+
 		case 'S':
 			y = getsplitnumv6 (optarg, &m_argv6.v6splitmask, &m_argv6.v6splitnum);
 			if (!y) {
 				v6args |= V6SPLIT;
 			} else {
-				printf
-				    ("-[ERR : Invalid IPv6 splitmask, unable to split]\n");
+				fprintf (stderr, "Invalid IPv6 splitmask, unable to split.\n");
 				split_errv6 = 1;
 			}
 			break;
+
 		case 't':
 			v6args |= V6_INFO;
 			break;
+
 		case 'u':
 			v4args |= V4VERBSPLIT;
 			v6args |= V6VERBSPLIT;
 			break;
-		case 'v':
-		case 'V':
-			print_version ();
-			return 0;
-		case 'w':
-			v4args |= C_WILDCARD;
-			break;
-		case '?':
-			printf ("Try '%s -h' for more information.\n", NAME);
-			return 0;
+
 		case '4':
 			strncpy (abox_cur->str, optarg, 127);
 			abox_cur->type = AT_V4;
@@ -805,6 +791,7 @@ main (int argc, char *argv[])
 			abox_cur = new_arg (abox_cur);
 
 			break;
+
 		case '6':
 			strncpy (abox_cur->str, optarg, 127);
 			abox_cur->type = AT_V6;
@@ -814,6 +801,7 @@ main (int argc, char *argv[])
 			abox_cur = new_arg (abox_cur);
 
 			break;
+
 		case 'I':
 			strncpy (abox_cur->str, optarg, 127);
 			abox_cur->type = AT_INT;
@@ -821,6 +809,18 @@ main (int argc, char *argv[])
 			abox_cur = new_arg (abox_cur);
 
 			break;
+
+		case 'v':
+		case 'V':
+			print_version ();
+			return 0;
+
+		case '?':
+		case 'h':
+		case 'H':
+			print_help ();
+			return 0;
+
 		default:
 			print_short_help ();
 			return 0;
@@ -828,7 +828,8 @@ main (int argc, char *argv[])
 	}
 
 	if (split_errv4 || split_errv6) {
-		printf ("-[ERR : No valid commands recieved]\n");
+        nothing:
+		printf ("No (valid) commands recieved, nothing to do.\n");
 		free_boxargs (abox_start);
 		return -1;
 	}
@@ -861,7 +862,7 @@ main (int argc, char *argv[])
 		while (abox_tmp->next != abox_cur) {
 			abox_tmp = abox_tmp->next;
 		}
-		abox_tmp->next=NULL;
+		abox_tmp->next = NULL;
 		free (abox_cur);
 		abox_cur = NULL;
 	}
@@ -885,24 +886,19 @@ main (int argc, char *argv[])
 	if_start = NULL;
 	if_cur = NULL;
 	if (!(if_cur = if_start = get_if_ext ())) {
-		printf
-		    ("-[INFO : Unable to retrieve interface information]\n");
-		printf
-		    ("-[INFO : Will only parse none interface arguments]\n\n");
+		printf ("INFO: Unable to retrieve interface information, skipping interface(s).\n");
 	}
 
 	if (!parse_stdin)
 		ifarg_cur = ifarg_start = parse_abox (abox_start, if_start);
 
-	if (!ifarg_start && !parse_stdin) {
-		printf ("-[FATAL : No valid commandline arguments found]\n\n");
-		return -1;
-	}
+	if (!ifarg_start && !parse_stdin)
+                goto nothing;
 
 	iffound = 0;
 	index = 0;
 	ifarg_cur = ifarg_start;
-	bzero ((char *) oldcmdstr, 128);
+	memset (oldcmdstr, 0, sizeof(oldcmdstr));
 	while (ifarg_cur && !parse_stdin) {
 		if (strlen (ifarg_cur->cmdstr) > 0) {
 			if (!strcmp (ifarg_cur->cmdstr, oldcmdstr))
@@ -957,7 +953,7 @@ main (int argc, char *argv[])
 				iffound = 0;
 				index = 0;
 				ifarg_cur = ifarg_start;
-				bzero ((char *) oldcmdstr, 128);
+                                memset (oldcmdstr, 0, sizeof(oldcmdstr));
 				while (ifarg_cur) {
 					if (strlen (ifarg_cur->cmdstr) > 0) {
 						if (!strcmp (ifarg_cur->cmdstr, oldcmdstr))
@@ -977,7 +973,7 @@ main (int argc, char *argv[])
 			z = 1;
 			free_if (ifarg_start);
 			free_boxargs (abox_start);
-			abox_start = abox_cur = (struct argbox *) malloc (sizeof (struct argbox));
+			abox_start = abox_cur = (struct argbox *)malloc (sizeof (struct argbox));
 			bzero ((char *) abox_cur, 128);
 			abox_cur->type = 0;
 			abox_cur->resolv = 0;
@@ -990,7 +986,7 @@ main (int argc, char *argv[])
 			}
 		}
 		if (y == -1)
-			printf ("\n-[ERR : Problem parsing stdin]\n\n");
+			fprintf (stderr, "ERROR: Problem parsing stdin\n");
 	}
 	if (parse_stdin) {
 		free (stdinarg[0]);
@@ -998,7 +994,7 @@ main (int argc, char *argv[])
 	}
 
 	if (!z && parse_stdin)
-		printf ("-[FATAL : No arguments found on stdin]\n\n");
+		fprintf (stderr, "FATAL: No arguments found on stdin\n");
 
 	if (!parse_stdin)
 		free_if (ifarg_start);

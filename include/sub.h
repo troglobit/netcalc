@@ -218,6 +218,7 @@ int getsplitnumv6 (char *buf, struct sip_in6_addr *splitmask, int *v6splitnum);
 int quadtonum (char *quad, u_int32_t * num);
 char *numtoquad (u_int32_t num);
 char *numtobitmap (u_int32_t num, u_int32_t prefix_len);
+u_int32_t numtolen (u_int32_t num);
 int parse_addr (struct if_info *ifi);
 int get_addrv4 (struct if_info *ifi);
 int get_addrv6 (struct if_info *ifi);
