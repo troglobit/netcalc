@@ -123,7 +123,7 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
 		v4args_tmp = v4args ^ V4SPLIT;
 		v4args_tmp = v4args_tmp ^ V4VERBSPLIT;
 		if (!v4args_tmp)
-			v4args_tmp = CIDR_INFO;
+			v4args_tmp = V4_INFO;
 		ifi_tmp.next = NULL;
 	}
 
@@ -195,102 +195,64 @@ show_networks_v4 (struct if_info *ifi, int count)
 	return 0;
 }
 
+
 void
 print_cf_info_v4 (struct if_info *ifi)
 {
-	printf ("[Classfull]\n");
-	printf ("Host address		- %s\n", numtoquad (ifi->v4ad.n_haddr));
-	printf ("Host address (decimal)	- %u\n", ifi->v4ad.n_haddr);
-	printf ("Host address (hex)	- %X\n", ifi->v4ad.n_haddr);
-	printf ("Network address		- %s\n",
-		numtoquad (ifi->v4ad.n_cnaddr));
-	printf ("Network class		- %c%s\n", ifi->v4ad.class,
-		ifi->v4ad.class_remark);
-	printf ("Network mask		- %s\n",
-		numtoquad (ifi->v4ad.n_cnmask));
-	printf ("Network mask (hex)	- %X\n", ifi->v4ad.n_cnmask);
-	printf ("Broadcast address	- %s\n",
-		numtoquad (ifi->v4ad.n_cnaddr +
-			   (0xffffffff - ifi->v4ad.n_cnmask)));
-	printf ("\n");
+        u_int32_t num, bcast, len, min, max;
+        char temp[21];
 
-	return;
-}
+        num = ifi->v4ad.n_broadcast - ifi->v4ad.n_naddr - 1;
+        len = ifi->v4ad.n_nmaskbits;
+        if (len > 30) {
+                if (len == 31) {
+                        num = 2;
+                        strncat (ifi->v4ad.class_remark, ", PtP Link RFC 3021", 64 - strlen (ifi->v4ad.class_remark));
+                        min = ifi->v4ad.n_naddr;
+                        max = min + 1;
+                }
+                else 
+                        num = 1;
+        }
+        else {
+                min = ifi->v4ad.n_naddr + 1;
+                max = ifi->v4ad.n_broadcast - 1;
+        }
 
-void
-print_cf_bitmap_v4 (struct if_info *ifi)
-{
-	printf ("[Classfull bitmaps]\n");
-	printf ("Network address		- %s\n",
-		numtobitmap (ifi->v4ad.n_cnaddr));
-	printf ("Network mask		- %s\n",
-		numtobitmap (ifi->v4ad.n_cnmask));
-	printf ("\n");
+	printf ("Address  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", 
+                numtoquad (ifi->v4ad.n_haddr), numtobitmap (ifi->v4ad.n_haddr, len));
+//	printf ("Address (decimal): %u\n", ifi->v4ad.n_haddr);
+//	printf ("Address (hex)    : %X\n", ifi->v4ad.n_haddr);
+        snprintf (temp, sizeof(temp), "%s = %d", numtoquad (ifi->v4ad.n_nmask), ifi->v4ad.n_nmaskbits);
+	printf ("Netmask  : \e[34m%-20s\e[0m \e[31m%s\e[0m\n", temp, numtobitmap (ifi->v4ad.n_nmask, len));
+//	printf ("Netmask (hex)	- %X\n", ifi->v4ad.n_cnmask);
+	printf ("Wildcard : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad (ifi->v4ad.n_nmask ^ 0xffffffff),
+		numtobitmap (ifi->v4ad.n_nmask ^ 0xffffffff, len));
 
-	return;
-}
+        printf ("=>\n");
 
-void
-print_cidr_info_v4 (struct if_info *ifi)
-{
-	printf ("[CIDR]\n");
-	printf ("Host address		- %s\n", numtoquad (ifi->v4ad.n_haddr));
-	printf ("Host address (decimal)	- %u\n", ifi->v4ad.n_haddr);
-	printf ("Host address (hex)	- %X\n", ifi->v4ad.n_haddr);
-	printf ("Network address		- %s\n",
-		numtoquad (ifi->v4ad.n_naddr));
-	printf ("Network mask		- %s\n", numtoquad (ifi->v4ad.n_nmask));
-	printf ("Network mask (bits)	- %d\n", ifi->v4ad.n_nmaskbits);
-	printf ("Network mask (hex)	- %X\n", ifi->v4ad.n_nmask);
-	printf ("Broadcast address	- %s\n",
-		numtoquad (ifi->v4ad.n_broadcast));
-	printf ("Cisco wildcard		- %s\n",
-		numtoquad (ifi->v4ad.n_nmask ^ 0xffffffff));
-	if (!ifi->v4ad.n_nmask)
-		printf ("Addresses in network	- %u\n",
-			(ifi->v4ad.n_broadcast) - (ifi->v4ad.n_naddr));
-	else
-		printf ("Addresses in network	- %u\n",
-			(ifi->v4ad.n_broadcast) - (ifi->v4ad.n_naddr) + 1);
-	printf ("Network range		- %s - ", numtoquad (ifi->v4ad.n_naddr));
-	printf ("%s\n", numtoquad (ifi->v4ad.n_broadcast));
-	if (ifi->v4ad.n_naddr + 1 <= ifi->v4ad.n_broadcast - 1) {
-		printf ("Usable range		- %s - ",
-			numtoquad (ifi->v4ad.n_naddr + 1));
-		printf ("%s\n", numtoquad (ifi->v4ad.n_broadcast - 1));
+        snprintf (temp, sizeof(temp), "%s/%d", numtoquad (ifi->v4ad.n_cnaddr), ifi->v4ad.n_nmaskbits);
+	if (num >= 2) {
+                size_t clen = ifi->v4ad.class - 'A' + 1;
+                char buf[5] = { 0 };
+                char *net = numtobitmap (ifi->v4ad.n_cnaddr, len);
+
+                strncpy (buf, net, clen);
+                printf ("Network  : \e[34m%-20s\e[0m \e[35m%s\e[0m\e[33m%s\e[0m\n", temp, buf, &net[clen]);
+                printf ("HostMin  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad (min), numtobitmap (min, len));
+		printf ("HostMax  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad (max), numtobitmap (max, len));
+                if (len < 31) {
+                        bcast = ifi->v4ad.n_broadcast;
+                        printf ("Broadcast: \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad (bcast), numtobitmap (bcast, len));
+                }
 	}
+        else {
+                printf ("HostRoute: \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad (ifi->v4ad.n_cnaddr),
+                       numtobitmap (ifi->v4ad.n_cnaddr, len));
+        }
+
+        printf ("Hosts/Net: \e[34m%-20u\e[0m  \e[35mClass %c\e[0m%s\n", num, ifi->v4ad.class, ifi->v4ad.class_remark);
 	printf ("\n");
-
-	return;
-}
-
-void
-print_cidr_bitmap_v4 (struct if_info *ifi)
-{
-	printf ("[CIDR bitmaps]\n");
-	printf ("Host address		- %s\n",
-		numtobitmap (ifi->v4ad.n_haddr));
-	printf ("Network address		- %s\n",
-		numtobitmap (ifi->v4ad.n_naddr));
-	printf ("Network mask		- %s\n",
-		numtobitmap (ifi->v4ad.n_nmask));
-	printf ("Broadcast address	- %s\n",
-		numtobitmap (ifi->v4ad.n_broadcast));
-	printf ("Cisco wildcard		- %s\n",
-		numtobitmap (ifi->v4ad.n_nmask ^ 0xffffffff));
-	printf ("Network range		- %s -\n",
-		numtobitmap (ifi->v4ad.n_naddr));
-	printf ("			  %s\n",
-		numtobitmap (ifi->v4ad.n_broadcast));
-	if (ifi->v4ad.n_naddr + 1 <= ifi->v4ad.n_broadcast - 1) {
-		printf ("Usable range		- %s -\n",
-			numtobitmap (ifi->v4ad.n_naddr + 1));
-		printf ("			  %s\n",
-			numtobitmap (ifi->v4ad.n_broadcast - 1));
-	}
-	printf ("\n");
-
-	return;
 }
 
 void
@@ -691,17 +653,13 @@ show_split_networks_v6 (struct if_info *ifi, struct sip_in6_addr splitmask, int 
 void
 print_help ()
 {
-	printf ("%s %s\n\n", NAME, VERSION);
-	printf
-	    ("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n",
-	     NAME);
+	printf ("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n", NAME);
 	printf ("Global options:\n");
 	printf ("  -a, --all\t\t\tAll possible information.\n");
 	printf ("  -d, --resolve\t\t\tEnable name resolution.\n");
 	printf ("  -h, --help\t\t\tDisplay this help.\n");
 	printf ("  -I, --addr-int=INT\t\tAdded an interface.\n");
-	printf
-	    ("  -n, --subnets=NUM\t\tDisplay NUM extra subnets (starting from\n");
+	printf ("  -n, --subnets=NUM\t\tDisplay NUM extra subnets (starting from\n");
 	printf ("\t\t\t\tthe current subnet). Will display all subnets\n");
 	printf ("\t\t\t\tin the current /24 if NUM is 0.\n");
 	printf ("  -u, --split-verbose\t\tVerbose split.\n");
@@ -710,21 +668,15 @@ print_help ()
 	printf ("  -6, --addr-ipv6=ADDR\t\tAdd an ipv6 address.\n");
 	printf ("\n");
 	printf ("IPv4 options:\n");
-	printf ("  -b, --cidr-bitmap\t\tCIDR bitmap.\n");
-	printf ("  -c, --classfull-addr\t\tClassfull address information.\n");
-	printf ("  -i, --cidr-addr\t\tCIDR address information. (default)\n");
-	printf
-	    ("  -s, --v4split=MASK\t\tSplit the current network into subnets\n");
+	printf ("  -s, --v4split=MASK\t\tSplit the current network into subnets\n");
 	printf ("\t\t\t\tof MASK size.\n");
 	printf ("  -w, --wildcard\t\tDisplay information for a wildcard\n");
 	printf ("\t\t\t\t(inverse mask).\n");
-	printf ("  -x, --classfull-bitmap\tClassfull bitmap.\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e, --v4inv6\t\t\tIPv4 compatible IPv6 information.\n");
 	printf ("  -r, --v6rev\t\t\tIPv6 reverse DNS output.\n");
-	printf
-	    ("  -S, --v6split=MASK\t\tSplit the current network into subnets\n\t\t\t\tof MASK size.\n");
+	printf ("  -S, --v6split=MASK\t\tSplit the current network into subnets\n\t\t\t\tof MASK size.\n");
 	printf ("  -t, --v6-standard\t\tStandard IPv6. (default)\n");
 	printf ("\n");
 	printf ("Address must be in the \"standard\" dotted quad format.\n");
@@ -734,14 +686,11 @@ print_help ()
 	printf (" - Hex               [0xnnnnnnnn | nnnnnnnn]\n");
 	printf ("\n");
 	printf ("Interface must be a valid network interface on the system.\n");
-	printf
-	    ("If this options is used an attempt will be made to gain the address\n");
-	printf ("and netmask from the specified interface.\n");
 	printf ("\n");
-	printf
-	    ("Replacing address/interface with '-' will use stdin for reading further\n");
+	printf ("Replacing address/interface with '-' will use stdin for reading further\n");
 	printf ("arguments.\n");
-	printf ("\n");
+	printf ("==============================================================================\n");
+	printf ("%s %s\n", NAME, VERSION);
 	printf ("Report bugs to <simon@routemeister.net>.\n");
 
 	return;
@@ -750,10 +699,7 @@ print_help ()
 void
 print_help ()
 {
-	printf ("%s %s\n\n", NAME, VERSION);
-	printf
-	    ("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n",
-	     NAME);
+	printf ("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n", NAME);
 	printf ("Global options:\n");
 	printf ("  -a\t\tAll possible information.\n");
 	printf ("  -d\t\tEnable name resolution.\n");
@@ -768,19 +714,13 @@ print_help ()
 	printf ("  -6\t\tAdd an ipv6 address.\n");
 	printf ("\n");
 	printf ("IPv4 options:\n");
-	printf ("  -b\t\tCIDR bitmap.\n");
-	printf ("  -c\t\tClassfull address information.\n");
-	printf ("  -i\t\tCIDR address information. (default)\n");
-	printf
-	    ("  -s\t\tSplit the current network into subnets of MASK size.\n");
+	printf ("  -s\t\tSplit the current network into subnets of MASK size.\n");
 	printf ("  -w\t\tDisplay information for a wildcard (inverse mask).\n");
-	printf ("  -x\t\tClassfull bitmap.\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e\t\tIPv4 compatible IPv6 information.\n");
 	printf ("  -r\t\tIPv6 reverse DNS output.\n");
-	printf
-	    ("  -S\t\tSplit the current network into subnets of MASK size.\n");
+	printf ("  -S\t\tSplit the current network into subnets of MASK size.\n");
 	printf ("  -t\t\tStandard IPv6. (default)\n");
 	printf ("\n");
 	printf ("Address must be in the \"standard\" dotted quad format.\n");
@@ -790,14 +730,11 @@ print_help ()
 	printf (" - Hex               [0xnnnnnnnn | nnnnnnnn]\n");
 	printf ("\n");
 	printf ("Interface must be a valid network interface on the system.\n");
-	printf
-	    ("If this options is used an attempt will be made to gain the address\n");
-	printf ("and netmask from the specified interface.\n");
 	printf ("\n");
-	printf
-	    ("Replacing address/interface with '-' will use stdin for reading further\n");
+	printf ("Replacing address/interface with '-' will use stdin for reading further\n");
 	printf ("arguments.\n");
-	printf ("\n");
+	printf ("==============================================================================\n");
+	printf ("%s %s\n", NAME, VERSION);
 	printf ("Report bugs to <simon@routemeister.net>.\n");
 
 	return;

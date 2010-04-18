@@ -59,22 +59,20 @@ int
 out_cmdline (struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 	     int v6args, struct misc_args m_argv6, int recurse, int index)
 {
-	int ret;
-
-	ret = 0;
+        int ret = 0;
 
 	if (ifarg_cur->type == IFT_V4) {
-		printf ("-[ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
+//		printf ("-[ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
 		ret = get_addrv4 (ifarg_cur);
 	}
 
 	if (ifarg_cur->type == IFT_V6) {
-		printf ("-[ipv6 : %s] - %d\n", ifarg_cur->cmdstr, index);
+//		printf ("-[ipv6 : %s] - %d\n", ifarg_cur->cmdstr, index);
 		ret = get_addrv6 (ifarg_cur);
 	}
 
 	if (ifarg_cur->type == IFT_INTV4 || ifarg_cur->type == IFT_INTV6) {
-		printf ("-[int-ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
+//		printf ("-[int-ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
 		if (ifarg_cur->errorstr[0] != '\0') {
 			printf ("\n-[ERR : %s]\n\n-\n", ifarg_cur->errorstr);
 			return 0;
@@ -84,7 +82,7 @@ out_cmdline (struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 	}
 
 	if (ifarg_cur->type == IFT_UNKWN) {
-		printf ("-[unknown : %s] - %d\n", ifarg_cur->cmdstr, index);
+//		printf ("-[unknown : %s] - %d\n", ifarg_cur->cmdstr, index);
 		printf ("\n-[ERR : %s]\n\n-\n", ifarg_cur->errorstr);
 		return 0;
 	}
@@ -100,31 +98,22 @@ out_cmdline (struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 
 	if (ifarg_cur->type == IFT_V4 || ifarg_cur->type == IFT_INTV4) {
 		if (!v4args)
-			v4args = CIDR_INFO;
+			v4args = V4_INFO;
 
-		printf ("\n");
-		if ((v4args & CF_INFO) == CF_INFO)
+		if ((v4args & V4_INFO) == V4_INFO)
 			print_cf_info_v4 (ifarg_cur);
-		if ((v4args & CIDR_INFO) == CIDR_INFO)
-			print_cidr_info_v4 (ifarg_cur);
-		if ((v4args & CF_BITMAP) == CF_BITMAP)
-			print_cf_bitmap_v4 (ifarg_cur);
-		if ((v4args & CIDR_BITMAP) == CIDR_BITMAP)
-			print_cidr_bitmap_v4 (ifarg_cur);
 		if ((v4args & NET_INFO) == NET_INFO)
 			show_networks_v4 (ifarg_cur, m_argv4.numnets);
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4 (ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
 		if ((v4args & C_WILDCARD) == C_WILDCARD)
 			show_c_wildcard_info_v4 (ifarg_cur);
-		printf ("-\n");
 	}
 
 	if (ifarg_cur->type == IFT_V6 || ifarg_cur->type == IFT_INTV6) {
 		if (!v6args)
 			v6args = V6_INFO;
 
-		printf ("\n");
 		if ((v6args & V6_INFO) == V6_INFO)
 			print_v6 (ifarg_cur);
 		if ((v6args & V4INV6) == V4INV6)
@@ -133,7 +122,6 @@ out_cmdline (struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 			print_rev_v6 (ifarg_cur);
 		if ((v6args & V6SPLIT) == V6SPLIT)
 			show_split_networks_v6 (ifarg_cur, m_argv6.v6splitmask, v6args, m_argv6);
-		printf ("-\n");
 	}
 
 	return 0;
@@ -680,15 +668,11 @@ main (int argc, char *argv[])
 #ifdef HAVE_GETOPT_LONG
 	static struct option l_o[] = {
 		{"all", no_argument, 0, 'a'},
-		{"cidr-bitmap", no_argument, 0, 'b'},
-		{"classfull-addr", no_argument, 0, 'c'},
 		{"help", no_argument, 0, 'h'},
-		{"cidr-addr", no_argument, 0, 'i'},
 		{"subnets", required_argument, 0, 'n'},
 		{"v4split", required_argument, 0, 's'},
 		{"v6-standard", no_argument, 0, 't'},
 		{"version", no_argument, 0, 'v'},
-		{"classfull-bitmap", no_argument, 0, 'x'},
 		{"addr-ipv4", required_argument, 0, '4'},
 		{"addr-ipv6", required_argument, 0, '6'},
 		{"addr-int", required_argument, 0, 'I'},
@@ -707,8 +691,11 @@ main (int argc, char *argv[])
 	}
 
 	parse_stdin = 0;
-	v4args = 0;
-	v6args = 0;
+	/*
+	 * Our default v4 and v6 options, hopefully what's mostly used.
+	 */
+        v4args = V4_INFO;
+        v6args = V6_INFO;
 	m_argv4.splitmask = 0;
 	m_argv4.numnets = 0;
 	m_argv6.splitmask = 0;
@@ -740,23 +727,15 @@ main (int argc, char *argv[])
 	 */
 #ifdef HAVE_GETOPT_LONG
 	while ((ch =
-		getopt_long (argc, argv, "abcdehHiI:n:rs:S:tuvVwx4:6:", l_o,
+		getopt_long (argc, argv, "adehHI:n:rs:S:tuvVw4:6:", l_o,
 			     NULL)) != -1) {
 #else
-	while ((ch = getopt (argc, argv, "abcdehHiI:n:rs:S:tuvVwx4:6:")) != -1) {
+	while ((ch = getopt (argc, argv, "adehHI:n:rs:S:tuvVw4:6:")) != -1) {
 #endif
 		switch (ch) {
 		case 'a':
-			v4args =
-			    v4args | CF_INFO | CF_BITMAP | CIDR_INFO |
-			    CIDR_BITMAP | NET_INFO;
-			v6args = v6args | V6_INFO | V4INV6 | V6REV;
-			break;
-		case 'b':
-			v4args = v4args | CIDR_BITMAP;
-			break;
-		case 'c':
-			v4args = v4args | CF_INFO;
+			v4args |= V4_INFO | NET_INFO;
+			v6args |= V6_INFO | V4INV6 | V6REV;
 			break;
 		case 'd':
 			resolve = 1;
@@ -765,26 +744,23 @@ main (int argc, char *argv[])
 #endif
 			break;
 		case 'e':
-			v6args = v6args | V4INV6;
+			v6args |= V4INV6;
 			break;
 		case 'h':
 		case 'H':
 			print_help ();
 			return 0;
-		case 'i':
-			v4args = v4args | CIDR_INFO;
-			break;
 		case 'n':
-			v4args = v4args | NET_INFO;
+			v4args |= NET_INFO;
 			m_argv4.numnets = atoi (optarg);
 			break;
 		case 'r':
-			v6args = v6args | V6REV;
+			v6args |= V6REV;
 			break;
 		case 's':
 			y = getsplitnumv4 (optarg, &m_argv4.splitmask);
 			if (!y) {
-				v4args = v4args | V4SPLIT;
+				v4args |= V4SPLIT;
 			} else {
 				printf
 				    ("-[ERR : Invalid IPv4 splitmask, unable to split]\n");
@@ -794,7 +770,7 @@ main (int argc, char *argv[])
 		case 'S':
 			y = getsplitnumv6 (optarg, &m_argv6.v6splitmask, &m_argv6.v6splitnum);
 			if (!y) {
-				v6args = v6args | V6SPLIT;
+				v6args |= V6SPLIT;
 			} else {
 				printf
 				    ("-[ERR : Invalid IPv6 splitmask, unable to split]\n");
@@ -802,21 +778,18 @@ main (int argc, char *argv[])
 			}
 			break;
 		case 't':
-			v6args = v6args | V6_INFO;
+			v6args |= V6_INFO;
 			break;
 		case 'u':
-			v4args = v4args | V4VERBSPLIT;
-			v6args = v6args | V6VERBSPLIT;
+			v4args |= V4VERBSPLIT;
+			v6args |= V6VERBSPLIT;
 			break;
 		case 'v':
 		case 'V':
 			print_version ();
 			return 0;
 		case 'w':
-			v4args = v4args | C_WILDCARD;
-			break;
-		case 'x':
-			v4args = v4args | CF_BITMAP;
+			v4args |= C_WILDCARD;
 			break;
 		case '?':
 			printf ("Try '%s -h' for more information.\n", NAME);
@@ -854,7 +827,7 @@ main (int argc, char *argv[])
 		}
 	}
 
-	if (!v4args && !v6args && (split_errv4 || split_errv6)) {
+	if (split_errv4 || split_errv6) {
 		printf ("-[ERR : No valid commands recieved]\n");
 		free_boxargs (abox_start);
 		return -1;
@@ -863,13 +836,6 @@ main (int argc, char *argv[])
 		printf ("\n");
 
 	argcount = optind;
-	/*
-	 * Our default v4 and v6 options, hopefully what's mostly used.
-	 */
-	if (!v4args)
-		v4args = CIDR_INFO;
-	if (!v6args)
-		v6args = V6_INFO;
 	if (m_argv4.numnets < 1)
 		m_argv4.numnets = -1;
 

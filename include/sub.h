@@ -177,10 +177,7 @@ struct dnsresp {
 #define IFT_UNKWN 5
 
 /* v4 args */
-#define CF_INFO     0x01
-#define CF_BITMAP   0x02
-#define CIDR_INFO   0x04
-#define CIDR_BITMAP 0x08
+#define V4_INFO     0x01
 #define NET_INFO    0x10
 #define V4SPLIT     0x20
 #define V4VERBSPLIT 0x40
@@ -220,7 +217,7 @@ int getsplitnumv4 (char *buf, u_int32_t * splitmask);
 int getsplitnumv6 (char *buf, struct sip_in6_addr *splitmask, int *v6splitnum);
 int quadtonum (char *quad, u_int32_t * num);
 char *numtoquad (u_int32_t num);
-char *numtobitmap (u_int32_t num);
+char *numtobitmap (u_int32_t num, u_int32_t prefix_len);
 int parse_addr (struct if_info *ifi);
 int get_addrv4 (struct if_info *ifi);
 int get_addrv6 (struct if_info *ifi);

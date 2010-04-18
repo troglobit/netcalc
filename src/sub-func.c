@@ -345,19 +345,17 @@ numtoquad (u_int32_t num)
 
 	for (x = 0; x < 4; x++)
 		a[x] = num >> (8 * (3 - x)) & 0xff;
-	bzero ((char *) quad, 17);
-	snprintf (quad, 16, "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
+	snprintf (quad, sizeof(quad), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
 
 	return quad;
 }
 
 char *
-numtobitmap (u_int32_t num)
+numtobitmap (u_int32_t num, u_int32_t prefix_len)
 {
-	static char bitmap[36];
+	static char bitmap[100];
 	int x, y, z;
 
-	bzero ((char *) bitmap, 36);
 	y = 1;
 	z = 0;
 	for (x = 0; x < 32; x++) {
@@ -366,10 +364,11 @@ numtobitmap (u_int32_t num)
 		else
 			bitmap[z] = '1';
 		if (y == 8 && z < 34) {
-			z++;
-			bitmap[z] = '.';
+			bitmap[++z] = '.';
 			y = 0;
 		}
+                if (x == prefix_len - 1)
+                   bitmap[++z] = ' ';
 		y++;
 		z++;
 	}
@@ -523,21 +522,23 @@ get_addrv4 (struct if_info *ifi)
 	if ((x & 0xe0) == 0xc0) {
 		ifi->v4ad.class = 'C';
 		ifi->v4ad.n_cnmask = 0xffffff00;
+                y = ifi->v4ad.n_haddr >> 16;
+                if (x == 192 && (y & 0xF8) == 168)
+                   snprintf (ifi->v4ad.class_remark, 64, ", Private intranet");
 	}
 	if ((x & 0xf0) == 0xe0) {
 		ifi->v4ad.class = 'D';
-		snprintf (ifi->v4ad.class_remark, 64, " (multicast network)");
+		snprintf (ifi->v4ad.class_remark, 64, ", Multicast");
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 	}
 	if ((x & 0xf8) == 0xf0) {
 		ifi->v4ad.class = 'E';
-		snprintf (ifi->v4ad.class_remark, 64,
-			  " (reserved for future use)");
+		snprintf (ifi->v4ad.class_remark, 64, ", Reserved for future use");
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 	}
 	if (ifi->v4ad.class == '\0') {
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
-		snprintf (ifi->v4ad.class_remark, 64, "Nonexistant");
+		snprintf (ifi->v4ad.class_remark, 64, ", Nonexistent");
 	}
 
 	/*
