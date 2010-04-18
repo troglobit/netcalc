@@ -96,7 +96,7 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
                         char buf[30];
 
                         snprintf (buf, sizeof(buf), "%s", numtoquad (start));
-                        printf ("Network  : \e[34m%-*s - %-15s\e[0m", maxlen, buf, numtoquad (end));
+                        printf ("Network  : \e[34m%-*s - %-15s\e[0m  ", maxlen, buf, numtoquad (end));
                         printf ("Netmask: \e[34m%s\e[0m\n", numtoquad (splitmask));
 		}
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
