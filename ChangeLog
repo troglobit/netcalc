@@ -1,3 +1,8 @@
+Mon Jan 14 19:39:00 CET 2013
+  * Fix multiple buffer overflows. Patch from Jaromir Capik.
+  * Fix multiple spelling errors. Suggestions from Ross Richardson.
+  * Version 1.1.6
+
 Mon Jul 20 22:38:14 CET 2009
   * Compilation fix for GCC 4.4, patch from Artem Zolochevskiy.
   * Compilation fix Sun Studio 11 on Solaris 8 x86, patch from Ian Dickinson.

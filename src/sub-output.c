@@ -135,11 +135,11 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
 			printf ("%s\n", numtoquad (end));
 		}
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
-			bzero ((char *) ifi_tmp.p_v4addr, 19);
-			bzero ((char *) ifi_tmp.p_v4nmask, 16);
-			bzero ((char *) ifi_tmp.p_v6addr, 44);
-			snprintf (ifi_tmp.p_v4addr, 19, "%s", numtoquad (start));
-			snprintf (ifi_tmp.p_v4nmask, 16, "%s", numtoquad (splitmask));
+			safe_bzero (ifi_tmp.p_v4addr);
+			safe_bzero (ifi_tmp.p_v4nmask);
+			safe_bzero (ifi_tmp.p_v6addr);
+			safe_snprintf (ifi_tmp.p_v4addr, "%s", numtoquad (start));
+			safe_snprintf (ifi_tmp.p_v4nmask, "%s", numtoquad (splitmask));
 		}
 		start += diff;
 		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
@@ -198,7 +198,7 @@ show_networks_v4 (struct if_info *ifi, int count)
 void
 print_cf_info_v4 (struct if_info *ifi)
 {
-	printf ("[Classfull]\n");
+	printf ("[Classful]\n");
 	printf ("Host address		- %s\n", numtoquad (ifi->v4ad.n_haddr));
 	printf ("Host address (decimal)	- %u\n", ifi->v4ad.n_haddr);
 	printf ("Host address (hex)	- %X\n", ifi->v4ad.n_haddr);
@@ -220,7 +220,7 @@ print_cf_info_v4 (struct if_info *ifi)
 void
 print_cf_bitmap_v4 (struct if_info *ifi)
 {
-	printf ("[Classfull bitmaps]\n");
+	printf ("[Classful bitmaps]\n");
 	printf ("Network address		- %s\n",
 		numtobitmap (ifi->v4ad.n_cnaddr));
 	printf ("Network mask		- %s\n",
@@ -447,11 +447,11 @@ print_revdns_v6 (struct sip_in6_addr addr) {
 	char inbuf[40], outbuf[256];
 	int x, y;
 
-	bzero ((char *) inbuf, 40);
-	bzero ((char *) outbuf, 256);
+	safe_bzero (inbuf);
+	safe_bzero (outbuf);
 
-	snprintf
-	(inbuf, 39, "%04x%04x%04x%04x%04x%04x%04x%04x",
+	safe_snprintf
+	(inbuf, "%04x%04x%04x%04x%04x%04x%04x%04x",
 	 addr.sip6_addr16[0],
 	 addr.sip6_addr16[1],
 	 addr.sip6_addr16[2],
@@ -467,7 +467,7 @@ print_revdns_v6 (struct sip_in6_addr addr) {
 		y += 2;
 	}
 
-	strcat (outbuf, "ip6.arpa.");
+	safe_strncat (outbuf, "ip6.arpa.");
 
 	printf("%s", outbuf);
 }
@@ -642,10 +642,10 @@ show_split_networks_v6 (struct if_info *ifi, struct sip_in6_addr splitmask, int 
 		}
 
 		if ((v6args & V6VERBSPLIT) == V6VERBSPLIT) {
-			bzero ((char *) ifi_tmp.p_v4addr, 19);
-			bzero ((char *) ifi_tmp.p_v4nmask, 16);
-			bzero ((char *) ifi_tmp.p_v6addr, 44);
-			snprintf (ifi_tmp.p_v6addr, 44, "%s/%d", get_comp_v6 (start), m_argv6.v6splitnum);
+			safe_bzero (ifi_tmp.p_v4addr);
+			safe_bzero (ifi_tmp.p_v4nmask);
+			safe_bzero (ifi_tmp.p_v6addr);
+			safe_snprintf (ifi_tmp.p_v6addr, "%s/%d", get_comp_v6 (start), m_argv6.v6splitnum);
 		}
 
 		v6plus (&start, &sdiff);
@@ -711,14 +711,14 @@ print_help ()
 	printf ("\n");
 	printf ("IPv4 options:\n");
 	printf ("  -b, --cidr-bitmap\t\tCIDR bitmap.\n");
-	printf ("  -c, --classfull-addr\t\tClassfull address information.\n");
+	printf ("  -c, --classful-addr\t\tClassful address information.\n");
 	printf ("  -i, --cidr-addr\t\tCIDR address information. (default)\n");
 	printf
 	    ("  -s, --v4split=MASK\t\tSplit the current network into subnets\n");
 	printf ("\t\t\t\tof MASK size.\n");
 	printf ("  -w, --wildcard\t\tDisplay information for a wildcard\n");
 	printf ("\t\t\t\t(inverse mask).\n");
-	printf ("  -x, --classfull-bitmap\tClassfull bitmap.\n");
+	printf ("  -x, --classful-bitmap\tClassful bitmap.\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e, --v4inv6\t\t\tIPv4 compatible IPv6 information.\n");
@@ -769,12 +769,12 @@ print_help ()
 	printf ("\n");
 	printf ("IPv4 options:\n");
 	printf ("  -b\t\tCIDR bitmap.\n");
-	printf ("  -c\t\tClassfull address information.\n");
+	printf ("  -c\t\tClassful address information.\n");
 	printf ("  -i\t\tCIDR address information. (default)\n");
 	printf
 	    ("  -s\t\tSplit the current network into subnets of MASK size.\n");
 	printf ("  -w\t\tDisplay information for a wildcard (inverse mask).\n");
-	printf ("  -x\t\tClassfull bitmap.\n");
+	printf ("  -x\t\tClassful bitmap.\n");
 	printf ("\n");
 	printf ("IPv6 options:\n");
 	printf ("  -e\t\tIPv4 compatible IPv6 information.\n");
@@ -818,7 +818,7 @@ print_version ()
 	printf ("%s %s\n", NAME, VERSION);
 	printf ("Written by Simon Ekstrand.\n");
 	printf ("\n");
-	printf ("Copyright (C) 2003-2005 Simon Ekstrand.\n");
+	printf ("Copyright (C) 2003-2013 Simon Ekstrand.\n");
 	printf
 	    ("This is free software; see the source for copying conditions.  There is NO\n");
 	printf
