@@ -37,8 +37,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sub.h"
-#include "sub-o.h"
+#include "netcalc.h"
+#include "output.h"
 
 #define ARGLEN 128
 

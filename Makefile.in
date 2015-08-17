@@ -95,8 +95,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_netcalc_OBJECTS = sub-func.$(OBJEXT) sub-output.$(OBJEXT) \
-	sub.$(OBJEXT) strlcpy.$(OBJEXT) strlcat.$(OBJEXT)
+am_netcalc_OBJECTS = netcalc.$(OBJEXT) output.$(OBJEXT) misc.$(OBJEXT) \
+	strlcpy.$(OBJEXT) strlcat.$(OBJEXT)
 netcalc_OBJECTS = $(am_netcalc_OBJECTS)
 netcalc_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -290,7 +290,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = configure
 doc_DATA = README.md LICENSE
-netcalc_SOURCES = sub-func.c sub-output.c sub.c strlcpy.c strlcat.c
+netcalc_SOURCES = netcalc.c output.c misc.c strlcpy.c strlcat.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -398,11 +398,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netcalc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcpy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub-func.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub-output.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -789,10 +789,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-docDATA
 	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-am uninstall-binPROGRAMS uninstall-docDATA
 
-
-sub-func.o: sub-func.c sub.h sub-o.h
-sub-output.o: sub-output.c sub.h
-sub.o: sub.c sub.h sub-o.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

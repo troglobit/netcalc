@@ -3,13 +3,16 @@
  * Copyright (c) 2010-2015  Joachim Nilsson
  */
 
-#ifndef SUB_H
-#define SUB_H
+#ifndef NETCALC_H_
+#define NETCALC_H_
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
+#else
+#include <sys/types.h>		/* u_intN_t */
 #endif
 #include <net/if.h>		/* IFNAMSIZ */
 
@@ -150,10 +153,7 @@ struct argbox {
 #define V6TYPE_V4INV6 2
 
 /*
- * prototypes
- */
-/*
- * sub.c
+ * netcalc.c
  */
 int out_int(struct if_info *if_cur, struct if_info *ifarg_cur, int v4args,
 	    struct misc_args m_argv4, int v6args, struct misc_args m_argv6);
@@ -163,32 +163,44 @@ int cleanline(char *sbuf, char *dbuf);
 int get_stdin(char *args[]);
 
 /*
- * sub-func.c
+ * misc.c
  */
 int count(char *buf, char ch);
-int validate_v4addr(char *addr);
+
+int validate_v4addr (char *addr);
 int validate_netmask(char *in_addr);
+
 int getsplitnumv4(char *buf, uint32_t * splitmask);
 int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum);
+
 int quadtonum(char *quad, uint32_t * num);
 char *numtoquad(uint32_t num);
 char *numtobitmap(uint32_t num, uint32_t prefix_len);
 uint32_t numtolen(uint32_t num);
+
 int parse_addr(struct if_info *ifi);
+
 int get_addrv4(struct if_info *ifi);
 int get_addrv6(struct if_info *ifi);
+
 int split_ipv6addr(char *addr, struct ipv6_split *spstr);
 int validate_s_v6addr(char *addr, int type);
+
 int getcolon(char *addr, int pos, int type);
+
 int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type);
 int v6masktonum(char *nmask, int *nmaskbits, struct sip_in6_addr *in6_addr);
+
 int validate_v6addr(char *addr);
+
 int v6addrtoprefix(struct v6addr *in6_addr);
 int v6addrtosuffix(struct v6addr *in6_addr);
 int v6addrtobroadcast(struct v6addr *in6_addr);
+
 void v6_type(struct v6addr *in6_addr);
 void v6_comment(struct v6addr *in6_addr);
 int v6verifyv4(struct sip_in6_addr addr);
+
 char *get_comp_v6(struct sip_in6_addr addr);
 int mk_ipv6addr(struct v6addr *in6_addr, char *addr);
 
@@ -198,8 +210,7 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr);
 size_t strlcpy(char *dst, const char *src, size_t siz);
 size_t strlcat(char *dst, const char *src, size_t siz);
 
-
-#endif /* SUB_H */
+#endif /* NETCALC_H_ */
 
 /**
  * Local Variables:

@@ -585,7 +585,7 @@ PACKAGE_STRING='netcalc 2.0-alpha1'
 PACKAGE_BUGREPORT='https://github.com/troglobit/netcalc/issues'
 PACKAGE_URL=''
 
-ac_unique_file="sub.c"
+ac_unique_file="netcalc.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

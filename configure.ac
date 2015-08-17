@@ -3,7 +3,7 @@ AC_INIT([netcalc],[2.0-alpha1],[https://github.com/troglobit/netcalc/issues])
 AM_INIT_AUTOMAKE([foreign])
 AM_SILENT_RULES([yes])
 
-AC_CONFIG_SRCDIR([sub.c])
+AC_CONFIG_SRCDIR([netcalc.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([Makefile])
 

@@ -30,7 +30,9 @@
 #endif
 #include <stdio.h>
 #include <string.h>
-#include "sub.h"
+
+#include "netcalc.h"
+
 
 void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4)
 {

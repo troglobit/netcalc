@@ -3,12 +3,9 @@
  * Copyright (c) 2010-2015  Joachim Nilsson
  */
 
-#ifndef SUB_O_H
-#define SUB_O_H
+#ifndef NETCALC_OUTPUT_H_
+#define NETCALC_OUTPUT_H_
 
-/*
- * prototypes
- */
 void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4);
 int show_networks_v4(struct if_info *ifi, int count);
 void print_cf_info_v4(struct if_info *ifi);
@@ -26,7 +23,7 @@ void print_short_help(void);
 void print_help(void);
 void print_version(void);
 
-#endif				/* SUB_O_H */
+#endif /* NETCALC_OUTPUT_H_ */
 
 /**
  * Local Variables:
