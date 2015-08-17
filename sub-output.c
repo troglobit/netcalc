@@ -89,7 +89,7 @@ show_split_networks_v4 (struct if_info *ifi, u_int32_t splitmask, int v4args, st
                         char buf[30];
 
                         snprintf (buf, sizeof(buf), "%s", numtoquad (start));
-                        printf ("Network  : \e[34m%-*s - %-15s\e[0m  ", maxlen, buf, numtoquad (end));
+                        printf ("Network  : \e[34m%-*s - %-15s\e[0m  ", (int)maxlen, buf, numtoquad (end));
                         printf ("Netmask: \e[34m%s\e[0m\n", numtoquad (splitmask));
 		}
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
@@ -159,8 +159,8 @@ show_networks_v4 (struct if_info *ifi, int count)
 
 	printf ("[Networks/%d]\n", len);
 	while (count) {
-                printf ("Network  : \e[34m%-*s - ", startlen, numtoquad (start));
-                printf ("%-*s\e[0m", endlen, numtoquad (end));
+                printf ("Network  : \e[34m%-*s - ", (int)startlen, numtoquad (start));
+                printf ("%-*s\e[0m", (int)endlen, numtoquad (end));
                 printf ("  Netmask: \e[34m%s\e[0m\n", numtoquad (ifi->v4ad.n_nmask));
 
 		start += diff;
@@ -234,7 +234,7 @@ print_cf_info_v4 (struct if_info *ifi)
 
         printf ("Hosts/Net: \e[34m%-20u\e[0m  ", num);
         if (ifi->v4ad.class == 'I') /* Invalid */
-                printf ("\e[35mClass Invalid", ifi->v4ad.class);
+                printf ("\e[35mClass Invalid");
         else
                 printf ("\e[35mClass %c", ifi->v4ad.class);
         printf ("\e[0m%s\n", ifi->v4ad.class_remark);
