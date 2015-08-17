@@ -26,10 +26,9 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "sub.h"
 
@@ -585,51 +584,6 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 	return;
 }
 
-#ifdef HAVE_GETOPT_LONG
-void print_help(void)
-{
-	printf("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n", NAME);
-	printf("Global options:\n");
-	printf("  -a, --all\t\t\tAll possible information.\n");
-	printf("  -d, --resolve\t\t\tEnable name resolution.\n");
-	printf("  -h, --help\t\t\tDisplay this help.\n");
-	printf("  -I, --addr-int=INT\t\tAdded an interface.\n");
-	printf("  -n, --subnets=NUM\t\tDisplay NUM extra subnets (starting from\n");
-	printf("\t\t\t\tthe current subnet). Will display all subnets\n");
-	printf("\t\t\t\tin the current /24 if NUM is 0.\n");
-	printf("  -u, --split-verbose\t\tVerbose split.\n");
-	printf("  -v, --version\t\t\tVersion information.\n");
-	printf("  -4, --addr-ipv4=ADDR\t\tAdd an ipv4 address.\n");
-	printf("  -6, --addr-ipv6=ADDR\t\tAdd an ipv6 address.\n");
-	printf("\n");
-	printf("IPv4 options:\n");
-	printf("  -b, --cidr-bitmap\t\tCIDR bitmap.\n");
-	printf("  -c, --classful-addr\t\tClassful address information.\n");
-	printf("  -i, --cidr-addr\t\tCIDR address information. (default)\n");
-	printf("  -s, --v4split=MASK\t\tSplit the current network into subnets\n");
-	printf("\t\t\t\tof MASK size.\n");
-	printf("  -w, --wildcard\t\tDisplay information for a wildcard\n");
-	printf("\t\t\t\t(inverse mask).\n");
-	printf("  -x, --classful-bitmap\tClassful bitmap.\n");
-	printf("\n");
-	printf("IPv6 options:\n");
-	printf("  -e, --v4inv6\t\t\tIPv4 compatible IPv6 information.\n");
-	printf("  -r, --v6rev\t\t\tIPv6 reverse DNS output.\n");
-	printf("  -S, --v6split=MASK\t\tSplit the current network into subnets\n\t\t\t\tof MASK size.\n");
-	printf("  -t, --v6-standard\t\tStandard IPv6. (default)\n");
-	printf("\n");
-	printf("Address must be in dotted quad forma, but the netmask can be given in three\n"
-	       "different ways:\n"
-	       " - Number of bits    [/nn]\n"
-	       " - Dotted quad       [nnn.nnn.nnn.nnn]\n"
-	       " - Hex               [0xnnnnnnnn | nnnnnnnn]\n"
-	       "\n"
-	       "Interface must be a valid network interface on the system.  Replacing address,\n"
-	       "or interface, with '-' will use stdin for reading further arguments.\n");
-
-	return;
-}
-#else				/* ! HAVE_GETOPT_LONG */
 void print_help(void)
 {
 	printf("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n", NAME);
@@ -670,7 +624,6 @@ void print_help(void)
 
 	return;
 }
-#endif				/* HAVE_GETOPT_LONG */
 
 void print_short_help(void)
 {

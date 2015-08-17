@@ -26,21 +26,17 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
-#include <stdio.h>
-#ifdef STDC_HEADERS
-#include <stdlib.h>
-#endif
-#include <string.h>
-#include <sys/types.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#if defined(HAVE_GETOPT_LONG) && defined(HAVE_GETOPT_H)
-#define _GNU_SOURCE
-#include <getopt.h>
+#ifdef STDC_HEADERS
+#include <stdlib.h>
 #endif
+#include <stdio.h>
+#include <string.h>
+
 #include "sub.h"
 #include "sub-o.h"
 
@@ -467,28 +463,7 @@ int main(int argc, char *argv[])
 	char oldcmdstr[ARGLEN] = "";
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
 	char *stdinarg[3];
-#ifdef HAVE_GETOPT_LONG
-	static struct option l_o[] = {
-		{"all", no_argument, 0, 'a'},
-		{"cidr-bitmap", no_argument, 0, 'b'},
-		{"classful-addr", no_argument, 0, 'c'},
-		{"help", no_argument, 0, 'h'},
-		{"subnets", required_argument, 0, 'n'},
-		{"v4split", required_argument, 0, 's'},
-		{"v6-standard", no_argument, 0, 't'},
-		{"version", no_argument, 0, 'v'},
-		{"classful-bitmap", no_argument, 0, 'x'},
-		{"addr-ipv4", required_argument, 0, '4'},
-		{"addr-ipv6", required_argument, 0, '6'},
-		{"addr-int", required_argument, 0, 'I'},
-		{"v4inv6", no_argument, 0, 'e'},
-		{"v6split", required_argument, 0, 'S'},
-		{"v6rev", no_argument, 0, 'r'},
-		{"split-verbose", no_argument, 0, 'u'},
-		{"resolve", no_argument, 0, 'd'},
-		{0, 0, 0, 0}
-	};
-#endif
+
 	if (argc < 2) {
 		print_short_help();
 		return 0;
@@ -524,11 +499,7 @@ int main(int argc, char *argv[])
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
-#ifdef HAVE_GETOPT_LONG
-	while ((ch = getopt_long(argc, argv, "adehHI:n:rs:S:tuvV4:6:", l_o, NULL)) != -1) {
-#else
 	while ((ch = getopt(argc, argv, "adehHI:n:rs:S:tuvV4:6:")) != -1) {
-#endif
 		switch (ch) {
 		case 'a':
 			v4args |= V4_INFO | NET_INFO;

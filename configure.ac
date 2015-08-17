@@ -13,33 +13,7 @@ AC_PROG_INSTALL
 dnl - Configuration.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h stdint.h)
-
-AC_CHECK_FUNCS(strstr strtol strtoul)
-
-dnl Check if getopt_long is available.
-AC_DEFUN([sii_GETOPT_LONG],
-[
-  AC_CHECK_HEADERS(getopt.h,
-  [
-    AC_DEFINE(HAVE_GETOPT_H, 1, getopt_h)
-  ],
-  [
-    if test -f /usr/local/include/getopt.h;
-    then
-      echo checking for getopt.h in /usr/local/include... yes
-      AC_DEFINE(HAVE_GETOPT_H, 1, getopt_h)
-    fi
-  ])
-  AC_CHECK_FUNCS(getopt_long,,
-  [
-    AC_CHECK_LIB(gnugetopt, getopt_long,
-    [
-      AC_DEFINE(HAVE_GETOPT_LONG, 1, getopt_long)
-      LIBS="$LIBS -lgnugetopt"
-    ])
-  ])
-])
-
+AC_CHECK_FUNCS(strstr strtol strtoul getopt)
 
 dnl Check for uint[8,16,32]_t
 AC_TYPE_UINT8_T
