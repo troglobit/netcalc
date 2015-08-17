@@ -37,142 +37,53 @@
 void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4)
 {
 	uint32_t diff, start, end;
-	struct if_info ifi_tmp;
-	int v4args_tmp;
-	size_t maxlen;
-
-	v4args_tmp = 0;
-
-	if ((v4args & V4VERBSPLIT) == V4VERBSPLIT)
-		printf("[Split network/%d - verbose]\n", numtolen(splitmask));
-	else
-		printf("[Split network/%d]\n", numtolen(splitmask));
+	size_t maxlen = 0;
 
 	if (splitmask < ifi->v4ad.n_nmask) {
-		fprintf(stderr, "Cannot subnet to /%d with this base network, use a prefix len > /%d\n",
-			numtolen(splitmask), numtolen(ifi->v4ad.n_nmask));
+		warnx("Cannot subnet to /%d with this base network, use a prefix len > /%d",
+		      numtolen(splitmask), numtolen(ifi->v4ad.n_nmask));
 		return;
 	}
-	diff = 0xffffffff - splitmask + 1;
+
+	printf("[Split network/%d]\n", numtolen(splitmask));
+
+	diff  = 0xffffffff - splitmask + 1;
 	start = ifi->v4ad.n_naddr;
-	end = ifi->v4ad.n_naddr + diff - 1;
+	end   = ifi->v4ad.n_naddr + diff - 1;
 
-	if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
-		memcpy((struct if_info *)&ifi_tmp, (struct if_info *)ifi, sizeof(struct if_info));
-		v4args_tmp = v4args ^ V4SPLIT;
-		v4args_tmp = v4args_tmp ^ V4VERBSPLIT;
-		if (!v4args_tmp)
-			v4args_tmp = V4_INFO;
-		ifi_tmp.next = NULL;
-	} else {
-		/* Figure out max width of a network string. */
-		while (1) {
-			char buf[30];
-			size_t len;
+	/* Figure out max width of a network string. */
+	while (1) {
+		char buf[30];
+		size_t len;
 
-			len = snprintf(buf, sizeof(buf), "%s", numtoquad(start));
-			if (len > maxlen)
-				maxlen = len;
+		len = snprintf(buf, sizeof(buf), "%s", numtoquad(start));
+		if (len > maxlen)
+			maxlen = len;
 
-			start += diff;
-			if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
-				break;
-			end += diff;
-		}
+		start += diff;
+		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
+			break;
+		end += diff;
 	}
 
 	start = ifi->v4ad.n_naddr;
 	end = ifi->v4ad.n_naddr + diff - 1;
 	while (1) {
-		if ((v4args & V4VERBSPLIT) != V4VERBSPLIT) {
-			char buf[30];
+		char buf[30];
 
-			snprintf(buf, sizeof(buf), "%s", numtoquad(start));
-			printf("Network  : \e[34m%-*s - %-15s\e[0m  ", (int)maxlen, buf, numtoquad(end));
-			printf("Netmask: \e[34m%s\e[0m\n", numtoquad(splitmask));
-		}
-		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
-			memset(ifi_tmp.p_v6addr, 0, sizeof(ifi_tmp.p_v6addr));
-			snprintf(ifi_tmp.p_v4addr, sizeof(ifi_tmp.p_v4addr), "%s", numtoquad(start));
-			snprintf(ifi_tmp.p_v4nmask, sizeof(ifi_tmp.p_v4nmask), "%s", numtoquad(splitmask));
-		}
+		snprintf(buf, sizeof(buf), "%s", numtoquad(start));
+		printf("Network  : \e[34m%-*s - %-15s\e[0m  ", (int)maxlen, buf, numtoquad(end));
+		printf("Netmask  : \e[34m%s\e[0m\n", numtoquad(splitmask));
+
 		start += diff;
 		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
 			break;
 		end += diff;
-
-		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT)
-			out_cmdline(&ifi_tmp, v4args_tmp, m_argv4, 0, m_argv4, 1, 0);
 	}
 
 	printf("\n");
 
 	return;
-}
-
-int show_networks_v4(struct if_info *ifi, int count)
-{
-	int lcount = count;
-	size_t startlen = 0, endlen = 0;
-	uint32_t diff, start, end, len;
-	uint32_t lstart, lend;
-
-	diff = 0xffffffff - ifi->v4ad.n_nmask + 1;
-	len = ifi->v4ad.n_nmaskbits;
-	if (len >= 31) {
-		start = ifi->v4ad.n_naddr & ifi->v4ad.n_nmask;
-		end = start;
-		if (len == 31)
-			end++;
-	} else {
-		start = ifi->v4ad.n_naddr;
-		end = ifi->v4ad.n_broadcast;
-	}
-	lstart = start;
-	lend = end;
-
-	/* Figure out max width of a network string. */
-	while (lcount) {
-		char buf[30];
-		size_t len;
-
-		len = snprintf(buf, sizeof(buf), "%s", numtoquad(lstart));
-		if (len > startlen)
-			startlen = len;
-
-		len = snprintf(buf, sizeof(buf), "%s", numtoquad(lend));
-		if (len > endlen)
-			endlen = len;
-
-		lstart += diff;
-		if (lend == 0xffffffff)
-			break;
-		if ((lend & 0x000000ff) == 0xff && lcount == -1)
-			break;
-		lend += diff;
-		if (lcount > 0)
-			lcount--;
-	}
-
-	printf("[Networks/%d]\n", len);
-	while (count) {
-		printf("Network  : \e[34m%-*s - ", (int)startlen, numtoquad(start));
-		printf("%-*s\e[0m", (int)endlen, numtoquad(end));
-		printf("  Netmask: \e[34m%s\e[0m\n", numtoquad(ifi->v4ad.n_nmask));
-
-		start += diff;
-		if (end == 0xffffffff)
-			break;
-		if ((end & 0x000000ff) == 0xff && count == -1)
-			break;
-		end += diff;
-		if (count > 0)
-			count--;
-	}
-
-	printf("\n");
-
-	return 0;
 }
 
 void print_cf_info_v4(struct if_info *ifi)
@@ -488,15 +399,6 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 {
 	struct sip_in6_addr sdiff, ediff, start, end, tmpaddr;
 	int x, y, z;
-	struct if_info ifi_tmp;
-	int v6args_tmp;
-
-	v6args_tmp = 0;
-
-	if ((v6args & V6VERBSPLIT) == V6VERBSPLIT)
-		printf("[Split network - verbose]\n");
-	else
-		printf("[Split network]\n");
 
 	x = 0;
 	y = 0;
@@ -507,10 +409,13 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 			y = 2;
 		x++;
 	} while (x < 8 && !y);
+
 	if (y == 2) {
-		printf("-[ERR : Oversized splitmask]\n\n");
+		warnx("Oversized splitmask");
 		return;
 	}
+
+	printf("[Split network]\n");
 
 	for (x = 0; x < 8; x++) {
 		if (splitmask.sip6_addr16)
@@ -524,30 +429,13 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 	tmpaddr.sip6_addr16[7] = 1;
 	v6plus(&sdiff, &tmpaddr);
 
-	if ((v6args & V6VERBSPLIT) == V6VERBSPLIT) {
-		memcpy((struct if_info *)&ifi_tmp, (struct if_info *)ifi, sizeof(struct if_info));
-		v6args_tmp = v6args ^ V6SPLIT;
-		v6args_tmp = v6args_tmp ^ V6VERBSPLIT;
-		if (!v6args_tmp)
-			v6args_tmp = V6_INFO;
-		ifi_tmp.next = NULL;
-	}
-
 	x = 0;
 	while (!x) {
-		if ((v6args & V6VERBSPLIT) != V6VERBSPLIT) {
-			printf("Network			- ");
-			print_exp_v6(start);
-			printf(" -\n\t\t\t  ");
-			print_exp_v6(end);
-			printf("\n");
-		}
-
-		if ((v6args & V6VERBSPLIT) == V6VERBSPLIT) {
-			memset(ifi_tmp.p_v4addr, 0, sizeof(ifi_tmp.p_v4addr));
-			memset(ifi_tmp.p_v4nmask, 0, sizeof(ifi_tmp.p_v4nmask));
-			snprintf(ifi_tmp.p_v6addr, sizeof(ifi_tmp.p_v6addr), "%s/%d", get_comp_v6(start), m_argv6.v6splitnum);
-		}
+		printf("Network			- ");
+		print_exp_v6(start);
+		printf(" -\n\t\t\t  ");
+		print_exp_v6(end);
+		printf("\n");
 
 		v6plus(&start, &sdiff);
 
@@ -576,9 +464,6 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 
 		v6plus(&end, &start);
 		v6plus(&end, &ediff);
-
-		if ((v6args & V6VERBSPLIT) == V6VERBSPLIT)
-			out_cmdline(&ifi_tmp, v6args_tmp, m_argv6, v6args_tmp, m_argv6, 1, 0);
 	}
 
 	printf("\n");
@@ -586,61 +471,29 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 	return;
 }
 
-void print_help(void)
+int usage(int code)
 {
-	printf("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n\n", NAME);
-	printf("Global options:\n");
-	printf("  -a\t\tAll possible information.\n");
-	printf("  -d\t\tEnable name resolution.\n");
-	printf("  -h\t\tDisplay this help.\n");
-	printf("  -I\t\tAdded an interface.\n");
-	printf("  -n n\t\tDisplay n extra subnets (starting from current subnet).\n");
-	printf("\t\tWill display all subnets in the current /24 if n is 0.\n");
-	printf("  -u\t\tVerbose split.\n");
-	printf("  -v\t\tVersion information.\n");
-	printf("  -4\t\tAdd an ipv4 address.\n");
-	printf("  -6\t\tAdd an ipv6 address.\n");
-	printf("\n");
-	printf("IPv4 options:\n");
-	printf("  -b\t\tCIDR bitmap.\n");
-	printf("  -c\t\tClassful address information.\n");
-	printf("  -i\t\tCIDR address information. (default)\n");
-	printf("  -s\t\tSplit the current network into subnets of MASK size.\n");
-	printf("  -w\t\tDisplay information for a wildcard (inverse mask).\n");
-	printf("  -x\t\tClassful bitmap.\n");
-	printf("\n");
-	printf("IPv6 options:\n");
-	printf("  -e\t\tIPv4 compatible IPv6 information.\n");
-	printf("  -r\t\tIPv6 reverse DNS output.\n");
-	printf("  -S\t\tSplit the current network into subnets of MASK size.\n");
-	printf("  -t\t\tStandard IPv6. (default)\n");
-	printf("\n");
-	printf("Address must be in dotted quad forma, but the netmask can be given in three\n"
-	       "different ways:\n"
-	       " - Number of bits    [/nn]\n"
-	       " - Dotted quad       [nnn.nnn.nnn.nnn]\n"
-	       " - Hex               [0xnnnnnnnn | nnnnnnnn]\n"
+	printf("Usage: %s [OPTIONS] <NETWORK/LEN | - | NETWORK NETMASK>\n"
 	       "\n"
-	       "Interface must be a valid network interface on the system.  Replacing address,\n"
-	       "or interface, with '-' will use stdin for reading further arguments.\n");
+	       "Global options:\n"
+	       "  -h       This help text\n"
+	       "  -v       Show version information\n"
+	       "\n"
+	       "IPv4 options:\n"
+	       "  -s MASK  Split the IPv4 network into subnets of MASK size\n"
+	       "\n"
+	       "IPv6 options:\n"
+	       "  -e       IPv4 compatible IPv6 information\n"
+	       "  -r       IPv6 reverse DNS output\n"
+	       "  -S MASK  Split the IPv6 network into subnets of MASK size\n"
+	       "\n"
+	       "Copyright (C) 2003-2013  Simon Ekstrand\n"
+	       "Copyright (C) 2010-2015  Joachim Nilsson\n"
+	       "\n"
+	       "This is free software, under the 3-clause BSD license: you are free to change\n"
+	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law\n", __progname);
 
-	return;
-}
-
-void print_short_help(void)
-{
-	printf("Usage: %s [OPTIONS]... <[ADDRESS]... [INTERFACE]... | [-]>\n", NAME);
-	printf("Try '%s -h' for more information.\n", NAME);
-}
-
-void print_version(void)
-{
-	printf("%s %s\n", NAME, VERSION);
-	printf("Copyright (C) 2003-2013 Simon Ekstrand\n"
-	       "Copyright (C) 2010-2015 Joachim Nilsson\n\n"
-	       "Licensed under the 3-Clause BSD <http://en.wikipedia.org/wiki/BSD_license>\n"
-	       "This is free software: you are free to change and redistribute it.\n"
-	       "There is NO WARRANTY, to the extent permitted by law.\n");
+	return code;
 }
 
 /**

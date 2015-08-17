@@ -44,7 +44,6 @@
 
 extern char *optarg;
 extern int optind, opterr, optopt;
-int resolve;
 
 int
 out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
@@ -52,20 +51,15 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 {
 	int ret = 0;
 
-	if (ifarg_cur->type == IFT_V4) {
-//              printf ("-[ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
+	if (ifarg_cur->type == IFT_V4)
 		ret = get_addrv4(ifarg_cur);
-	}
 
-	if (ifarg_cur->type == IFT_V6) {
-//              printf ("-[ipv6 : %s] - %d\n", ifarg_cur->cmdstr, index);
+	if (ifarg_cur->type == IFT_V6)
 		ret = get_addrv6(ifarg_cur);
-	}
 
 	if (ifarg_cur->type == IFT_INTV4 || ifarg_cur->type == IFT_INTV6) {
-//              printf ("-[int-ipv4 : %s] - %d\n", ifarg_cur->cmdstr, index);
-		if (ifarg_cur->errorstr[0] != '\0') {
-			printf("\n-[ERR : %s]\n\n-\n", ifarg_cur->errorstr);
+		if (ifarg_cur->errorstr[0] != 0) {
+			warnx("Invalid address: %s", ifarg_cur->errorstr);
 			return 0;
 		}
 
@@ -73,17 +67,16 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 	}
 
 	if (ifarg_cur->type == IFT_UNKWN) {
-//              printf ("-[unknown : %s] - %d\n", ifarg_cur->cmdstr, index);
-		printf("\n-[ERR : %s]\n\n-\n", ifarg_cur->errorstr);
+		warnx("Unknown %s: %s", ifarg_cur->cmdstr, ifarg_cur->errorstr);
 		return 0;
 	}
 
 	if (ret == -1) {
-		printf("\n-[ERR : Invalid address]\n\n-\n");
+		warnx("Invalid address");
 		return 0;
 	}
 	if (ret == -2) {
-		printf("\n-[ERR : Invalid netmask]\n\n-\n");
+		warnx("Invalid netmask");
 		return 0;
 	}
 
@@ -93,8 +86,6 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 
 		if ((v4args & V4_INFO) == V4_INFO)
 			print_cf_info_v4(ifarg_cur);
-		if ((v4args & NET_INFO) == NET_INFO)
-			show_networks_v4(ifarg_cur, m_argv4.numnets);
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4(ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
 	}
@@ -271,9 +262,6 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 {
 	char expaddr[ARGLEN];
 	int x, y;
-	int error;
-
-	error = 0;
 
 	/*
 	 * We use goto's here *gasp*.
@@ -282,11 +270,8 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 		/*
 		 * Baaad argument. Error out if this happens.
 		 */
-		if (strlen(argv[argcount]) > sizeof(expaddr) - 1) {
-			printf("-[ERR : INVALID ARG - %s]\n", expaddr);
-			error = 1;
-			exit(1);
-		}
+		if (strlen(argv[argcount]) > sizeof(expaddr) - 1)
+			errx(1, "Invalid argument %s", expaddr);
 
 		strlcpy(expaddr, argv[argcount], sizeof(expaddr));
 
@@ -360,9 +345,6 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
  complete:
 		argcount++;
 	}
-
-	if (error)
-		printf("\n");
 
 	return abox_cur;
 }
@@ -453,7 +435,7 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 
 int main(int argc, char *argv[])
 {
-	int x, y, z, m, v4args, v6args, iffound, argcount, first_err;
+	int x, y, z, m, v4args, v6args, argcount, first_err;
 	struct if_info *if_start, *if_cur;
 	struct if_info *ifarg_start, *ifarg_cur, *ifarg_old;
 	int ch, parse_stdin, index;
@@ -464,10 +446,8 @@ int main(int argc, char *argv[])
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
 	char *stdinarg[3];
 
-	if (argc < 2) {
-		print_short_help();
-		return 0;
-	}
+	if (argc < 2)
+		return usage(1);
 
 	parse_stdin = 0;
 	/*
@@ -484,7 +464,6 @@ int main(int argc, char *argv[])
 	first_err = 1;
 	ifarg_start = NULL;
 	ifarg_old = NULL;
-	resolve = 0;
 
 	/*
 	 * abox == argument box == a box that holds (commandline) arguments :)
@@ -499,27 +478,10 @@ int main(int argc, char *argv[])
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
-	while ((ch = getopt(argc, argv, "adehHI:n:rs:S:tuvV4:6:")) != -1) {
+	while ((ch = getopt(argc, argv, "ehrs:S:v")) != -1) {
 		switch (ch) {
-		case 'a':
-			v4args |= V4_INFO | NET_INFO;
-			v6args |= V6_INFO | V4INV6 | V6REV;
-			break;
-
-		case 'd':
-			resolve = 1;
-#if (!defined(HAVE_GETHOSTBYNAME2) && !defined(HAVE_GETADDRINFO)) || !defined(HAVE_INET_NTOP)
-			printf("-[INFO : IPv6 address resolution will fail due to lack of OS support]\n");
-#endif
-			break;
-
 		case 'e':
 			v6args |= V4INV6;
-			break;
-
-		case 'n':
-			v4args |= NET_INFO;
-			m_argv4.numnets = atoi(optarg);
 			break;
 
 		case 'r':
@@ -531,7 +493,7 @@ int main(int argc, char *argv[])
 			if (!y) {
 				v4args |= V4SPLIT;
 			} else {
-				fprintf(stderr, "Invalid IPv4 splitmask, unable to split.\n");
+				warnx("Invalid IPv4 splitmask, unable to split.");
 				split_errv4 = 1;
 			}
 			break;
@@ -541,75 +503,30 @@ int main(int argc, char *argv[])
 			if (!y) {
 				v6args |= V6SPLIT;
 			} else {
-				fprintf(stderr, "Invalid IPv6 splitmask, unable to split.\n");
+				warnx("Invalid IPv6 splitmask, unable to split.");
 				split_errv6 = 1;
 			}
 			break;
 
-		case 't':
-			v6args |= V6_INFO;
-			break;
-
-		case 'u':
-			v4args |= V4VERBSPLIT;
-			v6args |= V6VERBSPLIT;
-			break;
-
-		case '4':
-			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
-			abox_cur->type = AT_V4;
-			abox_cur->resolv = 1;
-			if (validate_netmask(optarg) == 2)
-				abox_cur->resolv = 0;
-			if (validate_v4addr(optarg) == 1)
-				abox_cur->resolv = 0;
-			abox_cur = new_arg(abox_cur);
-
-			break;
-
-		case '6':
-			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
-			abox_cur->type = AT_V6;
-			abox_cur->resolv = 1;
-			if (validate_v6addr(expaddr) == 1)
-				abox_cur->resolv = 0;
-			abox_cur = new_arg(abox_cur);
-
-			break;
-
-		case 'I':
-			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
-			abox_cur->type = AT_INT;
-			abox_cur->resolv = 0;
-			abox_cur = new_arg(abox_cur);
-
-			break;
-
 		case 'v':
-		case 'V':
-			print_version();
+			printf("%s\n", VERSION);
 			return 0;
 
 		case '?':
 		case 'h':
-		case 'H':
-			print_help();
-			return 0;
+			return usage(0);
 
 		default:
-			print_short_help();
-			return 0;
+			return usage(1);
 		}
 	}
 
 	if (split_errv4 || split_errv6) {
  nothing:
-		printf("No (valid) commands recieved, nothing to do.\n");
+		warnx("No (valid) commands recieved, nothing to do.");
 		free_boxargs(abox_start);
-		return -1;
+		return 1;
 	}
-	if (split_errv4 || split_errv6)
-		printf("\n");
 
 	argcount = optind;
 	if (m_argv4.numnets < 1)
@@ -620,9 +537,8 @@ int main(int argc, char *argv[])
 			parse_stdin = 1;
 	} else {
 		if (abox_start->str[0] == '\0') {
-			print_short_help();
 			free_boxargs(abox_start);
-			return 0;
+			return usage(0);
 		}
 	}
 
@@ -642,17 +558,6 @@ int main(int argc, char *argv[])
 		abox_cur = NULL;
 	}
 
-	abox_tmp = abox_start;
-	if (!resolve) {
-		while (abox_tmp) {
-			abox_tmp->resolv = 0;
-			abox_tmp = abox_tmp->next;
-		}
-	}
-#if 0
-	show_abox(abox_start);
-#endif
-
 	/*
 	 * This will try to gather information about the network interfaces
 	 * present on the local machine.
@@ -666,7 +571,6 @@ int main(int argc, char *argv[])
 	if (!ifarg_start && !parse_stdin)
 		goto nothing;
 
-	iffound = 0;
 	index = 0;
 	ifarg_cur = ifarg_start;
 	while (ifarg_cur && !parse_stdin) {
@@ -678,7 +582,7 @@ int main(int argc, char *argv[])
 		} else {
 			index = 0;
 		}
-		iffound += out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
+		out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
 		strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 		ifarg_cur = ifarg_cur->next;
 	}
@@ -706,18 +610,8 @@ int main(int argc, char *argv[])
 			free(abox_cur);
 			abox_cur = NULL;
 
-			abox_tmp = abox_start;
-			if (!resolve) {
-				while (abox_tmp) {
-					abox_tmp->resolv = 0;
-					abox_tmp = abox_tmp->next;
-				}
-			}
-
 			ifarg_cur = ifarg_start = parse_abox(abox_start, if_start);
-
 			if (ifarg_start) {
-				iffound = 0;
 				index = 0;
 				ifarg_cur = ifarg_start;
 				while (ifarg_cur) {
@@ -729,7 +623,7 @@ int main(int argc, char *argv[])
 					} else {
 						index = 0;
 					}
-					iffound += out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
+					out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
 					strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 					ifarg_cur = ifarg_cur->next;
 				}
@@ -747,7 +641,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		if (y == -1)
-			fprintf(stderr, "ERROR: Problem parsing stdin\n");
+			warnx("Problem parsing stdin");
 	}
 	if (parse_stdin) {
 		free(stdinarg[0]);
@@ -755,13 +649,13 @@ int main(int argc, char *argv[])
 	}
 
 	if (!z && parse_stdin)
-		fprintf(stderr, "FATAL: No arguments found on stdin\n");
+		warnx("No arguments found on stdin");
 
 	if (!parse_stdin)
 		free_if(ifarg_start);
 	free_if(if_start);
 
-	return iffound;
+	return 0;
 }
 
 /**

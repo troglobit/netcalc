@@ -14,13 +14,8 @@
 #else
 #include <sys/types.h>		/* u_intN_t */
 #endif
+#include <err.h>		/* warnx() et al */
 #include <net/if.h>		/* IFNAMSIZ */
-
-#ifdef PACKAGE
-#define NAME PACKAGE
-#else
-#define NAME "netcalc"
-#endif
 
 /*** Fallback to older types before stdint.h was defined ***/
 #ifndef HAVE_UINT8_T
@@ -39,6 +34,31 @@
 #define V4ADDR_VAL "0123456789."
 #define V6ADDR_VAL "0123456789ABCDEFabcdef:"
 #define NETMASK_VAL "0123456789"
+
+#define AT_V4 1
+#define AT_V6 2
+#define AT_INT 3
+#define AT_UNKWN 4
+
+#define IFT_V4 1
+#define IFT_V6 2
+#define IFT_INTV4 3
+#define IFT_INTV6 4
+#define IFT_UNKWN 5
+
+/* v4 args */
+#define V4_INFO     0x01
+#define V4SPLIT     0x20
+#define C_WILDCARD  0x40
+
+/* v6 args */
+#define V6_INFO     0x01
+#define V4INV6      0x02
+#define V6SPLIT     0x04
+#define V6REV       0x08
+
+#define V6TYPE_STANDARD 1
+#define V6TYPE_V4INV6 2
 
 /*
  * Easier to define this ourselves then to use all the different
@@ -124,33 +144,7 @@ struct argbox {
 	struct argbox *next;
 };
 
-#define AT_V4 1
-#define AT_V6 2
-#define AT_INT 3
-#define AT_UNKWN 4
-
-#define IFT_V4 1
-#define IFT_V6 2
-#define IFT_INTV4 3
-#define IFT_INTV6 4
-#define IFT_UNKWN 5
-
-/* v4 args */
-#define V4_INFO     0x01
-#define NET_INFO    0x10
-#define V4SPLIT     0x20
-#define V4VERBSPLIT 0x40
-#define C_WILDCARD  0x80
-
-/* v6 args */
-#define V6_INFO     0x01
-#define V4INV6      0x02
-#define V6SPLIT     0x04
-#define V6REV       0x08
-#define V6VERBSPLIT 0x10
-
-#define V6TYPE_STANDARD 1
-#define V6TYPE_V4INV6 2
+extern char *__progname;
 
 /*
  * netcalc.c

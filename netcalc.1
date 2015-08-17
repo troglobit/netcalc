@@ -7,22 +7,62 @@
 .Nd IP subnet calculator
 .Sh SYNOPSIS
 .Nm
-.Op Fl abcdehiInrsStuvx46
-.Ar ADDRESS | NETWORK
+.Op Fl ehrv
+.Op Fl s Ar MASK
+.Op Fl S Ar MASK
+.Aq Ar ADDRESS/LEN | Ar - | Ar NETWORK Op Ar NETMASK
 .Sh DESCRIPTION
 .Nm
 is a simple network calculator derived from
 .Nm sipcalc.
 .Nm
 takes an IP address and a subnet mask, or an IP address and prefix mask
-in CIDR notation, on the commandline and outputs information about the
-subnet.
-.Nm
-supports both IPv4 and IPv6 addresses.
+in CIDR notation and outputs information about the subnet.  Both IPv4
+and IPv6 addresses are supported.
+.Sh FEATURES
+.Bl -bullet -width 1n -compact
+.It
+Multiple address and netmask input formats
+.It
+Classful and CIDR output
+.It
+Output of broadcast address, network class, Cisco wildcard,
+hosts/range, network range
+.It
+Output of multiple types of bitmaps
+.It
+Support for multiple networks input from commandline
+.It
+Support for reading newline separated list of networks from standard input (STDIN)
+.It
+Ability to split a network into smaller ones
+.It
+Compressed and expanded IPv6 input addresses
+.It
+Compressed and expanded IPv6 output
+.It
+Support for v4 in v6 output
+.El
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl h
+Print a summary of the options and exit
+.It Fl e
+IPv4 compatible IPv6 information
+.It Fl r
+IPv6 reverse DNS output
+.It Fl s Ar MASK
+Split the IPv4 network into subnets of MASK size
+.It Fl S Ar MASK
+Split the IPv6 network into subnets of MASK size
+.It Fl v
+Show version information
+.El
 .Pp
-IPv4 addresses must be given in the "standard" dotted quad format, ie.,
-xxx.xxx.xxx.xxx with an optional netmask that can be given in three
-different ways:
+IPv4 (network) addresses must be given in standard dotted quad format,
+i.e., xxx.xxx.xxx.xxx with an optional netmask that can be given in
+three different ways:
+.Pp
 .Bl -bullet -width 1n -compact
 .It
 CIDR, e.g. /n, where n >= 0 <= 32
@@ -31,65 +71,17 @@ Dotted quad, e.g. xxx.xxx.xxx.xxx
 .It
 A hexadecimal value, e.g. 0xnnnnnnnn or nnnnnnnn
 .El
+.Pp
 IPv6 addresses may be given in any of the forms defined in RFC2373, the
 netmask (prefix) must be given in CIDR notation.  Valid values for the
 netmask range from n >= 0 <= 128, default value if netmask is omitted is
 128.
 .Pp
 .Nm
-also accepts arguments from stdin, this can be useful for example for
+also accepts arguments from stdin, this can be useful for using
 .Xr cat 1
-ing a list of addresses stored in a file to
-.Nm .
-Each line sent to should contain an address netmask pair or address/len.
-.Pp
-.Sh FEATURES
-For IPv4 the following features are available:
-.Bl -bullet -width 1n -compact
-.It
-Multiple address and netmask input formats.
-.It
-Retrieving of address information from interfaces.
-.It
-Classfull and CIDR output.
-.It
-Multiple address and netmask output formats (dotted quad, hex, number of bits).
-.It
-Output of broadcast address, network class, Cisco wildcard,
-hosts/range, network range.
-.It
-Output of multiple types of bitmaps.
-.It
-Output of a user-defined number of extra networks.
-.It
-Multiple networks input from commandline.
-.It
-DNS resolutions of hostnames.
-.It
-Parsing of a newline separated list of networks from standard input (STDIN).
-.It
-The ability to "split" a network based on a smaller netmask, also with
-recursive runs on the generated subnets.
-.El
-.PP
-For IPv6 the following features are available:
-.Bl -bullet -width 1n -compact
-.It
-Compressed and expanded input addresses.
-.It
-Compressed and expanded output.
-.It
-Standard IPv6 network output.
-.It
-v4 in v6 output.
-.It
-Reverse DNS address generation.
-.It
-DNS resolutions of hostnames.
-.It
-The ability to "split" a network based on a smaller netmask, also with
-recursive runs on the generated subnets.
-.El
+on a list of addresses stored in a file.  Each line should contain an
+address netmask pair or address/len tuple.
 .Sh BUGS
 Use the project's GitHub page to file bug reports, feature requests or
 patches (preferably as GitHub pull requests!), or questions at
