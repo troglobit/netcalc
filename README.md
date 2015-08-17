@@ -1,21 +1,22 @@
 IP network calculator
 =====================
 
-netcalc is a clone of [sipcalc][], which is an console based IP subnet
-calculator with IPv4 and IPv6 support.
+netcalc is a slimmed down clone of [sipcalc][], using the output format
+of [ipcalc][].  It is written in C and has very few dependencies.  Both
+IPv4 and IPv6 is supported.
 
 ![Image netcalc example run](example.png "netcalc in action!")
 
-Sipcalc development started by Simon Ekstrand back in 2001 and has most
-of the features needed in an IP calculator.  It is no longer in active
-development.
+The original sipcalc project was started by Simon Ekstrand in 2001.  No
+longer in active development, but has a lot of features and is available
+on major Linux distributions and works on *BSD and Solaris as well.
 
-This project is a slimmed down version of the sipcalc code base, using
-the output format of [ipcalc][].  It is written in C and has very few
-dependencies.
+[Use GitHub][github] to file bug reports, questions, feature requests or
+patches -- preferably as GitHub pull requests!
 
 [ipcalc]:  http://jodies.de/ipcalc
 [sipcalc]: http://www.routemeister.net/
+[github]:  https://github.com/troglobit/netcalc
 
 <!--
   -- Local Variables:
