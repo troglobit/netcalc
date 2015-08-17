@@ -65,12 +65,6 @@
 #define V6ADDR_VAL "0123456789ABCDEFabcdef:"
 #define NETMASK_VAL "0123456789"
 
-#define TERMINATE(x) (x[sizeof(x)-1]='\0')
-#define safe_strncpy(dest,src) strncpy(dest,src,sizeof(dest)-1+TERMINATE(dest)*0)
-#define safe_strncat(dest,src) strncat(dest,src,sizeof(dest)-1+TERMINATE(dest)*0)
-#define safe_snprintf(dest,whatever...) snprintf(dest,sizeof(dest),## whatever)
-#define safe_bzero(dest) bzero((char *)dest,sizeof(dest))
-
 /*
  * Easier to define this ourselves then to use all the different
  * versions from different platforms.
@@ -236,13 +230,13 @@ void free_dnsresp(struct dnsresp *d_resp);
 char *resolve_addr(char *addr, int family, struct dnsresp *);
 
 /*
- * interface.c
+ * strlcpy.c strlcat.c
  */
-struct if_info *new_if(struct if_info *ifarg_cur);
-void free_if(struct if_info *ifa);
-struct if_info *get_if_ext();
+size_t strlcpy(char *dst, const char *src, size_t siz);
+size_t strlcat(char *dst, const char *src, size_t siz);
 
-#endif				/* SUB_H */
+
+#endif /* SUB_H */
 
 /**
  * Local Variables:

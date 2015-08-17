@@ -91,11 +91,9 @@ void show_split_networks_v4(struct if_info *ifi, u_int32_t splitmask, int v4args
 			printf("Netmask: \e[34m%s\e[0m\n", numtoquad(splitmask));
 		}
 		if ((v4args & V4VERBSPLIT) == V4VERBSPLIT) {
-			safe_bzero(ifi_tmp.p_v4addr);
-			safe_bzero(ifi_tmp.p_v4nmask);
-			safe_bzero(ifi_tmp.p_v6addr);
-			safe_snprintf(ifi_tmp.p_v4addr, "%s", numtoquad(start));
-			safe_snprintf(ifi_tmp.p_v4nmask, "%s", numtoquad(splitmask));
+			memset(ifi_tmp.p_v6addr, 0, sizeof(ifi_tmp.p_v6addr));
+			snprintf(ifi_tmp.p_v4addr, sizeof(ifi_tmp.p_v4addr), "%s", numtoquad(start));
+			snprintf(ifi_tmp.p_v4nmask, sizeof(ifi_tmp.p_v4nmask), "%s", numtoquad(splitmask));
 		}
 		start += diff;
 		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
@@ -354,22 +352,16 @@ void print_comp_v4inv6(struct sip_in6_addr addr)
 
 void print_exp_v6(struct sip_in6_addr addr)
 {
-	printf
-	    ("%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-	     addr.sip6_addr16[0],
-	     addr.sip6_addr16[1],
-	     addr.sip6_addr16[2],
-	     addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
+	printf("%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
+	       addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
+	       addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 }
 
 void print_mixed_v6(struct sip_in6_addr addr)
 {
-	printf
-	    ("%x:%x:%x:%x:%x:%x:%x:%x",
-	     addr.sip6_addr16[0],
-	     addr.sip6_addr16[1],
-	     addr.sip6_addr16[2],
-	     addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
+	printf("%x:%x:%x:%x:%x:%x:%x:%x",
+	       addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
+	       addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 }
 
 void print_revdns_v6(struct sip_in6_addr addr)
@@ -377,15 +369,10 @@ void print_revdns_v6(struct sip_in6_addr addr)
 	char inbuf[40], outbuf[256];
 	int x, y;
 
-	safe_bzero(inbuf);
-	safe_bzero(outbuf);
-
-	safe_snprintf
-	    (inbuf, "%04x%04x%04x%04x%04x%04x%04x%04x",
-	     addr.sip6_addr16[0],
-	     addr.sip6_addr16[1],
-	     addr.sip6_addr16[2],
-	     addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
+	memset(outbuf, 0, sizeof(outbuf));
+	snprintf(inbuf, sizeof(inbuf), "%04x%04x%04x%04x%04x%04x%04x%04x",
+		 addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
+		 addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 
 	y = 0;
 	for (x = (strlen(inbuf) - 1); x >= 0; x--) {
@@ -394,7 +381,7 @@ void print_revdns_v6(struct sip_in6_addr addr)
 		y += 2;
 	}
 
-	safe_strncat(outbuf, "ip6.arpa.");
+	strlcat(outbuf, "ip6.arpa.", sizeof(outbuf));
 
 	printf("%s", outbuf);
 }
@@ -556,10 +543,9 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, 
 		}
 
 		if ((v6args & V6VERBSPLIT) == V6VERBSPLIT) {
-			safe_bzero(ifi_tmp.p_v4addr);
-			safe_bzero(ifi_tmp.p_v4nmask);
-			safe_bzero(ifi_tmp.p_v6addr);
-			safe_snprintf(ifi_tmp.p_v6addr, "%s/%d", get_comp_v6(start), m_argv6.v6splitnum);
+			memset(ifi_tmp.p_v4addr, 0, sizeof(ifi_tmp.p_v4addr));
+			memset(ifi_tmp.p_v4nmask, 0, sizeof(ifi_tmp.p_v4nmask));
+			snprintf(ifi_tmp.p_v6addr, sizeof(ifi_tmp.p_v6addr), "%s/%d", get_comp_v6(start), m_argv6.v6splitnum);
 		}
 
 		v6plus(&start, &sdiff);

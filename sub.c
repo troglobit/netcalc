@@ -44,6 +44,8 @@
 #include "sub.h"
 #include "sub-o.h"
 
+#define ARGLEN 128
+
 extern char *optarg;
 extern int optind, opterr, optopt;
 int resolve;
@@ -168,23 +170,21 @@ int cleanline(char *sbuf, char *dbuf)
 
 int get_stdin(char *args[])
 {
-	char buf[2], sbuf[128], dbuf[128], *arg1, *arg2;
+	char buf[2], sbuf[ARGLEN], dbuf[ARGLEN], *arg1, *arg2;
 	int x, y, z, argmax;
 
-	safe_bzero(buf);
+	memset(buf, 0, sizeof(buf));
 
 	argmax = (IFNAMSIZ + 1 > 19) ? IFNAMSIZ + 1 : 19;
-	arg1 = (char *)malloc(argmax);
-	arg2 = (char *)malloc(16);
-	bzero((char *)arg1, argmax);
-	bzero((char *)arg2, 16);
-	safe_bzero(sbuf);
-	safe_bzero(dbuf);
+	arg1 = (char *)calloc(1, argmax);
+	arg2 = (char *)calloc(1, 16);
+	memset(sbuf, 0, sizeof(sbuf));
+	memset(dbuf, 0, sizeof(dbuf));
 
 	while (!sbuf[0]) {
 		x = 0;
 		y = 0;
-		safe_bzero(sbuf);
+		memset(sbuf, 0, sizeof(sbuf));
 		do {
 			x = read(0, buf, 1);
 			if (x == 1)
@@ -235,8 +235,8 @@ int get_stdin(char *args[])
 		z++;
 	}
 
-	strncpy(args[0], arg1, 127);
-	strncpy(args[1], arg2, 127);
+	strlcpy(args[0], arg1, ARGLEN);
+	strlcpy(args[1], arg2, ARGLEN);
 
 	free(arg1);
 	free(arg2);
@@ -246,12 +246,8 @@ int get_stdin(char *args[])
 
 struct argbox *new_arg(struct argbox *abox)
 {
-	abox->next = (struct argbox *)malloc(sizeof(struct argbox));
+	abox->next = (struct argbox *)calloc(1, sizeof(struct argbox));
 	abox = abox->next;
-	safe_bzero(abox->str);
-	abox->type = 0;
-	abox->resolv = 0;
-	abox->next = NULL;
 
 	return abox;
 }
@@ -277,7 +273,7 @@ void free_boxargs(struct argbox *abox)
  */
 struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *abox_cur)
 {
-	char expaddr[128];
+	char expaddr[ARGLEN];
 	int x, y;
 	int error;
 
@@ -287,9 +283,8 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 	 * We use goto's here *gasp*.
 	 */
 	while (argv[argcount]) {
-		safe_bzero(expaddr);
+		strlcpy(expaddr, argv[argcount], sizeof(expaddr));
 
-		safe_strncpy(expaddr, argv[argcount]);
 		/*
 		 * Baaad argument. Error out if this happens.
 		 */
@@ -304,7 +299,7 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 		 */
 		x = validate_v6addr(expaddr);
 		if (x) {
-			safe_strncpy(abox_cur->str, expaddr);
+			strlcpy(abox_cur->str, expaddr, sizeof(abox_cur->str));
 			abox_cur->type = AT_V6;
 			abox_cur->resolv = 0;
 			abox_cur = new_arg(abox_cur);
@@ -320,7 +315,7 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 		 */
 		x = validate_netmask(expaddr);
 		if (x == 2) {
-			safe_strncpy(abox_cur->str, expaddr);
+			strlcpy(abox_cur->str, expaddr, sizeof(abox_cur->str));
 			abox_cur->type = AT_V4;
 			abox_cur->resolv = 0;
 			abox_cur = new_arg(abox_cur);
@@ -358,16 +353,15 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 		if (argcount + 1 < argc)
 			y = validate_netmask(argv[argcount + 1]);
 		if (y == 1 || y == 3) {
-			safe_snprintf(abox_cur->str, "%s %s", expaddr, argv[argcount + 1]);
+			snprintf(abox_cur->str, sizeof(abox_cur->str), "%s %s", expaddr, argv[argcount + 1]);
 			argcount++;
 		} else
-			safe_strncpy(abox_cur->str, expaddr);
+			strlcpy(abox_cur->str, expaddr, sizeof(abox_cur->str));
 		abox_cur->type = AT_UNKWN;
 		abox_cur->resolv = 1;
 		abox_cur = new_arg(abox_cur);
 
  complete:
-		safe_bzero(expaddr);
 		argcount++;
 	}
 
@@ -406,11 +400,7 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 	char *tmpstr;
 	int x, if_found;
 
-	ifarg_old = ifarg_cur = ifarg_start = (struct if_info *)malloc(sizeof(struct if_info));
-	ifarg_cur->next = NULL;
-	bzero((char *)ifarg_cur->name, IFNAMSIZ);
-	safe_bzero(ifarg_cur->p_v4addr);
-	safe_bzero(ifarg_cur->p_v4nmask);
+	ifarg_old = ifarg_cur = ifarg_start = (struct if_info *)calloc(1, sizeof(struct if_info));
 
 	while (abox) {
 		if (abox->type == AT_V4 && !abox->resolv) {
@@ -430,19 +420,17 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 				x++;
 			}
 			ifarg_cur->type = IFT_V4;
-			safe_strncpy(ifarg_cur->cmdstr, abox->str);
+			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 		}
 
 		if (abox->type == AT_V4 && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)malloc(sizeof(struct dnsresp));
-			d_resp_start->next = NULL;
-			safe_bzero(d_resp_start->str);
-			d_resp_start->type = 0;
+			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
+
 			tmpstr = resolve_addr(abox->str, PF_INET, d_resp_cur);
 			if (tmpstr) {
 				d_resp_cur = d_resp_start;
 				while (d_resp_cur) {
-					safe_strncpy(ifarg_cur->cmdstr, abox->str);
+					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 					tmpstr = strstr(d_resp_cur->str, " ");
 					if (tmpstr != NULL && (strlen(tmpstr) > 0)) {
 						tmpstr++;
@@ -464,8 +452,8 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 					d_resp_cur = d_resp_cur->next;
 				}
 			} else {
-				safe_strncpy(ifarg_cur->p_v4addr, abox->str);
-				safe_strncpy(ifarg_cur->cmdstr, abox->str);
+				strlcpy(ifarg_cur->p_v4addr, abox->str, sizeof(ifarg_cur->p_v4addr));
+				strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 				ifarg_cur->type = IFT_V4;
 			}
 
@@ -473,24 +461,22 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 		}
 
 		if (abox->type == AT_V6 && !abox->resolv) {
-			safe_strncpy(ifarg_cur->p_v6addr, abox->str);
-			safe_strncpy(ifarg_cur->cmdstr, abox->str);
+			strlcpy(ifarg_cur->p_v6addr, abox->str, sizeof(ifarg_cur->p_v6addr));
+			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 
 			mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
 			ifarg_cur->type = IFT_V6;
 		}
 
 		if (abox->type == AT_V6 && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)malloc(sizeof(struct dnsresp));
-			d_resp_start->next = NULL;
-			safe_bzero(d_resp_start->str);
-			d_resp_start->type = 0;
+			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
+
 			tmpstr = resolve_addr(abox->str, PF_INET6, d_resp_cur);
 			if (tmpstr) {
 				d_resp_cur = d_resp_start;
 				while (d_resp_cur) {
-					safe_strncpy(ifarg_cur->cmdstr, abox->str);
-					safe_strncpy(ifarg_cur->p_v6addr, d_resp_cur->str);
+					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
+					strlcpy(ifarg_cur->p_v6addr, d_resp_cur->str, sizeof(ifarg_cur->p_v6addr));
 					ifarg_cur->type = IFT_V6;
 
 					mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
@@ -500,8 +486,8 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 					d_resp_cur = d_resp_cur->next;
 				}
 			} else {
-				safe_strncpy(ifarg_cur->cmdstr, abox->str);
-				safe_strncpy(ifarg_cur->p_v6addr, abox->str);
+				strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
+				strlcpy(ifarg_cur->p_v6addr, abox->str, sizeof(ifarg_cur->p_v6addr));
 				ifarg_cur->type = IFT_V6;
 
 				mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
@@ -511,24 +497,22 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 		}
 
 		if (abox->type == AT_UNKWN && !abox->resolv) {
-			strncpy(ifarg_cur->name, abox->str, IFNAMSIZ);
-			safe_strncpy(ifarg_cur->cmdstr, abox->str);
-			safe_snprintf(ifarg_cur->errorstr, "Unable to retrieve interface information");
+			strlcpy(ifarg_cur->name, abox->str, IFNAMSIZ);
+			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
+			snprintf(ifarg_cur->errorstr, sizeof(ifarg_cur->errorstr), "Unable to retrieve interface information");
 			ifarg_cur->type = IFT_INTV4;
 		}
 
 		if (abox->type == AT_UNKWN && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)malloc(sizeof(struct dnsresp));
-			d_resp_start->next = NULL;
-			safe_bzero(d_resp_start->str);
-			d_resp_start->type = 0;
+			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
+
 			tmpstr = resolve_addr(abox->str, PF_UNSPEC, d_resp_cur);
 			if (tmpstr) {
 				d_resp_cur = d_resp_start;
 				while (d_resp_cur) {
-					safe_strncpy(ifarg_cur->cmdstr, abox->str);
+					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 					if (d_resp_cur->type == AF_INET6) {
-						safe_strncpy(ifarg_cur->p_v6addr, d_resp_cur->str);
+						strlcpy(ifarg_cur->p_v6addr, d_resp_cur->str, sizeof(ifarg_cur->p_v6addr));
 						ifarg_cur->type = IFT_V6;
 
 						mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
@@ -569,14 +553,14 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 						memcpy((struct if_info *)ifarg_cur, (struct if_info *)if_cur,
 						       sizeof(struct if_info));
 						ifarg_cur->type = IFT_INTV4;
-						safe_strncpy(ifarg_cur->cmdstr, abox->str);
+						strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 						if_found = 1;
 					}
 					if_cur = if_cur->next;
 				}
 				if (!if_found) {
-					safe_strncpy(ifarg_cur->cmdstr, abox->str);
-					safe_snprintf(ifarg_cur->errorstr, "Unparsable argument.");
+					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
+					snprintf(ifarg_cur->errorstr, sizeof(ifarg_cur->errorstr), "Unparsable argument.");
 					ifarg_cur->type = IFT_UNKWN;
 				}
 			}
@@ -607,8 +591,8 @@ int main(int argc, char *argv[])
 	int ch, parse_stdin, index;
 	struct misc_args m_argv4, m_argv6;
 	int split_errv4, split_errv6;
-	char expaddr[128];
-	char oldcmdstr[128];
+	char expaddr[ARGLEN] = "";
+	char oldcmdstr[ARGLEN] = "";
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
 	char *stdinarg[3];
 #ifdef HAVE_GETOPT_LONG
@@ -662,11 +646,7 @@ int main(int argc, char *argv[])
 	 * This excludes most of the -[a-z] flags, they're generally handled by
 	 * v[4,6]args.
 	 */
-	abox_start = abox_cur = (struct argbox *)malloc(sizeof(struct argbox));
-	safe_bzero(abox_cur->str);
-	abox_cur->type = 0;
-	abox_cur->resolv = 0;
-	abox_cur->next = NULL;
+	abox_start = abox_cur = (struct argbox *)calloc(1, sizeof(struct argbox));
 
 	/*
 	 * v[4,6]args holds flags based on commandline arguments for what we
@@ -733,7 +713,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case '4':
-			safe_strncpy(abox_cur->str, optarg);
+			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
 			abox_cur->type = AT_V4;
 			abox_cur->resolv = 1;
 			if (validate_netmask(optarg) == 2)
@@ -745,7 +725,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case '6':
-			safe_strncpy(abox_cur->str, optarg);
+			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
 			abox_cur->type = AT_V6;
 			abox_cur->resolv = 1;
 			if (validate_v6addr(expaddr) == 1)
@@ -755,7 +735,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'I':
-			safe_strncpy(abox_cur->str, optarg);
+			strlcpy(abox_cur->str, optarg, sizeof(abox_cur->str));
 			abox_cur->type = AT_INT;
 			abox_cur->resolv = 0;
 			abox_cur = new_arg(abox_cur);
@@ -846,7 +826,6 @@ int main(int argc, char *argv[])
 	iffound = 0;
 	index = 0;
 	ifarg_cur = ifarg_start;
-	memset(oldcmdstr, 0, sizeof(oldcmdstr));
 	while (ifarg_cur && !parse_stdin) {
 		if (strlen(ifarg_cur->cmdstr) > 0) {
 			if (!strcmp(ifarg_cur->cmdstr, oldcmdstr))
@@ -857,18 +836,16 @@ int main(int argc, char *argv[])
 			index = 0;
 		}
 		iffound += out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
-		safe_strncpy(oldcmdstr, ifarg_cur->cmdstr);
+		strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 		ifarg_cur = ifarg_cur->next;
 	}
 
 	z = 0;
 	y = 1;
 	while (parse_stdin && y > -1) {
-		stdinarg[0] = (char *)malloc(128);
-		stdinarg[1] = (char *)malloc(128);
+		stdinarg[0] = (char *)calloc(1, ARGLEN);
+		stdinarg[1] = (char *)calloc(1, ARGLEN);
 		stdinarg[2] = NULL;
-		for (x = 0; x < 2; x++)
-			bzero((char *)stdinarg[x], 128);
 		y = get_stdin(stdinarg);
 		if (y > 0) {
 			m = 2;
@@ -900,7 +877,6 @@ int main(int argc, char *argv[])
 				iffound = 0;
 				index = 0;
 				ifarg_cur = ifarg_start;
-				memset(oldcmdstr, 0, sizeof(oldcmdstr));
 				while (ifarg_cur) {
 					if (strlen(ifarg_cur->cmdstr) > 0) {
 						if (!strcmp(ifarg_cur->cmdstr, oldcmdstr))
@@ -911,7 +887,7 @@ int main(int argc, char *argv[])
 						index = 0;
 					}
 					iffound += out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
-					safe_strncpy(oldcmdstr, ifarg_cur->cmdstr);
+					strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 					ifarg_cur = ifarg_cur->next;
 				}
 			}

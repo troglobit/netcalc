@@ -96,7 +96,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_netcalc_OBJECTS = sub-func.$(OBJEXT) sub-output.$(OBJEXT) \
-	sub.$(OBJEXT)
+	sub.$(OBJEXT) strlcpy.$(OBJEXT) strlcat.$(OBJEXT)
 netcalc_OBJECTS = $(am_netcalc_OBJECTS)
 netcalc_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -290,7 +290,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = configure
 doc_DATA = README.md LICENSE
-netcalc_SOURCES = sub-func.c sub-output.c sub.c
+netcalc_SOURCES = sub-func.c sub-output.c sub.c strlcpy.c strlcat.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -398,6 +398,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcpy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub-func.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub-output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sub.Po@am__quote@
