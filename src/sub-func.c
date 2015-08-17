@@ -115,7 +115,7 @@ validate_v4addr (char *addr)
 	y = 0;
 	for (x = 0; x < 4; x++) {
 		z = 0;
-		bzero ((char *) buf, 16);
+		safe_bzero (buf);
 		while (addr[y] != '.' && y < strlen (addr)) {
 			buf[z] = addr[y];
 			y++;
@@ -177,7 +177,7 @@ validate_netmask (char *in_addr)
 	if (x == 1)
 		return 3;
 
-	bzero ((char *) addr, 16);
+	safe_bzero (addr);
 	if (strstr (in_addr, "/")) {
 		x = 0;
 		while (in_addr[x] != '/' && x < 15) {
@@ -185,7 +185,7 @@ validate_netmask (char *in_addr)
 			x++;
 		}
 	} else {
-		strncpy (addr, in_addr, 16);
+		safe_strncpy (addr, in_addr);
 	}
 
 	/*
@@ -311,7 +311,7 @@ quadtonum (char *quad, u_int32_t * num)
 	if (!validate_v4addr (quad))
 		return -1;
 
-	bzero ((char *) buf, 128);
+	safe_bzero (buf);
 	x = 0;
 	while (quad[x] != '.') {
 		buf[x] = quad[x];
@@ -324,7 +324,7 @@ quadtonum (char *quad, u_int32_t * num)
 		if (z > 255 || z < 0)
 			return -1;
 		*num = *num | (z << (8 * (3 - y)));
-		bzero ((char *) buf, 128);
+		safe_bzero (buf);
 		z = 0;
 		while (quad[x] != '.' && quad[x] != '\0' && x < strlen (quad)) {
 			buf[z] = quad[x];
@@ -345,6 +345,7 @@ numtoquad (u_int32_t num)
 
 	for (x = 0; x < 4; x++)
 		a[x] = num >> (8 * (3 - x)) & 0xff;
+
 	snprintf (quad, sizeof(quad), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
 
 	return quad;
@@ -356,6 +357,7 @@ numtobitmap (u_int32_t num, u_int32_t prefix_len)
 	static char bitmap[100];
 	int x, y, z;
 
+	safe_bzero (bitmap);
 	y = 1;
 	z = 0;
 	for (x = 0; x < 32; x++) {
@@ -395,8 +397,8 @@ parse_addr (struct if_info *ifi)
 	char *s_find;
 	int x, y, z;
 
-	bzero ((char *) buf, 128);
-	bzero ((char *) buf2, 128);
+	safe_bzero (buf);
+	safe_bzero (buf2);
 	ifi->v4ad.n_nmaskbits = 0;
 
 	/*
@@ -519,7 +521,8 @@ get_addrv4 (struct if_info *ifi)
 	if (y == 2)
 		return -2;
 
-	/* network class, class remark and classfull netmask
+	/*
+	 * network class, class remark and classful netmask
          * For details, and a possible RFC URL extension, see http://en.wikipedia.org/wiki/IPv4
 	 */
         len = ifi->v4ad.n_nmaskbits;
@@ -534,64 +537,64 @@ get_addrv4 (struct if_info *ifi)
 		ifi->v4ad.n_cnmask = 0xff000000;
 
                 if (x == 0)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sCurrent network", len < 8 ? "In Part " : ""), rfc = "RFC1700";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sCurrent network", len < 8 ? "In Part " : ""), rfc = "RFC1700";
                 if (x == 10)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 8 ? "In Part " : ""), rfc = "RFC1928";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network", len < 8 ? "In Part " : ""), rfc = "RFC1928";
                 if (x == 127)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sLoopback network", len < 8 ? "In Part " : ""), rfc = "RFC5735";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLoopback network", len < 8 ? "In Part " : ""), rfc = "RFC5735";
 	}
 	if ((x & 0xc0) == 0x80) {
 		ifi->v4ad.class = 'B';
 		ifi->v4ad.n_cnmask = 0xffff0000;
 
                 if (x == 169 && y == 254)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sLink-Local", len < 16 ? "In Part " : ""), rfc = "RFC3927";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLink-Local", len < 16 ? "In Part " : ""), rfc = "RFC3927";
                 if (x == 172 && (y & 0xF0) == 16)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 12 ? "In Part " : ""), rfc = "RFC1918";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network", len < 12 ? "In Part " : ""), rfc = "RFC1918";
 	}
 	if ((x & 0xe0) == 0xc0) {
 		ifi->v4ad.class = 'C';
 		ifi->v4ad.n_cnmask = 0xffffff00;
 
                 if (x == 192 && (y & 0xF8) == 168)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sPrivate network", len < 16 ? "In Part " : ""), rfc = "RFC1918";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network", len < 16 ? "In Part " : ""), rfc = "RFC1918";
                 if (x == 192 && y == 88 && z == 99)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sIPv6 to IPv4 relay", len < 24 ? "In Part " : ""), rfc = "RFC3068";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sIPv6 to IPv4 relay", len < 24 ? "In Part " : ""), rfc = "RFC3068";
                 if (x == 192 && y == 0 && z == 0)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sReserved, IANA", len < 24 ? "In Part " : ""), rfc = "RFC5735";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sReserved, IANA", len < 24 ? "In Part " : ""), rfc = "RFC5735";
                 if (x == 192 && y == 0 && z == 2)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-1, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5735";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sTEST-NET-1, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5735";
                 if (x == 198 && y == 18 && z == 0)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sNetwork benchmark tests", len < 15 ? "In Part " : ""), rfc = "RFC2544";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sNetwork benchmark tests", len < 15 ? "In Part " : ""), rfc = "RFC2544";
                 if (x == 198 && y == 51 && z == 100)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-2, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sTEST-NET-2, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
                 if (x == 203 && y == 0 && z == 113)
-                        snprintf (ifi->v4ad.class_remark, 64, ", %sTEST-NET-3, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
+                        snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sTEST-NET-3, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
 	}
 	if ((x & 0xf0) == 0xe0) {
 		ifi->v4ad.class = 'D';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
-		snprintf (ifi->v4ad.class_remark, 64, ", Multicast"), rfc = "RFC3171";
+		snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Multicast"), rfc = "RFC3171";
 	}
 	if ((x & 0xf8) == 0xf0) {
 		ifi->v4ad.class = 'E';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
-		snprintf (ifi->v4ad.class_remark, 64, ", Reserved for future use"), rfc = "RFC1700";
+		snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Reserved for future use"), rfc = "RFC1700";
 	}
         if (x == 255) {
 		ifi->v4ad.class = 'I';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
-		snprintf (ifi->v4ad.class_remark, 64, ", Broadcast"), rfc = "RFC919";
+		snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Broadcast"), rfc = "RFC919";
         }
 
 	if (ifi->v4ad.class == '\0') {
 		ifi->v4ad.class = 'I'; /* MAX Classes! */
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
-		ifi->v4ad.n_cnmask = 0xffffffff;
-		snprintf (ifi->v4ad.class_remark, 64, ", Nonexistent");
+//		ifi->v4ad.n_cnmask = 0xffffffff;
+		snprintf (ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Nonexistent");
 	}
 
         sz = strlen (ifi->v4ad.class_remark);
@@ -601,7 +604,7 @@ get_addrv4 (struct if_info *ifi)
                 snprintf (&ifi->v4ad.class_remark[sz], 64 - sz, " (%s)", rfc);
 
 	/*
-	 * network address (classfull + cidr)
+	 * network address (classful + cidr)
 	 */
 	ifi->v4ad.n_naddr = ifi->v4ad.n_haddr & ifi->v4ad.n_nmask;
 	ifi->v4ad.n_cnaddr = ifi->v4ad.n_haddr & ifi->v4ad.n_cnmask;
@@ -643,7 +646,7 @@ split_ipv6addr (char *addr, struct ipv6_split *spstr)
 	if (split && (count (addr, '/') == 1)) {
 		if (strlen (split) > 1 && strlen (split) < 5) {
 			split++;
-			strncpy (spstr->nmask, split, 3);
+			safe_strncpy (spstr->nmask, split);
 		}
 	}
 
@@ -836,7 +839,7 @@ getcolon (char *addr, int pos, int type)
 			y++;
 		}
 
-		bzero ((char *) str, 5);
+		safe_bzero (str);
 		x = 0;
 		while (y < strlen (addr) && addr[y] != ':') {
 			str[x] = addr[y];
@@ -846,7 +849,7 @@ getcolon (char *addr, int pos, int type)
 	}
 
 	if (compressed) {
-		bzero ((char *) str, 5);
+		safe_bzero (str);
 		if (pos <= cstart) {
 			x = 0;
 			y = 0;
@@ -884,7 +887,7 @@ getcolon (char *addr, int pos, int type)
 				y++;
 			}
 
-			bzero ((char *) str, 5);
+			safe_bzero (str);
 			x = 0;
 			while (y < strlen (addr) && addr[y] != ':') {
 				str[x] = addr[y];
@@ -925,7 +928,7 @@ v6addrtonum (struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 	}
 
 	if (type == V6TYPE_V4INV6) {
-		bzero ((char *) buf, 128);
+		safe_bzero (buf);
 		x = 0;
 		while (spstr.ipv4addr[x] != '.') {
 			buf[x] = spstr.ipv4addr[x];
@@ -943,7 +946,7 @@ v6addrtonum (struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 			}
 			n = atoi (buf);
 
-			bzero ((char *) buf, 128);
+			safe_bzero (buf);
 			z = 0;
 			while (spstr.ipv4addr[x] != '.'
 			       && spstr.ipv4addr[x] != '\0'
@@ -997,9 +1000,9 @@ validate_v6addr (char *addr)
 	int x;
 	struct ipv6_split spstr;
 
-	bzero ((char *) spstr.ipv6addr, 40);
-	bzero ((char *) spstr.ipv4addr, 16);
-	bzero ((char *) spstr.nmask, 4);
+	safe_bzero (spstr.ipv6addr);
+	safe_bzero (spstr.ipv4addr);
+	safe_bzero (spstr.nmask);
 
 	split_ipv6addr (addr, &spstr);
 
@@ -1071,29 +1074,29 @@ v6_type (struct v6addr *in6_addr)
 	a = in6_addr->haddr.sip6_addr16[0];
 
 	if (a == 0)
-		snprintf (in6_addr->class_remark, 63, "Reserved");
+		safe_snprintf (in6_addr->class_remark, "Reserved");
 	if (a == 2 || a == 3)
-		snprintf (in6_addr->class_remark, 63,
+		safe_snprintf (in6_addr->class_remark,
 			  "Reserved for NSAP Allocation");
 	if (a == 4 || a == 5)
-		snprintf (in6_addr->class_remark, 63,
+		safe_snprintf (in6_addr->class_remark,
 			  "Reserved for IPX Allocation");
 	if ((a & 0xe000) == 0x2000)
-		snprintf (in6_addr->class_remark, 63,
+		safe_snprintf (in6_addr->class_remark,
 			  "Aggregatable Global Unicast Addresses");
 	if ((a | 0x00ff) == 0x00ff)
-		snprintf (in6_addr->class_remark, 63, "Reserved");
+		safe_snprintf (in6_addr->class_remark, "Reserved");
 	if ((a & 0xff00) == 0xff00)
-		snprintf (in6_addr->class_remark, 63, "Multicast Addresses");
+		safe_snprintf (in6_addr->class_remark, "Multicast Addresses");
 	if ((a & 0xff80) == 0xfe80)
-		snprintf (in6_addr->class_remark, 63,
+		safe_snprintf (in6_addr->class_remark,
 			  "Link-Local Unicast Addresses");
 	if ((a & 0xffc0) == 0xfec0)
-		snprintf (in6_addr->class_remark, 63,
+		safe_snprintf (in6_addr->class_remark,
 			  "Site-Local Unicast Addresses");
 
 	if (in6_addr->class_remark[0] == '\0')
-		snprintf (in6_addr->class_remark, 63, "Unassigned");
+		safe_snprintf (in6_addr->class_remark, "Unassigned");
 
 	return;
 }
@@ -1109,7 +1112,7 @@ v6_comment (struct v6addr *in6_addr)
 			y = 1;
 	}
 	if (!y)
-		snprintf (in6_addr->comment, 63, "Unspecified");
+		safe_snprintf (in6_addr->comment, "Unspecified");
 
 	y = 0;
 	for (x = 0; x < 7; x++) {
@@ -1118,7 +1121,7 @@ v6_comment (struct v6addr *in6_addr)
 	}
 	if (!y)
 		if (in6_addr->haddr.sip6_addr16[7] == 1)
-			snprintf (in6_addr->comment, 63, "Loopback");
+			safe_snprintf (in6_addr->comment, "Loopback");
 
 	return;
 }
@@ -1152,7 +1155,7 @@ get_comp_v6 (struct sip_in6_addr addr)
 	int x, y, z;
 	int start, num;
 
-	bzero ((char *) outad, 44);
+	safe_bzero (outad);
 
 	start = -1;
 	num = 0;
@@ -1181,15 +1184,15 @@ get_comp_v6 (struct sip_in6_addr addr)
 	for (x = 0; x < 8; x++) {
 		if (x == start) {
 			if (!x)
-				strcat (outad, ":");
-			strcat (outad, ":");
+				safe_strncat (outad, ":");
+			safe_strncat (outad, ":");
 			x += num - 1;
 		} else {
-			bzero ((char *) tmpad, 5);
-			sprintf (tmpad, "%x", addr.sip6_addr16[x]);
-			strcat (outad, tmpad);
+			safe_bzero (tmpad);
+			safe_snprintf (tmpad, "%x", addr.sip6_addr16[x]);
+			safe_strncat (outad, tmpad);
 			if (x != 7)
-				strcat (outad, ":");
+				safe_strncat (outad, ":");
 		}
 	}
 
@@ -1202,9 +1205,9 @@ mk_ipv6addr (struct v6addr *in6_addr, char *addr)
 	int x, y, z;
 	struct ipv6_split spstr;
 
-	bzero ((char *) spstr.ipv6addr, 40);
-	bzero ((char *) spstr.ipv4addr, 16);
-	bzero ((char *) spstr.nmask, 4);
+	safe_bzero (spstr.ipv6addr);
+	safe_bzero (spstr.ipv4addr);
+	safe_bzero (spstr.nmask);
 
 	split_ipv6addr (addr, &spstr);
 
@@ -1255,9 +1258,9 @@ mk_ipv6addr (struct v6addr *in6_addr, char *addr)
 	v6addrtobroadcast (in6_addr);
 	in6_addr->real_v4 = v6verifyv4 (in6_addr->haddr);
 
-	bzero ((char *) in6_addr->class_remark, 64);
+	safe_bzero (in6_addr->class_remark);
 	v6_type (in6_addr);
-	bzero ((char *) in6_addr->comment, 64);
+	safe_bzero (in6_addr->comment);
 	v6_comment (in6_addr);
 
 	return 0;
@@ -1269,7 +1272,7 @@ new_dnsresp (struct dnsresp *d_resp)
 	d_resp->next = (struct dnsresp *) malloc (sizeof (struct dnsresp));
 	d_resp = d_resp->next;
 	d_resp->next = NULL;
-	bzero((char *) d_resp->str, 128);
+	safe_bzero(d_resp->str);
 	d_resp->type = 0;
 
 	return d_resp;
@@ -1295,17 +1298,17 @@ _resolv_v4_ghbn (char *raddr, struct dnsresp *d_resp, char *extra)
 	static char retaddr[1024];
 	int x;
 
-	bzero ((char *) retaddr, 1024);
+	safe_bzero (retaddr);
 
 	he = gethostbyname (raddr);
 	if (!he)
 		return NULL;
 
 	if (he->h_addrtype == AF_INET) {
-		snprintf (retaddr, 1023, "%s%s", inet_ntoa (*(struct in_addr *) he->h_addr_list[0]), extra);
+		safe_snprintf (retaddr, "%s%s", inet_ntoa (*(struct in_addr *) he->h_addr_list[0]), extra);
 		x = 0;
 		while (he->h_addr_list[x]) {
-			snprintf (d_resp->str, 127, "%s%s", inet_ntoa (*(struct in_addr *) he->h_addr_list[x]), extra);
+			safe_snprintf (d_resp->str, "%s%s", inet_ntoa (*(struct in_addr *) he->h_addr_list[x]), extra);
 			d_resp->type = AF_INET;
 			x++;
 			if (he->h_addr_list[x])
@@ -1335,18 +1338,18 @@ _resolv_v6_ghbn2 (char *raddr, struct dnsresp *d_resp, char *extra)
 	char ip6addr[128];
 	int x;
 
-	bzero ((char *) retaddr, 1024);
+	safe_bzero (retaddr);
 
 	he = gethostbyname2 (raddr, AF_INET6);
 	if (!he)
 		return NULL;
 
 	if (he->h_addrtype == AF_INET6) {
-		bzero ((char *) ip6addr, 128);
-		snprintf (retaddr, 1023, "%s%s", inet_ntop (AF_INET6, he->h_addr_list[0], ip6addr, 128), extra);
+		safe_bzero (ip6addr);
+		safe_snprintf (retaddr, "%s%s", inet_ntop (AF_INET6, he->h_addr_list[0], ip6addr, 128), extra);
 		x = 0;
 		while (he->h_addr_list[x]) {
-			snprintf (d_resp->str, 127, "%s%s", inet_ntop (AF_INET6, he->h_addr_list[x], ip6addr, 128), extra);
+			safe_snprintf (d_resp->str, "%s%s", inet_ntop (AF_INET6, he->h_addr_list[x], ip6addr, 128), extra);
 			d_resp->type = AF_INET6;
 			x++;
 			if (he->h_addr_list[x])
@@ -1391,11 +1394,11 @@ _resolv_v6_gai (char *raddr, struct dnsresp *d_resp, char *extra)
 
 	res_orig = res;
 	while (res) {
-		bzero ((char *) ip6addr, 128);
+		safe_bzero (ip6addr);
 		if (res->ai_family == PF_INET6) {
 			sin6 = (struct sockaddr_in6 *) res->ai_addr;
-			snprintf (retaddr, 1023, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			snprintf (d_resp->str, 127, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
+			safe_snprintf (retaddr, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
+			safe_snprintf (d_resp->str, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
 			d_resp->type = AF_INET6;
 		}
 		if (res->ai_next && (res->ai_family == PF_INET || res->ai_family == PF_INET6))
@@ -1444,17 +1447,17 @@ _resolv_unspec_gai (char *raddr, struct dnsresp *d_resp, char *extra)
 	res_orig = res;
 
 	while (res) {
-		bzero ((char *) ip6addr, 128);
+		safe_bzero (ip6addr);
 		if (res->ai_family == PF_INET) {
 			sin = (struct sockaddr_in *) res->ai_addr;
-			snprintf (retaddr, 1023, "%s%s", inet_ntoa (sin->sin_addr), extra);
-			snprintf(d_resp->str, 127, "%s%s", inet_ntoa (sin->sin_addr), extra);
+			safe_snprintf (retaddr, "%s%s", inet_ntoa (sin->sin_addr), extra);
+			safe_snprintf(d_resp->str, "%s%s", inet_ntoa (sin->sin_addr), extra);
 			d_resp->type = AF_INET;
 		}
 		if (res->ai_family == PF_INET6) {
 			sin6 = (struct sockaddr_in6 *) res->ai_addr;
-			snprintf (retaddr, 1023, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			snprintf (d_resp->str, 127, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
+			safe_snprintf (retaddr, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
+			safe_snprintf (d_resp->str, "%s%s", inet_ntop (AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
 			d_resp->type = AF_INET6;
 		}
 		if (res->ai_next && (res->ai_family == PF_INET || res->ai_family == PF_INET6))
@@ -1539,30 +1542,30 @@ resolve_addr (char *addr, int family, struct dnsresp *d_resp)
 	if (family == PF_UNSPEC && !ipv6_cap)
 		family = PF_INET;
 
-	bzero ((char *) extra, 32);
-	bzero ((char *) raddr, 1024);
+	safe_bzero (extra);
+	safe_bzero (raddr);
 	tmpstr = strstr (addr, "/");
 	if (tmpstr) {
-		strncpy (extra, tmpstr, 31);
+		safe_strncpy (extra, tmpstr);
 		strncpy (raddr, addr, strlen (addr) - strlen (tmpstr));
 	}
 	else {
 		tmpstr = strstr (addr, " ");
 		if (tmpstr) {
-			strncpy (extra, tmpstr, 31);
+			safe_strncpy (extra, tmpstr);
 			strncpy (raddr, addr, strlen (addr) - strlen (tmpstr));
 		}
 		else
-			strncpy (raddr, addr, 1023);
+			safe_strncpy (raddr, addr);
 	}
 
-	bzero ((char *) retaddr, 1024);
+	safe_bzero (retaddr);
 
 	if (family == PF_INET) {
 		tmpstr = _resolv_v4_ghbn (raddr, d_resp, extra);
 		if (!tmpstr)
 			return NULL;
-		strncpy (retaddr, tmpstr, 1024);
+		safe_strncpy (retaddr, tmpstr);
 		return retaddr;
 	}
 
@@ -1571,7 +1574,7 @@ resolve_addr (char *addr, int family, struct dnsresp *d_resp)
 			tmpstr = _resolv_v6_gai (raddr, d_resp, extra);
 			if (!tmpstr)
 				return NULL;
-			strncpy (retaddr, tmpstr, 1024);
+			safe_strncpy (retaddr, tmpstr);
 			return retaddr;
 		}
 
@@ -1579,7 +1582,7 @@ resolve_addr (char *addr, int family, struct dnsresp *d_resp)
 			tmpstr = _resolv_v6_ghbn2 (raddr, d_resp, extra);
 			if (!tmpstr)
 				return NULL;
-			strncpy (retaddr, tmpstr, 1024);
+			safe_strncpy (retaddr, tmpstr);
 			return retaddr;
 		}
 	}
@@ -1589,13 +1592,13 @@ resolve_addr (char *addr, int family, struct dnsresp *d_resp)
 			tmpstr = _resolv_unspec_gai (raddr, d_resp, extra);
 			if (!tmpstr)
 				return NULL;
-			strncpy (retaddr, tmpstr, 1024);
+			safe_strncpy (retaddr, tmpstr);
 			return retaddr;
 		}
 		if (f_gethostbyname && f_gethostbyname2) {
 			tmpstr = _resolv_v4_ghbn (raddr, d_resp, extra);
 			if (tmpstr) {
-				strncpy (retaddr, tmpstr, 1024);
+				safe_strncpy (retaddr, tmpstr);
 				d_resp_tmp = d_resp;
 				d_resp = new_dnsresp (d_resp);
 			}

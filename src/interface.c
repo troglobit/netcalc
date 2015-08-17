@@ -60,10 +60,10 @@ new_if (struct if_info *ifarg_cur)
 	n_if = ifarg_cur->next;
 	n_if->next = NULL;
 	bzero ((char *) n_if->name, IFNAMSIZ + 1);
-	bzero ((char *) n_if->p_v4addr, 19);
-	bzero ((char *) n_if->p_v4nmask, 16);
-	bzero ((char *) n_if->errorstr, 64);
-	bzero ((char *) n_if->cmdstr, 128);
+	safe_bzero (n_if->p_v4addr);
+	safe_bzero (n_if->p_v4nmask);
+	safe_bzero (n_if->errorstr);
+	safe_bzero (n_if->cmdstr);
 	n_if->type = 0;
 
 	return n_if;

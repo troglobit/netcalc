@@ -14,7 +14,7 @@ sipcalc \- IP subnet calculator
 is an ip subnet calculator consisting of two parts.
 A plain text based console version, and web (cgi) based counterpart.
 This manpage only addresses the console based version.
-Sipcalc, in it's simplest form takes an ip-address and a subnet mask
+Sipcalc, in its simplest form takes an ip-address and a subnet mask
 on the commandline and outputs information about the subnet.
 Sipcalc has support for both IPv4 and IPv6 addresses.
 
@@ -24,7 +24,7 @@ via stdin using the special character -.
 
 .IP Address-IPv4
 Address must be given in the "standard" dotted quad format, ie.:
-xxx.xxx.xxx.xxx and prepended with a netmask the can be given in 
+xxx.xxx.xxx.xxx with an optional netmask that can be given in
 three different ways:
  - CIDR, ex. /n where n >= 0 <= 32.
  - Dotted quad, ex. xxx.xxx.xxx.xxx.
@@ -32,7 +32,7 @@ three different ways:
 
 .IP Address-IPv6
 Addresses may be given in any of the forms defined in RFC2373, the netmask
-(prefix) must be given in CIDR notion.
+(prefix) must be given in CIDR notation.
 Valid values for the netmask range from n >= 0 <= 128, default value if
 netmask is omitted is 128.
 
@@ -94,7 +94,7 @@ Standard IPv6 network output.
 .IP *
 v4 in v6 output.
 .IP *
-Reverse dns address generation.
+Reverse DNS address generation.
 .IP *
 DNS resolutions of hostnames.
 .IP *
@@ -112,7 +112,7 @@ Currently the only input option that produces multiple output sections is an
 interface with multiple addresses. A subsection starts with the string
 "[IDENTIFIER]", where IDENTIFIER is an identifier for the subsection type.
 The subsection types are based on the used commandline options.
-Sections always en with the single character '-' alone on a line.
+Sections always end with the single character '-' alone on a line.
 Worth mentioning is also that sections can include not only subsections, but
 also other sections, this currently only happen when the -u and -s/-S options
 are used.
@@ -129,9 +129,9 @@ hosts under normal conditions.
 .IP "Network mask"
 The network mask (netmask) used to specify the size
 of a given subnet, usually represented in three different formats:
-dotted quad (xxx.xxx.xxx.xxx)
-hex (0xnnnnnnnn)
-bits (/n where n >= 0 <= 32)
+dotted quad (xxx.xxx.xxx.xxx),
+hex (0xnnnnnnnn),
+and bits (/n where n >= 0 <= 32)
 .IP "Broadcast address"
 The broadcast address of a given subnet, usually
 the last address in a range.
@@ -234,7 +234,7 @@ All options passed to sipcalc on the commandline will also be inherited
 when the subnet is passed back to sipcalc for parsing, with one exception,
 the -s/-S flag, we don't want an endless loop.
 Sending only the -s/-S and -u flags to sipcalc will give the default output
-(-i for ipv4 and -t for ipv6).
+(-i for IPv4 and -t for IPv6).
 
 .IP "-v, --version"
 Display version information.

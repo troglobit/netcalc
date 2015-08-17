@@ -75,6 +75,12 @@
 #define V6ADDR_VAL "0123456789ABCDEFabcdef:"
 #define NETMASK_VAL "0123456789"
 
+#define TERMINATE(x) (x[sizeof(x)-1]='\0')
+#define safe_strncpy(dest,src) strncpy(dest,src,sizeof(dest)-1+TERMINATE(dest)*0)
+#define safe_strncat(dest,src) strncat(dest,src,sizeof(dest)-1+TERMINATE(dest)*0)
+#define safe_snprintf(dest,whatever...) snprintf(dest,sizeof(dest),## whatever)
+#define safe_bzero(dest) bzero((char *)dest,sizeof(dest))
+
 /*
  * Easier to define this ourselves then to use all the different
  * versions from different platforms.
