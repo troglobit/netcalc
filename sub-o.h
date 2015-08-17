@@ -1,11 +1,6 @@
 /*
- * sipcalc, sub-o.h
- *
- * $Id: sub-o.h,v 1.11 2003/03/19 12:28:15 simius Exp $
- *
- * -
- * Copyright (c) 2003 Simon Ekstrand
- * All rights reserved.
+ * Copyright (c) 2003-2013  Simon Ekstrand
+ * Copyright (c) 2010-2015  Joachim Nilsson
  */
 
 #ifndef SUB_O_H
@@ -31,4 +26,4 @@ void print_short_help ();
 void print_help ();
 void print_version ();
 
-#endif				/* SUB_O_H */
+#endif /* SUB_O_H */

@@ -1,11 +1,6 @@
 /*
- * sipcalc, sub.h
- *
- * $Id: sub.h,v 1.31 2003/03/19 12:28:15 simius Exp $
- *
- * -
- * Copyright (c) 2003 Simon Ekstrand
- * All rights reserved.
+ * Copyright (c) 2003-2013  Simon Ekstrand
+ * Copyright (c) 2010-2015  Joachim Nilsson
  */
 
 #ifndef SUB_H
@@ -25,7 +20,7 @@
 #ifdef PACKAGE
 #define NAME PACKAGE
 #else
-#define NAME "sipcalc"
+#define NAME "netcalc"
 #endif
 
 #if defined(HAVE_GETHOSTBYNAME_NETDB) && !defined(HAVE_GETHOSTBYNAME)

@@ -1,0 +1,106 @@
+.\" To process this file use: groff -man -Tascii netcalc.1
+.Dd 17 August, 2015
+.Dt NETCALC 1 
+.Os
+.Sh NAME
+.Nm netcalc
+.Nd IP subnet calculator
+.Sh SYNOPSIS
+.Nm
+.Op Fl abcdehiInrsStuvx46
+.Ar ADDRESS | NETWORK
+.Sh DESCRIPTION
+.Nm
+is a simple network calculator derived from
+.Nm sipcalc.
+.Nm
+takes an IP address and a subnet mask, or an IP address and prefix mask
+in CIDR notation, on the commandline and outputs information about the
+subnet.
+.Nm
+supports both IPv4 and IPv6 addresses.
+.Pp
+IPv4 addresses must be given in the "standard" dotted quad format, ie.,
+xxx.xxx.xxx.xxx with an optional netmask that can be given in three
+different ways:
+.Bl -bullet -width 1n -compact
+.It
+CIDR, e.g. /n, where n >= 0 <= 32
+.It
+Dotted quad, e.g. xxx.xxx.xxx.xxx
+.It
+A hexadecimal value, e.g. 0xnnnnnnnn or nnnnnnnn
+.El
+IPv6 addresses may be given in any of the forms defined in RFC2373, the
+netmask (prefix) must be given in CIDR notation.  Valid values for the
+netmask range from n >= 0 <= 128, default value if netmask is omitted is
+128.
+.Pp
+.Nm
+also accepts arguments from stdin, this can be useful for example for
+.Xr cat 1
+ing a list of addresses stored in a file to
+.Nm .
+Each line sent to should contain an address netmask pair or address/len.
+.Pp
+.Sh FEATURES
+For IPv4 the following features are available:
+.Bl -bullet -width 1n -compact
+.It
+Multiple address and netmask input formats.
+.It
+Retrieving of address information from interfaces.
+.It
+Classfull and CIDR output.
+.It
+Multiple address and netmask output formats (dotted quad, hex, number of bits).
+.It
+Output of broadcast address, network class, Cisco wildcard,
+hosts/range, network range.
+.It
+Output of multiple types of bitmaps.
+.It
+Output of a user-defined number of extra networks.
+.It
+Multiple networks input from commandline.
+.It
+DNS resolutions of hostnames.
+.It
+Parsing of a newline separated list of networks from standard input (STDIN).
+.It
+The ability to "split" a network based on a smaller netmask, also with
+recursive runs on the generated subnets.
+.El
+.PP
+For IPv6 the following features are available:
+.Bl -bullet -width 1n -compact
+.It
+Compressed and expanded input addresses.
+.It
+Compressed and expanded output.
+.It
+Standard IPv6 network output.
+.It
+v4 in v6 output.
+.It
+Reverse DNS address generation.
+.It
+DNS resolutions of hostnames.
+.It
+The ability to "split" a network based on a smaller netmask, also with
+recursive runs on the generated subnets.
+.El
+.Sh BUGS
+Use the project's GitHub page to file bug reports, feature requests or
+patches (preferably as GitHub pull requests!), or questions at
+.Aq https://github.com/troglobit/netcalc
+.Sh AUTHORS
+The original author of
+.Nm sipcalc
+was Simon Ekstrand
+.Aq mailto:simon@routemeister.net
+the mess that later became
+.Nm
+is entirely Joachim Nilsson
+.Aq mailto:troglobit@gmail.com
+to blame for.

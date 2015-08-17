@@ -1,13 +1,19 @@
-AC_INIT(include/sub.h)
-AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(sipcalc,1.1.6)
+AC_PREREQ(2.62)
+AC_INIT(netcalc, 2.0-alpha1, https://github.com/troglobit/netcalc/issues)
+AM_INIT_AUTOMAKE([foreign])
+AM_SILENT_RULES([yes])
+
+AC_CONFIG_SRCDIR([sub.c])
+AC_CONFIG_HEADER([config.h])
+AC_CONFIG_FILES([Makefile])
+
 AC_PROG_CC
 AC_PROG_INSTALL
 
 dnl - Configuration.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(sys/ioctl.h unistd.h sys/types.h sys/bitypes.h sys/sockio.h netdb.h ctype.h)
-AC_PROG_GCC_TRADITIONAL
+AC_CHECK_HEADERS(unistd.h sys/types.h sys/bitypes.h sys/sockio.h netdb.h ctype.h)
+
 dnl Solaris also needs libnsl for inet_ntoa and friends.
 AC_CHECK_LIB(nsl, inet_ntoa,
 [
@@ -28,9 +34,7 @@ then
   LIBS="${LIBS} -L/usr/local/lib"
 fi
 
-
 dnl Check if getopt_long is available.
-
 AC_DEFUN([sii_GETOPT_LONG],
 [
   AC_CHECK_HEADERS(getopt.h,
@@ -56,7 +60,6 @@ AC_DEFUN([sii_GETOPT_LONG],
 
 
 dnl Check if we need netdb.h for resolver routines.
-
 AC_DEFUN([sii_GETADDRINFO],
 AC_MSG_CHECKING(for getaddrinfo in netdb.h)
 AC_TRY_COMPILE(
@@ -71,7 +74,7 @@ AC_TRY_COMPILE(
 AC_MSG_RESULT(no)))
 
 
-AC_DEFUN(sii_GETHOSTBYNAME,
+AC_DEFUN([sii_GETHOSTBYNAME],
 AC_MSG_CHECKING(for gethostbyname in netdb.h)
 AC_TRY_COMPILE(
 [
@@ -85,7 +88,7 @@ AC_TRY_COMPILE(
 AC_MSG_RESULT(no)))
 
 
-AC_DEFUN(sii_GETHOSTBYNAME2,
+AC_DEFUN([sii_GETHOSTBYNAME2],
 AC_MSG_CHECKING(for gethostbyname2 in netdb.h)
 AC_TRY_COMPILE(
 [
@@ -100,8 +103,7 @@ AC_MSG_RESULT(no)))
 
 
 dnl Check if struct sockaddr has member sa_len
-
-AC_DEFUN(sii_SA_LEN,
+AC_DEFUN([sii_SA_LEN],
 AC_MSG_CHECKING(if struct sockaddr has sa_len field)
 AC_TRY_COMPILE(
 [
@@ -119,7 +121,7 @@ AC_MSG_RESULT(no)))
 dnl Check if getopt_long is available.
 
 dnl Solaris has socket(2) in libsocket.
-AC_DEFUN(sii_LIBSOCKET,
+AC_DEFUN([sii_LIBSOCKET],
 [
   AC_CHECK_LIB(socket, socket,
   [
@@ -131,7 +133,7 @@ AC_DEFUN(sii_LIBSOCKET,
 
 dnl Check for uint[8,16,32]_t
 
-AC_DEFUN(sii_UINT8_T,
+AC_DEFUN([sii_UINT8_T],
 AC_MSG_CHECKING(if type uint8_t exists)
 AC_TRY_COMPILE(
 [
@@ -144,7 +146,7 @@ AC_TRY_COMPILE(
 ],
 AC_MSG_RESULT(no)))
 
-AC_DEFUN(sii_U_INT8_T,
+AC_DEFUN([sii_U_INT8_T],
 AC_MSG_CHECKING(if type u_int8_t exists)
 AC_TRY_COMPILE(
 [
@@ -159,7 +161,7 @@ AC_MSG_RESULT(no)))
 
 
 
-AC_DEFUN(sii_UINT16_T,
+AC_DEFUN([sii_UINT16_T],
 AC_MSG_CHECKING(if type uint16_t exists)
 AC_TRY_COMPILE(
 [
@@ -172,7 +174,7 @@ AC_TRY_COMPILE(
 ],
 AC_MSG_RESULT(no)))
 
-AC_DEFUN(sii_U_INT16_T,
+AC_DEFUN([sii_U_INT16_T],
 AC_MSG_CHECKING(if type u_int16_t exists)
 AC_TRY_COMPILE(
 [
@@ -187,7 +189,7 @@ AC_MSG_RESULT(no)))
 
 
 
-AC_DEFUN(sii_UINT32_T,
+AC_DEFUN([sii_UINT32_T],
 AC_MSG_CHECKING(if type uint32_t exists)
 AC_TRY_COMPILE(
 [
@@ -200,7 +202,7 @@ AC_TRY_COMPILE(
 ],
 AC_MSG_RESULT(no)))
 
-AC_DEFUN(sii_U_INT32_T,
+AC_DEFUN([sii_U_INT32_T],
 AC_MSG_CHECKING(if type u_int32_t exists)
 AC_TRY_COMPILE(
 [
@@ -226,9 +228,5 @@ sii_UINT32_T
 sii_U_INT8_T
 sii_U_INT16_T
 sii_U_INT32_T
-AC_OUTPUT(Makefile			\
-	  doc/Makefile			\
-	  include/Makefile		\
-	  src/Makefile			\
-	 )
 
+AC_OUTPUT

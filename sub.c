@@ -1,11 +1,6 @@
 /*
- * sipcalc, sub.c
- * 
- * $Id: sub.c,v 1.39 2003/03/19 12:28:16 simius Exp $
- * 
- * -
- * Copyright (c) 2003 Simon Ekstrand
- * All rights reserved.
+ * Copyright (c) 2003-2013  Simon Ekstrand
+ * Copyright (c) 2010-2015  Joachim Nilsson
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,8 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-static const char rcsid[] = "$Id: sub.c,v 1.39 2003/03/19 12:28:16 simius Exp $";
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -391,13 +384,27 @@ complete:
 	return abox_cur;
 }
 
-void
-show_abox (struct argbox *a)
+struct if_info *
+new_if (struct if_info *ifarg_cur)
 {
-	while(a) {
-		printf("%s - %d - %d\n", a->str, a->type, a->resolv);
-		a = a->next;
-	}
+        struct if_info *n_if;
+
+        n_if = (struct if_info *) calloc (1, sizeof (struct if_info));
+        ifarg_cur->next = n_if;
+
+        return n_if;
+}
+
+void
+free_if (struct if_info *if_cur)
+{
+        struct if_info *if_old;
+
+        while (if_cur) {
+                if_old = if_cur;
+                if_cur = if_cur->next;
+                free (if_old);
+        }
 }
 
 struct if_info *
@@ -516,52 +523,11 @@ parse_abox (struct argbox *abox, struct if_info *if_start)
 			free_dnsresp (d_resp_start);
 		}
 
-		if (abox->type == AT_INT) {
-			if_cur = if_start;
-			if_found = 0;
-			while (if_cur) {
-				if (!strcmp (abox->str, if_cur->name)) {
-					if (if_found) {
-						ifarg_old = ifarg_cur;
-						ifarg_cur = new_if (ifarg_cur);
-					}
-					memcpy ((struct if_info *) ifarg_cur, (struct if_info *) if_cur, sizeof (struct if_info));
-					ifarg_cur->type = IFT_INTV4;
-					safe_strncpy (ifarg_cur->cmdstr, abox->str);
-					if_found = 1;
-				}
-				if_cur = if_cur->next;
-			}
-			if (!if_found) {
-				strncpy (ifarg_cur->name, abox->str, IFNAMSIZ);
-				safe_strncpy (ifarg_cur->cmdstr, abox->str);
-				safe_snprintf(ifarg_cur->errorstr, "Unable to retrieve interface information");
-				ifarg_cur->type = IFT_INTV4;
-			}
-		}
-
 		if (abox->type == AT_UNKWN && !abox->resolv) {
-			if_cur = if_start;
-			if_found = 0;
-			while (if_cur) {
-				if (!strcmp (abox->str, if_cur->name)) {
-					if (if_found) {
-						ifarg_old = ifarg_cur;
-						ifarg_cur = new_if (ifarg_cur);
-					}
-					memcpy ((struct if_info *) ifarg_cur, (struct if_info *) if_cur, sizeof (struct if_info));
-					ifarg_cur->type = IFT_INTV4;
-					safe_strncpy (ifarg_cur->cmdstr, abox->str);
-					if_found = 1;
-				}
-				if_cur = if_cur->next;
-			}
-			if (!if_found) {
-				strncpy (ifarg_cur->name, abox->str, IFNAMSIZ);
-				safe_strncpy (ifarg_cur->cmdstr, abox->str);
-				safe_snprintf(ifarg_cur->errorstr, "Unable to retrieve interface information");
-				ifarg_cur->type = IFT_INTV4;
-			}
+			strncpy (ifarg_cur->name, abox->str, IFNAMSIZ);
+			safe_strncpy (ifarg_cur->cmdstr, abox->str);
+			safe_snprintf(ifarg_cur->errorstr, "Unable to retrieve interface information");
+			ifarg_cur->type = IFT_INTV4;
 		}
 
 		if (abox->type == AT_UNKWN && abox->resolv) {
@@ -887,9 +853,6 @@ main (int argc, char *argv[])
 	 */
 	if_start = NULL;
 	if_cur = NULL;
-	if (!(if_cur = if_start = get_if_ext ())) {
-		printf ("INFO: Unable to retrieve interface information, skipping interface(s).\n");
-	}
 
 	if (!parse_stdin)
 		ifarg_cur = ifarg_start = parse_abox (abox_start, if_start);

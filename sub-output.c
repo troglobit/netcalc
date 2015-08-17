@@ -1,11 +1,6 @@
 /*
- * sipcalc, sub-output.c
- * 
- * $Id: sub-output.c,v 1.32 2003/03/19 12:33:56 simius Exp $
- * 
- * -
- * Copyright (c) 2003 Simon Ekstrand
- * All rights reserved.
+ * Copyright (c) 2003-2013  Simon Ekstrand
+ * Copyright (c) 2010-2015  Joachim Nilsson
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,8 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-static const char rcsid[] = "$Id: sub-output.c,v 1.32 2003/03/19 12:33:56 simius Exp $";
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
