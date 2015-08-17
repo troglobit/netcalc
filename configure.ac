@@ -8,6 +8,7 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([Makefile])
 
 AC_PROG_CC
+AC_PROG_LN_S
 AC_PROG_INSTALL
 
 dnl - Configuration.
