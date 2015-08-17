@@ -12,27 +12,9 @@ AC_PROG_INSTALL
 
 dnl - Configuration.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h stdint.h sys/types.h sys/bitypes.h netdb.h ctype.h)
+AC_CHECK_HEADERS(unistd.h stdint.h)
 
-dnl Solaris also needs libnsl for inet_ntoa and friends.
-AC_CHECK_LIB(nsl, inet_ntoa,
-[
-  AC_DEFINE(HAVE_LIBNSL, 1, libnsl)
-  LIBS="$LIBS -lnsl"
-])
-AC_CHECK_FUNCS(strstr strtol strtoul gethostbyname gethostbyname2 inet_ntop getipnodebyaddr getaddrinfo)
-
-dnl - Include /usr/local/include if it exists.
-if test -d /usr/local/include;
-then
-  CFLAGS="${CFLAGS} -I/usr/local/include"
-fi
-
-dnl - Include /usr/local/lib if it exists.
-if test -d /usr/local/lib;
-then
-  LIBS="${LIBS} -L/usr/local/lib"
-fi
+AC_CHECK_FUNCS(strstr strtol strtoul)
 
 dnl Check if getopt_long is available.
 AC_DEFUN([sii_GETOPT_LONG],
@@ -59,71 +41,11 @@ AC_DEFUN([sii_GETOPT_LONG],
 ])
 
 
-dnl Check if we need netdb.h for resolver routines.
-AC_DEFUN([sii_GETADDRINFO],
-AC_MSG_CHECKING(for getaddrinfo in netdb.h)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-  #include <netdb.h>
-]], [[struct addrinfo h; struct addrinfo *r; getaddrinfo("127.0.0.1", NULL, &h, &r)]])],[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_GETADDRINFO_NETDB, 1, getaddrinfo_netdb)
-],[AC_MSG_RESULT(no)]))
-
-
-AC_DEFUN([sii_GETHOSTBYNAME],
-AC_MSG_CHECKING(for gethostbyname in netdb.h)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-  #include <netdb.h>
-]], [[struct hostent *h; h=gethostbyname("127.0.0.1")]])],[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_GETHOSTBYNAME_NETDB, 1, gethostbyname_netdb)
-],[AC_MSG_RESULT(no)]))
-
-
-AC_DEFUN([sii_GETHOSTBYNAME2],
-AC_MSG_CHECKING(for gethostbyname2 in netdb.h)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-  #include <netdb.h>
-]], [[struct hostent *h; h=gethostbyname("127.0.0.1", AF_INET)]])],[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_GETHOSTBYNAME2_NETDB, 1, gethostbyname2_netdb)
-],[AC_MSG_RESULT(no)]))
-
-
-dnl Check if struct sockaddr has member sa_len
-AC_DEFUN([sii_SA_LEN],
-AC_MSG_CHECKING(if struct sockaddr has sa_len field)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-  #include <sys/types.h>
-  #include <sys/socket.h>
-]], [[struct sockaddr sa;int x; x=sizeof(sa.sa_len);]])],[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_SA_LEN, 1, sa_len)
-],[AC_MSG_RESULT(no)]))
-
-
-dnl Check if getopt_long is available.
-
-dnl Solaris has socket(2) in libsocket.
-AC_DEFUN([sii_LIBSOCKET],
-[
-  AC_CHECK_LIB(socket, socket,
-  [
-    AC_DEFINE(HAVE_LIBSOCKET, 1, libsocket)
-    LIBS="$LIBS -lsocket"
-  ])
-])
-
 dnl Check for uint[8,16,32]_t
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
-sii_LIBSOCKET
-sii_GETHOSTBYNAME
-sii_GETHOSTBYNAME2
-sii_GETADDRINFO
-sii_SA_LEN
 sii_GETOPT_LONG
 
 AC_OUTPUT

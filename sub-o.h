@@ -9,7 +9,7 @@
 /*
  * prototypes
  */
-void show_split_networks_v4(struct if_info *ifi, u_int32_t splitmask, int v4args, struct misc_args m_argv4);
+void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4);
 int show_networks_v4(struct if_info *ifi, int count);
 void print_cf_info_v4(struct if_info *ifi);
 void print_comp_v6(struct sip_in6_addr addr);

@@ -33,9 +33,9 @@
 #include <string.h>
 #include "sub.h"
 
-void show_split_networks_v4(struct if_info *ifi, u_int32_t splitmask, int v4args, struct misc_args m_argv4)
+void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4)
 {
-	u_int32_t diff, start, end;
+	uint32_t diff, start, end;
 	struct if_info ifi_tmp;
 	int v4args_tmp;
 	size_t maxlen;
@@ -113,8 +113,8 @@ int show_networks_v4(struct if_info *ifi, int count)
 {
 	int lcount = count;
 	size_t startlen = 0, endlen = 0;
-	u_int32_t diff, start, end, len;
-	u_int32_t lstart, lend;
+	uint32_t diff, start, end, len;
+	uint32_t lstart, lend;
 
 	diff = 0xffffffff - ifi->v4ad.n_nmask + 1;
 	len = ifi->v4ad.n_nmaskbits;
@@ -176,7 +176,7 @@ int show_networks_v4(struct if_info *ifi, int count)
 
 void print_cf_info_v4(struct if_info *ifi)
 {
-	u_int32_t num, bcast, len, min, max;
+	uint32_t num, bcast, len, min, max;
 	char temp[21];
 
 	num = ifi->v4ad.n_broadcast - ifi->v4ad.n_naddr - 1;

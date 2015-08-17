@@ -283,8 +283,6 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 	 * We use goto's here *gasp*.
 	 */
 	while (argv[argcount]) {
-		strlcpy(expaddr, argv[argcount], sizeof(expaddr));
-
 		/*
 		 * Baaad argument. Error out if this happens.
 		 */
@@ -293,6 +291,8 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 			error = 1;
 			exit(1);
 		}
+
+		strlcpy(expaddr, argv[argcount], sizeof(expaddr));
 
 		/*
 		 * Is this a v6 address?
@@ -423,43 +423,6 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 		}
 
-		if (abox->type == AT_V4 && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
-
-			tmpstr = resolve_addr(abox->str, PF_INET, d_resp_cur);
-			if (tmpstr) {
-				d_resp_cur = d_resp_start;
-				while (d_resp_cur) {
-					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-					tmpstr = strstr(d_resp_cur->str, " ");
-					if (tmpstr != NULL && (strlen(tmpstr) > 0)) {
-						tmpstr++;
-						x = 0;
-						while (x < 15 && tmpstr[x] != ' ' && x < strlen(tmpstr)) {
-							ifarg_cur->p_v4nmask[x] = tmpstr[x];
-							x++;
-						}
-					}
-
-					x = 0;
-					while (x < 18 && d_resp_cur->str[x] != ' ') {
-						ifarg_cur->p_v4addr[x] = d_resp_cur->str[x];
-						x++;
-					}
-					ifarg_cur->type = IFT_V4;
-					if (d_resp_cur->next)
-						ifarg_cur = new_if(ifarg_cur);
-					d_resp_cur = d_resp_cur->next;
-				}
-			} else {
-				strlcpy(ifarg_cur->p_v4addr, abox->str, sizeof(ifarg_cur->p_v4addr));
-				strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-				ifarg_cur->type = IFT_V4;
-			}
-
-			free_dnsresp(d_resp_start);
-		}
-
 		if (abox->type == AT_V6 && !abox->resolv) {
 			strlcpy(ifarg_cur->p_v6addr, abox->str, sizeof(ifarg_cur->p_v6addr));
 			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
@@ -468,102 +431,11 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 			ifarg_cur->type = IFT_V6;
 		}
 
-		if (abox->type == AT_V6 && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
-
-			tmpstr = resolve_addr(abox->str, PF_INET6, d_resp_cur);
-			if (tmpstr) {
-				d_resp_cur = d_resp_start;
-				while (d_resp_cur) {
-					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-					strlcpy(ifarg_cur->p_v6addr, d_resp_cur->str, sizeof(ifarg_cur->p_v6addr));
-					ifarg_cur->type = IFT_V6;
-
-					mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
-
-					if (d_resp_cur->next)
-						ifarg_cur = new_if(ifarg_cur);
-					d_resp_cur = d_resp_cur->next;
-				}
-			} else {
-				strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-				strlcpy(ifarg_cur->p_v6addr, abox->str, sizeof(ifarg_cur->p_v6addr));
-				ifarg_cur->type = IFT_V6;
-
-				mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
-			}
-
-			free_dnsresp(d_resp_start);
-		}
-
 		if (abox->type == AT_UNKWN && !abox->resolv) {
 			strlcpy(ifarg_cur->name, abox->str, IFNAMSIZ);
 			strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
 			snprintf(ifarg_cur->errorstr, sizeof(ifarg_cur->errorstr), "Unable to retrieve interface information");
 			ifarg_cur->type = IFT_INTV4;
-		}
-
-		if (abox->type == AT_UNKWN && abox->resolv) {
-			d_resp_start = d_resp_cur = (struct dnsresp *)calloc(1, sizeof(struct dnsresp));
-
-			tmpstr = resolve_addr(abox->str, PF_UNSPEC, d_resp_cur);
-			if (tmpstr) {
-				d_resp_cur = d_resp_start;
-				while (d_resp_cur) {
-					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-					if (d_resp_cur->type == AF_INET6) {
-						strlcpy(ifarg_cur->p_v6addr, d_resp_cur->str, sizeof(ifarg_cur->p_v6addr));
-						ifarg_cur->type = IFT_V6;
-
-						mk_ipv6addr(&ifarg_cur->v6ad, ifarg_cur->p_v6addr);
-					}
-					if (d_resp_cur->type == AF_INET) {
-						tmpstr = strstr(d_resp_cur->str, " ");
-						if (tmpstr != NULL && (strlen(tmpstr) > 0)) {
-							tmpstr++;
-							x = 0;
-							while (x < 15 && tmpstr[x] != ' ' && x < strlen(tmpstr)) {
-								ifarg_cur->p_v4nmask[x] = tmpstr[x];
-								x++;
-							}
-						}
-
-						x = 0;
-						while (x < 18 && d_resp_cur->str[x] != ' ') {
-							ifarg_cur->p_v4addr[x] = d_resp_cur->str[x];
-							x++;
-						}
-						ifarg_cur->type = IFT_V4;
-
-					}
-					if (d_resp_cur->next)
-						ifarg_cur = new_if(ifarg_cur);
-					d_resp_cur = d_resp_cur->next;
-				}
-				free_dnsresp(d_resp_start);
-			} else {
-				if_cur = if_start;
-				if_found = 0;
-				while (if_cur) {
-					if (!strcmp(abox->str, if_cur->name)) {
-						if (if_found) {
-							ifarg_old = ifarg_cur;
-							ifarg_cur = new_if(ifarg_cur);
-						}
-						memcpy((struct if_info *)ifarg_cur, (struct if_info *)if_cur,
-						       sizeof(struct if_info));
-						ifarg_cur->type = IFT_INTV4;
-						strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-						if_found = 1;
-					}
-					if_cur = if_cur->next;
-				}
-				if (!if_found) {
-					strlcpy(ifarg_cur->cmdstr, abox->str, sizeof(ifarg_cur->cmdstr));
-					snprintf(ifarg_cur->errorstr, sizeof(ifarg_cur->errorstr), "Unparsable argument.");
-					ifarg_cur->type = IFT_UNKWN;
-				}
-			}
 		}
 
 		abox = abox->next;

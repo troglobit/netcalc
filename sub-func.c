@@ -26,20 +26,12 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-#ifdef HAVE_NETDB_H
-#include <netdb.h>
-#endif
-#ifdef HAVE_CTYPE_H
-#include <ctype.h>
+#include "config.h"
 #endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
 #include "sub.h"
 #include "sub-o.h"
 
@@ -134,7 +126,7 @@ int validate_netmask(char *in_addr)
 	int x, y, z, m;
 	char addr[16];
 	char *sl;
-	u_int32_t sm;
+	uint32_t sm;
 
 	if (strlen(in_addr) > 18)
 		return 0;
@@ -228,10 +220,10 @@ int validate_netmask(char *in_addr)
 	return 2;
 }
 
-int getsplitnumv4(char *buf, u_int32_t * splitmask)
+int getsplitnumv4(char *buf, uint32_t * splitmask)
 {
 	int x, y;
-	u_int32_t sm;
+	uint32_t sm;
 
 	if (strlen(buf) < 1)
 		return -1;
@@ -288,7 +280,7 @@ int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum)
 	return 0;
 }
 
-int quadtonum(char *quad, u_int32_t * num)
+int quadtonum(char *quad, uint32_t * num)
 {
 	char buf[128];
 	int x, y, z;
@@ -322,7 +314,7 @@ int quadtonum(char *quad, u_int32_t * num)
 	return 0;
 }
 
-char *numtoquad(u_int32_t num)
+char *numtoquad(uint32_t num)
 {
 	int a[4], x;
 	static char quad[17];
@@ -335,7 +327,7 @@ char *numtoquad(u_int32_t num)
 	return quad;
 }
 
-char *numtobitmap(u_int32_t num, u_int32_t prefix_len)
+char *numtobitmap(uint32_t num, uint32_t prefix_len)
 {
 	static char bitmap[100];
 	int x, y, z;
@@ -362,9 +354,9 @@ char *numtobitmap(u_int32_t num, u_int32_t prefix_len)
 }
 
 /* Note: Only applicable to netmasks */
-u_int32_t numtolen(u_int32_t num)
+uint32_t numtolen(uint32_t num)
 {
-	u_int32_t len = 0;
+	uint32_t len = 0;
 
 	while ((num <<= 1))
 		len++;
@@ -464,7 +456,7 @@ int parse_addr(struct if_info *ifi)
  */
 int get_addrv4(struct if_info *ifi)
 {
-	u_int32_t x, y, z, len;
+	uint32_t x, y, z, len;
 	char *rfc = NULL;
 	size_t sz;
 
@@ -1220,341 +1212,6 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr)
 	v6_comment(in6_addr);
 
 	return 0;
-}
-
-struct dnsresp *new_dnsresp(struct dnsresp *d_resp)
-{
-	d_resp->next = (struct dnsresp *)malloc(sizeof(struct dnsresp));
-	d_resp = d_resp->next;
-	d_resp->next = NULL;
-	memset(d_resp->str, 0, sizeof(d_resp->str));
-	d_resp->type = 0;
-
-	return d_resp;
-}
-
-void free_dnsresp(struct dnsresp *d_resp)
-{
-	struct dnsresp *old;
-
-	while (d_resp) {
-		old = d_resp;
-		d_resp = d_resp->next;
-		free(old);
-	}
-}
-
-#ifdef HAVE_GETHOSTBYNAME
-char *_resolv_v4_ghbn(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	struct hostent *he;
-	static char retaddr[1024];
-	int x;
-
-	memset(retaddr, 0, sizeof(retaddr));
-
-	he = gethostbyname(raddr);
-	if (!he)
-		return NULL;
-
-	if (he->h_addrtype == AF_INET) {
-		snprintf(retaddr, sizeof(retaddr), "%s%s", inet_ntoa(*(struct in_addr *)he->h_addr_list[0]), extra);
-		x = 0;
-		while (he->h_addr_list[x]) {
-			snprintf(d_resp->str, sizeof(d_resp->str), "%s%s", inet_ntoa(*(struct in_addr *)he->h_addr_list[x]), extra);
-			d_resp->type = AF_INET;
-			x++;
-			if (he->h_addr_list[x])
-				d_resp = new_dnsresp(d_resp);
-		}
-	}
-
-	if (retaddr[0] == '\0')
-		return NULL;
-
-	return retaddr;
-}
-#else
-char *_resolv_v4_ghbn(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	return NULL;
-}
-#endif
-
-#if defined(HAVE_GETHOSTBYNAME2) && defined(HAVE_INET_NTOP)
-char *_resolv_v6_ghbn2(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	struct hostent *he;
-	static char retaddr[1024];
-	char ip6addr[128];
-	int x;
-
-	memset(retaddr, 0, sizeof(retaddr));
-
-	he = gethostbyname2(raddr, AF_INET6);
-	if (!he)
-		return NULL;
-
-	if (he->h_addrtype == AF_INET6) {
-		memset(ip6addr, 0, sizeof(ip6addr));
-		snprintf(retaddr, sizeof(retaddr), "%s%s", inet_ntop(AF_INET6, he->h_addr_list[0], ip6addr, 128), extra);
-		x = 0;
-		while (he->h_addr_list[x]) {
-			snprintf(d_resp->str, sizeof(d_resp->str), "%s%s", inet_ntop(AF_INET6, he->h_addr_list[x], ip6addr, 128), extra);
-			d_resp->type = AF_INET6;
-			x++;
-			if (he->h_addr_list[x])
-				d_resp = new_dnsresp(d_resp);
-		}
-	}
-
-	if (retaddr[0] == '\0')
-		return NULL;
-
-	return retaddr;
-}
-#else
-char *_resolv_v6_ghbn2(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	return NULL;
-}
-#endif
-
-#if defined(HAVE_GETADDRINFO) && defined(HAVE_INET_NTOP)
-char *_resolv_v6_gai(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	int x;
-	struct addrinfo hints;
-	struct addrinfo *res, *res_orig;
-	struct sockaddr_in6 *sin6;
-	static char retaddr[1024];
-	char ip6addr[128];
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET6;
-	hints.ai_socktype = 0;
-	hints.ai_flags = AI_CANONNAME;
-	hints.ai_protocol = IPPROTO_TCP;
-	x = getaddrinfo(raddr, NULL, &hints, &res);
-	if (x)
-		return NULL;
-	if (!res)
-		return NULL;
-
-	res_orig = res;
-	while (res) {
-		memset(ip6addr, 0, sizeof(ip6addr));
-		if (res->ai_family == PF_INET6) {
-			sin6 = (struct sockaddr_in6 *)res->ai_addr;
-			snprintf(retaddr, sizeof(retaddr), "%s%s", inet_ntop(AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			snprintf(d_resp->str, sizeof(d_resp->str), "%s%s", inet_ntop(AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			d_resp->type = AF_INET6;
-		}
-		if (res->ai_next && (res->ai_family == PF_INET || res->ai_family == PF_INET6))
-			d_resp = new_dnsresp(d_resp);
-		res = res->ai_next;
-	}
-
-	freeaddrinfo(res_orig);
-
-	if (retaddr[0] == '\0')
-		return NULL;
-
-	return retaddr;
-}
-#else
-char *_resolv_v6_gai(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	return NULL;
-}
-#endif
-
-#if defined(HAVE_GETADDRINFO) && defined(HAVE_INET_NTOP)
-char *_resolv_unspec_gai(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	int x;
-	struct addrinfo hints;
-	struct addrinfo *res, *res_orig;
-	struct sockaddr_in *sin;
-	struct sockaddr_in6 *sin6;
-	static char retaddr[1024];
-	char ip6addr[128];
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = 0;
-	hints.ai_flags = AI_CANONNAME;
-	hints.ai_protocol = IPPROTO_TCP;
-	x = getaddrinfo(raddr, NULL, &hints, &res);
-	if (x)
-		return NULL;
-	if (!res)
-		return NULL;
-
-	res_orig = res;
-
-	while (res) {
-		memset(ip6addr, 0, sizeof(ip6addr));
-		if (res->ai_family == PF_INET) {
-			sin = (struct sockaddr_in *)res->ai_addr;
-			snprintf(retaddr, sizeof(retaddr), "%s%s", inet_ntoa(sin->sin_addr), extra);
-			snprintf(d_resp->str, sizeof(d_resp->str), "%s%s", inet_ntoa(sin->sin_addr), extra);
-			d_resp->type = AF_INET;
-		}
-		if (res->ai_family == PF_INET6) {
-			sin6 = (struct sockaddr_in6 *)res->ai_addr;
-			snprintf(retaddr, sizeof(retaddr), "%s%s", inet_ntop(AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			snprintf(d_resp->str, sizeof(d_resp->str), "%s%s", inet_ntop(AF_INET6, &sin6->sin6_addr, ip6addr, 128), extra);
-			d_resp->type = AF_INET6;
-		}
-		if (res->ai_next && (res->ai_family == PF_INET || res->ai_family == PF_INET6))
-			d_resp = new_dnsresp(d_resp);
-		res = res->ai_next;
-	}
-
-	freeaddrinfo(res_orig);
-
-	if (retaddr[0] == '\0')
-		return NULL;
-
-	return retaddr;
-}
-#else
-char *_resolv_unspec_gai(char *raddr, struct dnsresp *d_resp, char *extra)
-{
-	return NULL;
-}
-#endif
-
-char *resolve_addr(char *addr, int family, struct dnsresp *d_resp)
-{
-	char extra[32];
-	char *tmpstr;
-	char raddr[1024];
-	static char retaddr[1024];
-	struct dnsresp *d_resp_tmp;
-	int f_gethostbyname;
-	int f_gethostbyname2;
-	int f_getaddrinfo;
-	int f_inet_ntop;
-	int ipv4_cap;
-	int ipv6_cap;
-
-	f_gethostbyname = 0;
-	f_gethostbyname2 = 0;
-	f_getaddrinfo = 0;
-	f_inet_ntop = 0;
-	ipv4_cap = 0;
-	ipv6_cap = 0;
-
-#ifdef HAVE_GETHOSTBYNAME
-	f_gethostbyname = 1;
-#endif
-#ifdef HAVE_GETHOSTBYNAME2
-	f_gethostbyname2 = 1;
-#endif
-#ifdef HAVE_GETADDRINFO
-	f_getaddrinfo = 1;
-#endif
-#ifdef HAVE_INET_NTOP
-	f_inet_ntop = 1;
-#endif
-
-	if (f_gethostbyname)
-		ipv4_cap = 1;
-
-	if ((f_gethostbyname2 || f_getaddrinfo) && f_inet_ntop)
-		ipv6_cap = 1;
-
-	if (family != PF_INET && family != PF_INET6 && family != PF_UNSPEC)
-		return NULL;
-
-	if (family == PF_INET && !ipv4_cap)
-		return NULL;
-
-	if (family == PF_INET6 && !ipv6_cap)
-		return NULL;
-
-	if (family == PF_UNSPEC && (!ipv4_cap && !ipv6_cap))
-		return NULL;
-
-	if (strlen(addr) > 1023)
-		return NULL;
-
-	if (family == PF_UNSPEC && !ipv4_cap)
-		family = PF_INET6;
-
-	if (family == PF_UNSPEC && !ipv6_cap)
-		family = PF_INET;
-
-	memset(extra, 0, sizeof(extra));
-	memset(raddr, 0, sizeof(raddr));
-	tmpstr = strstr(addr, "/");
-	if (tmpstr) {
-		strlcpy(extra, tmpstr, sizeof(extra));
-		strncpy(raddr, addr, strlen(addr) - strlen(tmpstr));
-	} else {
-		tmpstr = strstr(addr, " ");
-		if (tmpstr) {
-			strlcpy(extra, tmpstr, sizeof(extra));
-			strncpy(raddr, addr, strlen(addr) - strlen(tmpstr));
-		} else
-			strlcpy(raddr, addr, sizeof(raddr));
-	}
-
-	memset(retaddr, 0, sizeof(retaddr));
-
-	if (family == PF_INET) {
-		tmpstr = _resolv_v4_ghbn(raddr, d_resp, extra);
-		if (!tmpstr)
-			return NULL;
-		strlcpy(retaddr, tmpstr, sizeof(retaddr));
-		return retaddr;
-	}
-
-	if (family == PF_INET6) {
-		if (f_getaddrinfo) {
-			tmpstr = _resolv_v6_gai(raddr, d_resp, extra);
-			if (!tmpstr)
-				return NULL;
-			strlcpy(retaddr, tmpstr, sizeof(retaddr));
-			return retaddr;
-		}
-
-		if (f_gethostbyname2) {
-			tmpstr = _resolv_v6_ghbn2(raddr, d_resp, extra);
-			if (!tmpstr)
-				return NULL;
-			strlcpy(retaddr, tmpstr, sizeof(retaddr));
-			return retaddr;
-		}
-	}
-
-	if (family == PF_UNSPEC) {
-		if (f_getaddrinfo) {
-			tmpstr = _resolv_unspec_gai(raddr, d_resp, extra);
-			if (!tmpstr)
-				return NULL;
-			strlcpy(retaddr, tmpstr, sizeof(retaddr));
-			return retaddr;
-		}
-		if (f_gethostbyname && f_gethostbyname2) {
-			tmpstr = _resolv_v4_ghbn(raddr, d_resp, extra);
-			if (tmpstr) {
-				strlcpy(retaddr, tmpstr, sizeof(retaddr));
-				d_resp_tmp = d_resp;
-				d_resp = new_dnsresp(d_resp);
-			}
-			tmpstr = _resolv_v6_ghbn2(raddr, d_resp, extra);
-			if (!tmpstr) {
-				d_resp_tmp->next = NULL;
-				free(d_resp);
-			}
-			return retaddr;
-		}
-	}
-
-	return NULL;
 }
 
 /**

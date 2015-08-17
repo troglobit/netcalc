@@ -8,14 +8,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
-#endif
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
 #endif
 #include <net/if.h>		/* IFNAMSIZ */
 
@@ -23,16 +17,6 @@
 #define NAME PACKAGE
 #else
 #define NAME "netcalc"
-#endif
-
-#if defined(HAVE_GETHOSTBYNAME_NETDB) && !defined(HAVE_GETHOSTBYNAME)
-#define HAVE_GETHOSTBYNAME
-#endif
-#if defined(HAVE_GETHOSTBYNAME2_NETDB) && !defined(HAVE_GETHOSTBYNAME2)
-#define HAVE_GETHOSTBYNAME
-#endif
-#if defined(HAVE_GETADDRINFO_NETDB) && !defined(HAVE_GETADDRINFO)
-#define HAVE_GETADDRINFO
 #endif
 
 /*** Fallback to older types before stdint.h was defined ***/
@@ -48,18 +32,6 @@
 #define uint32_t u_int32_t
 #endif
 /*** End of fallback ***/
-
-#ifndef PF_UNSPEC
-#define PF_UNSPEC AF_UNSPEC
-#endif
-
-#ifndef PF_INET
-#define PF_INET AF_INET
-#endif
-
-#ifndef PF_INET6
-#define PF_INET6 AF_INET6
-#endif
 
 #define V4ADDR_VAL "0123456789."
 #define V6ADDR_VAL "0123456789ABCDEFabcdef:"
@@ -86,14 +58,14 @@ struct v4addr {
 	char class_remark[64];
 	char pres_bitmap[36];
 	int n_nmaskbits;
-	u_int32_t n_cbroadcast;
-	u_int32_t n_broadcast;
-	u_int32_t n_cnaddr;
-	u_int32_t n_naddr;
-	u_int32_t n_cnmask;
-	u_int32_t n_nmask;
-	u_int32_t n_haddr;
-	u_int32_t i_broadcast;
+	uint32_t n_cbroadcast;
+	uint32_t n_broadcast;
+	uint32_t n_cnaddr;
+	uint32_t n_naddr;
+	uint32_t n_cnmask;
+	uint32_t n_nmask;
+	uint32_t n_haddr;
+	uint32_t i_broadcast;
 };
 
 /*
@@ -131,7 +103,7 @@ struct if_info {
 
 struct misc_args {
 	int numnets;
-	u_int32_t splitmask;
+	uint32_t splitmask;
 	struct sip_in6_addr v6splitmask;
 	int v6splitnum;
 };
@@ -147,12 +119,6 @@ struct argbox {
 	int type;
 	int resolv;
 	struct argbox *next;
-};
-
-struct dnsresp {
-	char str[128];
-	int type;
-	struct dnsresp *next;
 };
 
 #define AT_V4 1
@@ -202,12 +168,12 @@ int get_stdin(char *args[]);
 int count(char *buf, char ch);
 int validate_v4addr(char *addr);
 int validate_netmask(char *in_addr);
-int getsplitnumv4(char *buf, u_int32_t * splitmask);
+int getsplitnumv4(char *buf, uint32_t * splitmask);
 int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum);
-int quadtonum(char *quad, u_int32_t * num);
-char *numtoquad(u_int32_t num);
-char *numtobitmap(u_int32_t num, u_int32_t prefix_len);
-u_int32_t numtolen(u_int32_t num);
+int quadtonum(char *quad, uint32_t * num);
+char *numtoquad(uint32_t num);
+char *numtobitmap(uint32_t num, uint32_t prefix_len);
+uint32_t numtolen(uint32_t num);
 int parse_addr(struct if_info *ifi);
 int get_addrv4(struct if_info *ifi);
 int get_addrv6(struct if_info *ifi);
@@ -225,9 +191,6 @@ void v6_comment(struct v6addr *in6_addr);
 int v6verifyv4(struct sip_in6_addr addr);
 char *get_comp_v6(struct sip_in6_addr addr);
 int mk_ipv6addr(struct v6addr *in6_addr, char *addr);
-struct dnsresp *new_dnsresp(struct dnsresp *d_resp);
-void free_dnsresp(struct dnsresp *d_resp);
-char *resolve_addr(char *addr, int family, struct dnsresp *);
 
 /*
  * strlcpy.c strlcat.c
