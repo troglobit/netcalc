@@ -11,11 +11,13 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #ifdef HAVE_SYS_BITYPES_H
 #include <sys/bitypes.h>
 #endif
-#include <sys/socket.h>
-#include <net/if.h>
+#include <net/if.h>		/* IFNAMSIZ */
 
 #ifdef PACKAGE
 #define NAME PACKAGE
@@ -33,26 +35,19 @@
 #define HAVE_GETADDRINFO
 #endif
 
-#if !defined(HAVE_U_INT8_T) && defined(HAVE_UINT8_T)
-#define u_int8_t uint8_t
-#endif
-#if defined(HAVE_U_INT8_T) && !defined(HAVE_UINT8_T)
+/*** Fallback to older types before stdint.h was defined ***/
+#ifndef HAVE_UINT8_T
 #define uint8_t u_int8_t
 #endif
 
-#if !defined(HAVE_U_INT16_T) && defined(HAVE_UINT16_T)
-#define u_int16_t uint16_t
-#endif
-#if defined(HAVE_U_INT16_T) && !defined(HAVE_UINT16_T)
+#ifndef HAVE_UINT16_T
 #define uint16_t u_int16_t
 #endif
 
-#if !defined(HAVE_U_INT32_T) && defined(HAVE_UINT32_T)
-#define u_int32_t uint32_t
-#endif
-#if defined(HAVE_U_INT32_T) && !defined(HAVE_UINT32_T)
+#ifndef HAVE_UINT32_T
 #define uint32_t u_int32_t
 #endif
+/*** End of fallback ***/
 
 #ifndef PF_UNSPEC
 #define PF_UNSPEC AF_UNSPEC

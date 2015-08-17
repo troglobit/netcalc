@@ -51,9 +51,6 @@
 /* sa_len */
 #undef HAVE_SA_LEN
 
-/* Define to 1 if you have the `socket' function. */
-#undef HAVE_SOCKET
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -78,35 +75,14 @@
 /* Define to 1 if you have the <sys/bitypes.h> header file. */
 #undef HAVE_SYS_BITYPES_H
 
-/* Define to 1 if you have the <sys/sockio.h> header file. */
-#undef HAVE_SYS_SOCKIO_H
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* uint16_t */
-#undef HAVE_UINT16_T
-
-/* uint32_t */
-#undef HAVE_UINT32_T
-
-/* uint8_t */
-#undef HAVE_UINT8_T
-
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* u_int16_t */
-#undef HAVE_U_INT16_T
-
-/* u_int32_t */
-#undef HAVE_U_INT32_T
-
-/* u_int8_t */
-#undef HAVE_U_INT8_T
 
 /* Name of package */
 #undef PACKAGE
@@ -134,3 +110,25 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT8_T
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 8 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint8_t
