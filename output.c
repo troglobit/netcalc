@@ -45,7 +45,7 @@ void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args,
 		return;
 	}
 
-	printf("[Split network/%d]\n", numtolen(splitmask));
+	printf("\n[Split network/%d]\n", numtolen(splitmask));
 
 	diff  = 0xffffffff - splitmask + 1;
 	start = ifi->v4ad.n_naddr;
@@ -80,10 +80,6 @@ void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args,
 			break;
 		end += diff;
 	}
-
-	printf("\n");
-
-	return;
 }
 
 void print_cf_info_v4(struct if_info *ifi)
@@ -141,61 +137,63 @@ void print_cf_info_v4(struct if_info *ifi)
 	else
 		printf("\e[35mClass %c", ifi->v4ad.class);
 	printf("\e[0m%s\n", ifi->v4ad.class_remark);
-	printf("\n");
 }
 
-void print_comp_v6(struct sip_in6_addr addr)
+char *print_comp_v6(struct sip_in6_addr addr, char *buf, size_t len)
 {
-	int x, y, z;
+	int i, j, k;
 	int start, num;
 
 	start = -1;
 	num = 0;
-	y = 0;
-	z = 0;
-	for (x = 0; x < 8; x++) {
-		if (addr.sip6_addr16[x] == 0) {
-			if (y == -1)
-				y = x;
-			z++;
+	j = 0;
+	k = 0;
+	for (i = 0; i < 8; i++) {
+		if (addr.sip6_addr16[i] == 0) {
+			if (j == -1)
+				j = i;
+			k++;
 		} else {
-			if (z > num && z > 1) {
-				start = y;
-				num = z;
+			if (k > num && k > 1) {
+				start = j;
+				num = k;
 			}
-			y = -1;
-			z = 0;
+			j = -1;
+			k = 0;
 		}
 	}
 
-	if (z > num && z > 1) {
-		start = y;
-		num = z;
+	if (k > num && k > 1) {
+		start = j;
+		num = k;
 	}
 
-	for (x = 0; x < 8; x++) {
-		if (x == start) {
-			if (!x)
-				printf(":");
-			printf(":");
-			x += num - 1;
+	for (i = 0; i < 8; i++) {
+		if (i == start) {
+			if (!i)
+				strlcat(buf, ":", len);
+			strlcat(buf, ":", len);
+			i += num - 1;
 		} else {
-			printf("%x", addr.sip6_addr16[x]);
-			if (x != 7)
-				printf(":");
+			char tmp[5];
+
+			snprintf(tmp, sizeof(tmp), "%x", addr.sip6_addr16[i]);
+			strlcat(buf, tmp, len);
+
+			if (i != 7)
+				strlcat(buf, ":", len);
 		}
 	}
 
-	return;
+	return buf;
 }
 
 void print_exp_v4inv6(struct sip_in6_addr addr)
 {
 	unsigned char num;
 
-	printf("%04x:%04x:%04x:%04x:%04x:%04x:",
-	       addr.sip6_addr16[0],
-	       addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5]);
+	printf("\e[34m%04x:%04x:%04x:%04x:%04x:%04x:", addr.sip6_addr16[0], addr.sip6_addr16[1],
+	       addr.sip6_addr16[2], addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5]);
 
 	num = (addr.sip6_addr16[6] >> 8) & 0xff;
 	printf("%d.", num);
@@ -204,49 +202,48 @@ void print_exp_v4inv6(struct sip_in6_addr addr)
 	num = (addr.sip6_addr16[7] >> 8) & 0xff;
 	printf("%d.", num);
 	num = addr.sip6_addr16[7] & 0xff;
-	printf("%d", num);
-
-	return;
+	printf("%d\e[0m", num);
 }
 
 void print_comp_v4inv6(struct sip_in6_addr addr)
 {
 	unsigned char v4num;
-	int x, y, z;
+	int i, j, k;
 	int start, num;
 
 	start = -1;
 	num = 0;
-	y = 0;
-	z = 0;
-	for (x = 0; x < 6; x++) {
-		if (addr.sip6_addr16[x] == 0) {
-			if (y == -1)
-				y = x;
-			z++;
+	j = 0;
+	k = 0;
+	for (i = 0; i < 6; i++) {
+		if (addr.sip6_addr16[i] == 0) {
+			if (j == -1)
+				j = i;
+			k++;
 		} else {
-			if (z > num && z > 1) {
-				start = y;
-				num = z;
+			if (k > num && k > 1) {
+				start = j;
+				num = k;
 			}
-			y = -1;
-			z = 0;
+			j = -1;
+			k = 0;
 		}
 	}
 
-	if (z > num && z > 1) {
-		start = y;
-		num = z;
+	if (k > num && k > 1) {
+		start = j;
+		num = k;
 	}
 
-	for (x = 0; x < 6; x++) {
-		if (x == start) {
-			if (!x)
+	printf("\e[34m");
+	for (i = 0; i < 6; i++) {
+		if (i == start) {
+			if (!i)
 				printf(":");
 			printf(":");
-			x += num - 1;
+			i += num - 1;
 		} else {
-			printf("%x:", addr.sip6_addr16[x]);
+			printf("%x:", addr.sip6_addr16[i]);
 		}
 	}
 
@@ -258,137 +255,110 @@ void print_comp_v4inv6(struct sip_in6_addr addr)
 	printf("%d.", v4num);
 	v4num = addr.sip6_addr16[7] & 0xff;
 	printf("%d", v4num);
-
-	return;
+	printf("\e[0m");
 }
 
 void print_exp_v6(struct sip_in6_addr addr)
 {
-	printf("%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
+	printf("\e[34m%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x\e[0m",
 	       addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
 	       addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 }
 
-void print_mixed_v6(struct sip_in6_addr addr)
+char *print_mixed_v6(struct sip_in6_addr addr, char *buf, size_t len)
 {
-	printf("%x:%x:%x:%x:%x:%x:%x:%x",
-	       addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
-	       addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
-}
-
-void print_revdns_v6(struct sip_in6_addr addr)
-{
-	char inbuf[40], outbuf[256];
-	int x, y;
-
-	memset(outbuf, 0, sizeof(outbuf));
-	snprintf(inbuf, sizeof(inbuf), "%04x%04x%04x%04x%04x%04x%04x%04x",
+	snprintf(buf, len, "%x:%x:%x:%x:%x:%x:%x:%x",
 		 addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
 		 addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 
-	y = 0;
-	for (x = (strlen(inbuf) - 1); x >= 0; x--) {
-		outbuf[y] = inbuf[x];
-		outbuf[y + 1] = '.';
-		y += 2;
+	return buf;
+}
+
+static char *revdnsv6(struct sip_in6_addr addr, char *buf, size_t len)
+{
+	char tmp[40];
+	int i, j = 0;
+
+	memset(buf, 0, len);
+	snprintf(tmp, sizeof(tmp), "%04x%04x%04x%04x%04x%04x%04x%04x",
+		 addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
+		 addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
+
+	for (i = (strlen(tmp) - 1); i >= 0; i--) {
+		buf[j] = tmp[i];
+		buf[j + 1] = '.';
+		j += 2;
 	}
 
-	strlcat(outbuf, "ip6.arpa.", sizeof(outbuf));
+	strlcat(buf, "ip6.arpa.", len);
 
-	printf("%s", outbuf);
+	return buf;
 }
 
 void print_rev_v6(struct if_info *ifi)
 {
-	printf("[IPV6 DNS]\n");
-	printf("Reverse DNS (ip6.arpa)	-\n");
-	print_revdns_v6(ifi->v6ad.haddr);
-	printf("\n");
+	char buf[256];
 
-	printf("\n");
+	printf("Reverse DNS     : \e[34m%s\e[0m\n", revdnsv6(ifi->v6ad.haddr, buf, sizeof(buf)));
 }
 
 void print_v6(struct if_info *ifi)
 {
-	printf("[IPV6 INFO]\n");
-	printf("Expanded Address	- ");
-	print_exp_v6(ifi->v6ad.haddr);
-	printf("\n");
-	printf("Compressed address	- ");
-	print_comp_v6(ifi->v6ad.haddr);
-	printf("\n");
-	printf("Subnet prefix (masked)	- ");
-	print_mixed_v6(ifi->v6ad.prefix);
-	printf("/%d\n", ifi->v6ad.nmaskbits);
-	printf("Address ID (masked)	- ");
-	print_mixed_v6(ifi->v6ad.suffix);
-	printf("/%d\n", ifi->v6ad.nmaskbits);
-	printf("Prefix address		- ");
-	print_mixed_v6(ifi->v6ad.nmask);
-	printf("\n");
-	printf("Prefix length		- %d\n", ifi->v6ad.nmaskbits);
-	printf("Address type		- %s\n", ifi->v6ad.class_remark);
+	char buf[42];
+
+	printf("Address ID      : \e[34m%s/%d\e[0m\n", print_mixed_v6(ifi->v6ad.suffix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	printf("Compressed IPv6 : \e[34m%s\e[0m\n", print_comp_v6(ifi->v6ad.haddr, buf, sizeof(buf)));
+	printf("Expanded IPv6   : "); print_exp_v6(ifi->v6ad.haddr);  printf("\n");
+	printf("Prefix address  : \e[34m%s\e[0m = length \e[34m%d\e[0m\n", print_mixed_v6(ifi->v6ad.nmask, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	printf("Address type    : \e[35m%s\e[0m", ifi->v6ad.class_remark);
 	if (ifi->v6ad.comment[0])
-		printf("Comment			- %s\n", ifi->v6ad.comment);
-	printf("Network range		- ");
-	print_exp_v6(ifi->v6ad.prefix);
-	printf(" -\n			  ");
-	print_exp_v6(ifi->v6ad.broadcast);
-	printf("\n");
-
-	printf("\n");
-
-	return;
+		printf(", %s\n", ifi->v6ad.comment);
+	else
+		printf("\n");
+	printf("=>\n");
+	printf("Network         : \e[34m%s/%d\e[0m\n", print_mixed_v6(ifi->v6ad.prefix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	printf("HostMin         : "); print_exp_v6(ifi->v6ad.prefix);    printf("\n");
+	printf("HostMax         : "); print_exp_v6(ifi->v6ad.broadcast); printf("\n");
 }
 
 void print_v4inv6(struct if_info *ifi)
 {
-	printf("[V4INV6]\n");
 	if (ifi->v6ad.type == V6TYPE_V4INV6 && !ifi->v6ad.real_v4) {
-		printf("-[INFO : Address was submitted as an IPv4-compatible IPv6 address]\n");
-		printf("-[INFO : The Address does not qualify as this as per the guidelines]\n");
-		printf("-[INFO : in RFC2373]\n\n");
+		printf("Address was submitted as an IPv4-compatible IPv6 address, but\n");
+		printf("does not qualify as one, per the guidelines in RFC2373.\n\n");
 	}
 
-	printf("Expanded v4inv6 address	- ");
-	print_exp_v4inv6(ifi->v6ad.haddr);
-	printf("\n");
-	printf("Compr. v4inv6 address	- ");
-	print_comp_v4inv6(ifi->v6ad.haddr);
-	printf("\n");
+	printf("Compr. v4inv6   : "); print_comp_v4inv6(ifi->v6ad.haddr); printf("\n");
+	printf("Expanded v4inv6 : "); print_exp_v4inv6(ifi->v6ad.haddr);  printf("\n");
 	if (ifi->v6ad.type == V6TYPE_V4INV6 && ifi->v6ad.real_v4 == 1)
 		printf("Comment			- IPv4-compatible IPv6 address\n");
 	if (ifi->v6ad.type == V6TYPE_V4INV6 && ifi->v6ad.real_v4 == 2)
 		printf("Comment			- IPv4-mapped IPv6 address\n");
-
-	printf("\n");
-
-	return;
 }
 
 int v6plus(struct sip_in6_addr *a, struct sip_in6_addr *b)
 {
-	int x, y, z;
+	int i, j, k;
 
-	for (x = 7; x >= 0; x--) {
-		if (a->sip6_addr16[x] + b->sip6_addr16[x] > 0xffff) {
-			y = x - 1;
-			z = 0;
-			while (y >= 0 && !z) {
-				z = 1;
-				if (a->sip6_addr16[y] + 1 > 0xffff) {
-					a->sip6_addr16[y] = 0;
-					z = 0;
+	for (i = 7; i >= 0; i--) {
+		if (a->sip6_addr16[i] + b->sip6_addr16[i] > 0xffff) {
+			j = i - 1;
+			k = 0;
+			while (j >= 0 && !k) {
+				k = 1;
+				if (a->sip6_addr16[j] + 1 > 0xffff) {
+					a->sip6_addr16[j] = 0;
+					k = 0;
 				} else {
-					a->sip6_addr16[y]++;
+					a->sip6_addr16[j]++;
 				}
 
-				y--;
+				j--;
 			}
 
-			a->sip6_addr16[x] = a->sip6_addr16[x] + b->sip6_addr16[x] - 0x10000;
+			a->sip6_addr16[i] = a->sip6_addr16[i] + b->sip6_addr16[i] - 0x10000;
 		} else {
-			a->sip6_addr16[x] += b->sip6_addr16[x];
+			a->sip6_addr16[i] += b->sip6_addr16[i];
 		}
 	}
 
@@ -397,78 +367,80 @@ int v6plus(struct sip_in6_addr *a, struct sip_in6_addr *b)
 
 void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, int v6args, struct misc_args m_argv6)
 {
+	int i, j, k;
 	struct sip_in6_addr sdiff, ediff, start, end, tmpaddr;
-	int x, y, z;
 
-	x = 0;
-	y = 0;
+	i = 0;
+	j = 0;
 	do {
-		if (splitmask.sip6_addr16[x] > ifi->v6ad.nmask.sip6_addr16[x])
-			y = 1;
-		if (ifi->v6ad.nmask.sip6_addr16[x] > splitmask.sip6_addr16[x])
-			y = 2;
-		x++;
-	} while (x < 8 && !y);
+		if (splitmask.sip6_addr16[i] > ifi->v6ad.nmask.sip6_addr16[i])
+			j = 1;
+		if (ifi->v6ad.nmask.sip6_addr16[i] > splitmask.sip6_addr16[i])
+			j = 2;
+		i++;
+	} while (i < 8 && !j);
 
-	if (y == 2) {
+	if (j == 2) {
 		warnx("Oversized splitmask");
 		return;
 	}
 
-	printf("[Split network]\n");
-
-	for (x = 0; x < 8; x++) {
+	for (i = 0; i < 8; i++) {
 		if (splitmask.sip6_addr16)
-			sdiff.sip6_addr16[x] = 0xffffffff - splitmask.sip6_addr16[x];
-		start.sip6_addr16[x] = ifi->v6ad.prefix.sip6_addr16[x];
-		end.sip6_addr16[x] = ifi->v6ad.prefix.sip6_addr16[x] + sdiff.sip6_addr16[x];
-		ediff.sip6_addr16[x] = sdiff.sip6_addr16[x];
+			sdiff.sip6_addr16[i] = 0xffffffff - splitmask.sip6_addr16[i];
+		start.sip6_addr16[i] = ifi->v6ad.prefix.sip6_addr16[i];
+		end.sip6_addr16[i] = ifi->v6ad.prefix.sip6_addr16[i] + sdiff.sip6_addr16[i];
+		ediff.sip6_addr16[i] = sdiff.sip6_addr16[i];
 	}
-	for (x = 0; x < 8; x++)
-		tmpaddr.sip6_addr16[x] = 0;
+
+	for (i = 0; i < 8; i++)
+		tmpaddr.sip6_addr16[i] = 0;
 	tmpaddr.sip6_addr16[7] = 1;
 	v6plus(&sdiff, &tmpaddr);
 
-	x = 0;
-	while (!x) {
-		printf("Network			- ");
-		print_exp_v6(start);
-		printf(" -\n\t\t\t  ");
-		print_exp_v6(end);
-		printf("\n");
+	k = 0;
+	for (i = 0; i < 8; i++) {
+		uint16_t val = splitmask.sip6_addr16[i];
+
+		for (j = 0; j < 16; j++)
+			k += (val & (1 << j)) ? 1 : 0;
+	}
+
+	printf("\n[Split network/%d]\n", k);
+
+	i = 0;
+	while (!i) {
+		printf("Network         : "); print_exp_v6(start); printf("\n");
+		printf("                  "); print_exp_v6(end);   printf("\n");
 
 		v6plus(&start, &sdiff);
 
-		y = 0;
-		for (z = 0; z < 8; z++)
-			if (end.sip6_addr16[z] != 0xffff)
-				y = 1;
-		if (!y)
-			x = 1;
+		j = 0;
+		for (k = 0; k < 8; k++)
+			if (end.sip6_addr16[k] != 0xffff)
+				j = 1;
+		if (!j)
+			i = 1;
 
-		y = 0;
-		z = 0;
+		j = 0;
+		k = 0;
 		do {
-			if (end.sip6_addr16[z] > ifi->v6ad.broadcast.sip6_addr16[z])
-				y = 1;
-			if (ifi->v6ad.broadcast.sip6_addr16[z] > end.sip6_addr16[z])
-				y = 2;
-			z++;
-		} while (z < 8 && !y);
+			if (end.sip6_addr16[k] > ifi->v6ad.broadcast.sip6_addr16[k])
+				j = 1;
+			if (ifi->v6ad.broadcast.sip6_addr16[k] > end.sip6_addr16[k])
+				j = 2;
+			k++;
+		} while (k < 8 && !j);
 
-		if (!y || y == 1)
-			x = 1;
+		if (!j || j == 1)
+			i = 1;
 
-		for (z = 0; z < 8; z++)
-			end.sip6_addr16[z] = 0;
+		for (k = 0; k < 8; k++)
+			end.sip6_addr16[k] = 0;
 
 		v6plus(&end, &start);
 		v6plus(&end, &ediff);
 	}
-
-	printf("\n");
-
-	return;
 }
 
 int usage(int code)

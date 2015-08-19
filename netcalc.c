@@ -88,6 +88,8 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 			print_cf_info_v4(ifarg_cur);
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4(ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
+
+		printf("\n");
 	}
 
 	if (ifarg_cur->type == IFT_V6 || ifarg_cur->type == IFT_INTV6) {
@@ -102,6 +104,8 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 			print_rev_v6(ifarg_cur);
 		if ((v6args & V6SPLIT) == V6SPLIT)
 			show_split_networks_v6(ifarg_cur, m_argv6.v6splitmask, v6args, m_argv6);
+
+		printf("\n");
 	}
 
 	return 0;
