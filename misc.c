@@ -36,15 +36,15 @@
 
 int count(char *buf, char ch)
 {
-	int x, y;
+	int i, j;
 
-	y = 0;
-	for (x = 0; x < strlen(buf); x++) {
-		if (buf[x] == ch)
-			y++;
+	j = 0;
+	for (i = 0; i < strlen(buf); i++) {
+		if (buf[i] == ch)
+			j++;
 	}
 
-	return y;
+	return j;
 }
 
 /*
@@ -53,62 +53,60 @@ int count(char *buf, char ch)
  */
 int validate_v4addr(char *addr)
 {
-	int x, y, z, m;
+	int i, j, k, m;
 	char buf[16];
 
 	if (strlen(addr) < 7 || strlen(addr) > 15)
 		return 0;
 
-	x = 0;
-	y = 0;
-	while (x < strlen(addr)) {
-		if (addr[x] == '.')
-			y++;
-		x++;
+	i = 0;
+	j = 0;
+	while (i < strlen(addr)) {
+		if (addr[i++] == '.')
+			j++;
 	}
-	if (y != 3)
+	if (j != 3)
 		return 0;
 
-	x = 0;
-	y = 0;
-	while (x < strlen(addr)) {
-		z = 0;
-		y = 0;
-		while (z < strlen(V4ADDR_VAL) && !y) {
-			if (addr[x] == V4ADDR_VAL[z])
-				y = 1;
-			z++;
+	i = 0;
+	j = 0;
+	while (i < strlen(addr)) {
+		k = 0;
+		j = 0;
+		while (k < strlen(V4ADDR_VAL) && !j) {
+			if (addr[i] == V4ADDR_VAL[k])
+				j = 1;
+			k++;
 		}
-		if (!y)
+		if (!j)
 			return 0;
-		x++;
+		i++;
 	}
 
 	if (addr[0] == '.' || addr[strlen(addr) - 1] == '.')
 		return 0;
 
-	x = 0;
-	while (x < (strlen(addr) - 1)) {
-		if (addr[x] == '.' && addr[x + 1] == '.')
+	i = 0;
+	while (i < (strlen(addr) - 1)) {
+		if (addr[i] == '.' && addr[i + 1] == '.')
 			return 0;
-		x++;
+		i++;
 	}
 
-	y = 0;
-	for (x = 0; x < 4; x++) {
-		z = 0;
+	j = 0;
+	for (i = 0; i < 4; i++) {
+		k = 0;
 		memset(buf, 0, sizeof(buf));
-		while (addr[y] != '.' && y < strlen(addr)) {
-			buf[z] = addr[y];
-			y++;
-			z++;
-		}
-		if (z > 3)
+		while (addr[j] != '.' && j < strlen(addr))
+			buf[k++] = addr[j++];
+
+		if (k > 3)
 			return 0;
+
 		m = atoi(buf);
 		if (m < 0 || m > 255)
 			return 0;
-		y++;
+		j++;
 	};
 
 	return 1;
@@ -122,7 +120,7 @@ int validate_v4addr(char *addr)
  */
 int validate_netmask(char *in_addr)
 {
-	int x, y, z, m;
+	int i = 0, j = 0, k = 0, m;
 	char addr[16];
 	char *sl;
 	uint32_t sm;
@@ -130,64 +128,54 @@ int validate_netmask(char *in_addr)
 	if (strlen(in_addr) > 18)
 		return 0;
 
-	x = 0;
-	y = 0;
-	z = 0;
-	while (x < strlen(in_addr) && !y) {
-		if (!isxdigit(in_addr[x]) && in_addr[x] != 'x' && in_addr[x] != 'X')
-			y = 1;
-		if (in_addr[x] == 'x' || in_addr[x] == 'X') {
-			z++;
-			y = 0;
+	while (i < strlen(in_addr) && !j) {
+		if (!isxdigit(in_addr[i]) && in_addr[i] != 'x' && in_addr[i] != 'X')
+			j = 1;
+		if (in_addr[i] == 'x' || in_addr[i] == 'X') {
+			k++;
+			j = 0;
 		}
-		x++;
+		i++;
 	}
 
-	x = 0;
-	if (!y && z == 1) {
-		x = 0;
+	i = 0;
+	if (!j && k == 1) {
+		i = 0;
 		if (in_addr[0] == 'x' || in_addr[0] == 'X')
-			x = 1;
-		if (!x) {
-			if (in_addr[0] == '0' && (in_addr[1] == 'x' || in_addr[1] == 'X'))
-				x = 1;
-		}
+			i = 1;
+		if (!i && in_addr[0] == '0' && (in_addr[1] == 'x' || in_addr[1] == 'X'))
+			i = 1;
 	}
-	if (x == 1)
+	if (i == 1)
 		return 3;
 
 	memset(addr, 0, sizeof(addr));
 	if (strstr(in_addr, "/")) {
-		x = 0;
-		while (in_addr[x] != '/' && x < 15) {
-			addr[x] = in_addr[x];
-			x++;
+		i = 0;
+		while (in_addr[i] != '/' && i < 15) {
+			addr[i] = in_addr[i];
+			i++;
 		}
 	} else {
 		strlcpy(addr, in_addr, sizeof(addr));
 	}
 
-	/*
-	 * This also calls validate_v4addr.
-	 */
+	/* This also calls validate_v4addr() */
 	if (quadtonum(addr, &sm))
 		return 0;
 
 	if (!(sl = strstr(in_addr, "/"))) {
-		y = 0;
-		for (x = 0; x < 32; x++) {
-			if (!y && !((sm >> (31 - x)) & 1))
-				y = 1;
-			if (y == 1 && ((sm >> (31 - x)) & 1))
-				y = 2;
+		j = 0;
+		for (i = 0; i < 32; i++) {
+			if (!j && !((sm >> (31 - i)) & 1))
+				j = 1;
+			if (j == 1 && ((sm >> (31 - i)) & 1))
+				j = 2;
 		}
-		if (y == 2)
+		if (j == 2)
 			return -1;
 
-		/*
-		 * valid
-		 */
-		return 1;
+		return 1;	/* Valid */
 	}
 
 	sl++;
@@ -197,19 +185,19 @@ int validate_netmask(char *in_addr)
 	if (sl[0] == '.' || sl[1] == '.')
 		return 0;
 
-	x = 0;
-	y = 0;
-	while (x < strlen(sl)) {
-		z = 0;
-		y = 0;
-		while (z < strlen(V4ADDR_VAL) && !y) {
-			if (sl[x] == V4ADDR_VAL[z])
-				y = 1;
-			z++;
+	i = 0;
+	j = 0;
+	while (i < strlen(sl)) {
+		k = 0;
+		j = 0;
+		while (k < strlen(V4ADDR_VAL) && !j) {
+			if (sl[i] == V4ADDR_VAL[k])
+				j = 1;
+			k++;
 		}
-		if (!y)
+		if (!j)
 			return 0;
-		x++;
+		i++;
 	}
 
 	m = atoi(sl);
@@ -219,9 +207,9 @@ int validate_netmask(char *in_addr)
 	return 2;
 }
 
-int getsplitnumv4(char *buf, uint32_t * splitmask)
+int getsplitnumv4(char *buf, uint32_t *splitmask)
 {
-	int x, y;
+	int i, j;
 	uint32_t sm;
 
 	if (strlen(buf) < 1)
@@ -230,28 +218,29 @@ int getsplitnumv4(char *buf, uint32_t * splitmask)
 	if (strlen(buf) < 4) {
 		if (buf[0] == '/')
 			buf++;
-		y = atoi(buf);
-		if (y < 1 || y > 32)
+		j = atoi(buf);
+		if (j < 1 || j > 32)
 			return -1;
+
 		sm = 0;
-		for (x = 0; x < y; x++)
-			sm = sm | (1 << (31 - x));
+		for (i = 0; i < j; i++)
+			sm = sm | (1 << (31 - i));
 	} else {
 		if (!strstr(buf, "."))
 			sm = strtoul(buf, (char **)NULL, 16);
-		else {
+		else
 			if (quadtonum(buf, &sm))
 				return -1;
-		}
 	}
-	y = 0;
-	for (x = 0; x < 32; x++) {
-		if (!y && !((sm >> (31 - x)) & 1))
-			y = 1;
-		if (y == 1 && ((sm >> (31 - x)) & 1))
-			y = 2;
+
+	j = 0;
+	for (i = 0; i < 32; i++) {
+		if (!j && !((sm >> (31 - i)) & 1))
+			j = 1;
+		if (j == 1 && ((sm >> (31 - i)) & 1))
+			j = 2;
 	}
-	if (y == 2)
+	if (j == 2)
 		return -1;
 
 	*splitmask = sm;
@@ -261,7 +250,7 @@ int getsplitnumv4(char *buf, uint32_t * splitmask)
 
 int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum)
 {
-	int x, y;
+	int i, j;
 
 	if (strlen(buf) < 1)
 		return -1;
@@ -270,44 +259,41 @@ int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum)
 
 	if (buf[0] == '/')
 		buf++;
-	y = atoi(buf);
-	if (y < 1 || y > 128)
+
+	j = atoi(buf);
+	if (j < 1 || j > 128)
 		return -1;
-	*v6splitnum = y;
-	x = v6masktonum(buf, &y, splitmask);
+
+	*v6splitnum = j;
+	i = v6masktonum(buf, &j, splitmask);
 
 	return 0;
 }
 
-int quadtonum(char *quad, uint32_t * num)
+int quadtonum(char *quad, uint32_t *num)
 {
 	char buf[128];
-	int x, y, z;
+	int i, j, k;
 
 	if (!validate_v4addr(quad))
 		return -1;
 
 	memset(buf, 0, sizeof(buf));
-	x = 0;
-	while (quad[x] != '.') {
-		buf[x] = quad[x];
-		x++;
-	}
+	for (i = 0; quad[i] != '.'; i++)
+		buf[i] = quad[i];
+
 	*num = 0;
-	x++;
-	for (y = 0; y < 4; y++) {
-		z = atoi(buf);
-		if (z > 255 || z < 0)
+	i++;
+	for (j = 0; j < 4; j++) {
+		k = atoi(buf);
+		if (k > 255 || k < 0)
 			return -1;
-		*num = *num | (z << (8 * (3 - y)));
+
+		*num = *num | (k << (8 * (3 - j)));
 		memset(buf, 0, sizeof(buf));
-		z = 0;
-		while (quad[x] != '.' && quad[x] != '\0' && x < strlen(quad)) {
-			buf[z] = quad[x];
-			x++;
-			z++;
-		}
-		x++;
+		for (k = 0; quad[i] != '.' && quad[i] != '\0' && i < strlen(quad); k++)
+			buf[k] = quad[i++];
+		i++;
 	}
 
 	return 0;
@@ -315,11 +301,11 @@ int quadtonum(char *quad, uint32_t * num)
 
 char *numtoquad(uint32_t num)
 {
-	int a[4], x;
+	int a[4], i;
 	static char quad[17];
 
-	for (x = 0; x < 4; x++)
-		a[x] = num >> (8 * (3 - x)) & 0xff;
+	for (i = 0; i < 4; i++)
+		a[i] = num >> (8 * (3 - i)) & 0xff;
 
 	snprintf(quad, sizeof(quad), "%d.%d.%d.%d", a[0], a[1], a[2], a[3]);
 
@@ -329,24 +315,24 @@ char *numtoquad(uint32_t num)
 char *numtobitmap(uint32_t num, uint32_t prefix_len)
 {
 	static char bitmap[100];
-	int x, y, z;
+	int i, j, k;
 
 	memset(bitmap, 0, sizeof(bitmap));
-	y = 1;
-	z = 0;
-	for (x = 0; x < 32; x++) {
-		if (!((num >> (31 - x)) & 1))
-			bitmap[z] = '0';
+	j = 1;
+	k = 0;
+	for (i = 0; i < 32; i++) {
+		if (!((num >> (31 - i)) & 1))
+			bitmap[k] = '0';
 		else
-			bitmap[z] = '1';
-		if (y == 8 && z < 34) {
-			bitmap[++z] = '.';
-			y = 0;
+			bitmap[k] = '1';
+		if (j == 8 && k < 34) {
+			bitmap[++k] = '.';
+			j = 0;
 		}
-		if (x == prefix_len - 1)
-			bitmap[++z] = ' ';
-		y++;
-		z++;
+		if (i == prefix_len - 1)
+			bitmap[++k] = ' ';
+		j++;
+		k++;
 	}
 
 	return bitmap;
@@ -367,7 +353,7 @@ int parse_addr(struct if_info *ifi)
 {
 	char buf[128], buf2[128];
 	char *s_find;
-	int x, y, z;
+	int i, j, k;
 
 	memset(buf, 0, sizeof(buf));
 	memset(buf2, 0, sizeof(buf2));
@@ -391,19 +377,17 @@ int parse_addr(struct if_info *ifi)
 			if (strlen(s_find) > 2)
 				return -2;
 
-			x = 0;
-			y = 0;
-			while (x < strlen(s_find)) {
-				y = 0;
-				z = 0;
-				while (z < strlen(NETMASK_VAL) && !y) {
-					if (s_find[x] == NETMASK_VAL[z])
-						y = 1;
-					z++;
+			i = 0;
+			j = 0;
+			while (i < strlen(s_find)) {
+				j = 0;
+				for (k = 0; k < strlen(NETMASK_VAL) && !j; k++) {
+					if (s_find[i] == NETMASK_VAL[k])
+						j = 1;
 				}
-				if (!y)
+				if (!j)
 					return -2;
-				x++;
+				i++;
 			}
 
 			buf[0] = *s_find;
@@ -417,8 +401,8 @@ int parse_addr(struct if_info *ifi)
 			ifi->v4ad.n_nmaskbits = atoi(buf);
 
 			ifi->v4ad.n_nmask = 0;
-			for (x = 0; x < ifi->v4ad.n_nmaskbits; x++)
-				ifi->v4ad.n_nmask = ifi->v4ad.n_nmask | (1 << (31 - x));
+			for (i = 0; i < ifi->v4ad.n_nmaskbits; i++)
+				ifi->v4ad.n_nmask = ifi->v4ad.n_nmask | (1 << (31 - i));
 		}
 	} else {
 		/*
@@ -455,23 +439,23 @@ int parse_addr(struct if_info *ifi)
  */
 int get_addrv4(struct if_info *ifi)
 {
-	uint32_t x, y, z, len;
+	uint32_t i, j, k, len;
 	char *rfc = NULL;
 	size_t sz;
 
-	x = 0;
+	i = 0;
 	if (!ifi->name[0])
-		x = parse_addr(ifi);
+		i = parse_addr(ifi);
 
-	if (x)
-		return x;
+	if (i)
+		return i;
 
 	/*
 	 * count netmask bits
 	 */
 	ifi->v4ad.n_nmaskbits = 0;
-	for (x = 0; x < 32; x++) {
-		if ((ifi->v4ad.n_nmask >> x) & 1)
+	for (i = 0; i < 32; i++) {
+		if ((ifi->v4ad.n_nmask >> i) & 1)
 			ifi->v4ad.n_nmaskbits++;
 	}
 	if (ifi->v4ad.n_nmaskbits < 0 || ifi->v4ad.n_nmaskbits > 32)
@@ -480,14 +464,14 @@ int get_addrv4(struct if_info *ifi)
 	/*
 	 * validate netmask
 	 */
-	y = 0;
-	for (x = 0; x < 32; x++) {
-		if (!y && !((ifi->v4ad.n_nmask >> (31 - x)) & 1))
-			y = 1;
-		if (y == 1 && ((ifi->v4ad.n_nmask >> (31 - x)) & 1))
-			y = 2;
+	j = 0;
+	for (i = 0; i < 32; i++) {
+		if (!j && !((ifi->v4ad.n_nmask >> (31 - i)) & 1))
+			j = 1;
+		if (j == 1 && ((ifi->v4ad.n_nmask >> (31 - i)) & 1))
+			j = 2;
 	}
-	if (y == 2)
+	if (j == 2)
 		return -2;
 
 	/*
@@ -498,73 +482,73 @@ int get_addrv4(struct if_info *ifi)
 	memset(ifi->v4ad.class_remark, 0, sizeof(ifi->v4ad.class_remark));
 	ifi->v4ad.n_cnaddr = 0;
 
-	x = ifi->v4ad.n_haddr >> 24;
-	y = (ifi->v4ad.n_haddr >> 16) & 0xFF;
-	z = (ifi->v4ad.n_haddr >> 8) & 0xFF;
-	if (!(x & 0x80)) {
+	i = ifi->v4ad.n_haddr >> 24;
+	j = (ifi->v4ad.n_haddr >> 16) & 0xFF;
+	k = (ifi->v4ad.n_haddr >> 8) & 0xFF;
+	if (!(i & 0x80)) {
 		ifi->v4ad.class = 'A';
 		ifi->v4ad.n_cnmask = 0xff000000;
 
-		if (x == 0)
+		if (i == 0)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sCurrent network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC1700";
-		if (x == 10)
+		if (i == 10)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC1928";
-		if (x == 127)
+		if (i == 127)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLoopback network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC5735";
 	}
-	if ((x & 0xc0) == 0x80) {
+	if ((i & 0xc0) == 0x80) {
 		ifi->v4ad.class = 'B';
 		ifi->v4ad.n_cnmask = 0xffff0000;
 
-		if (x == 169 && y == 254)
+		if (i == 169 && j == 254)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLink-Local",
 				 len < 16 ? "In Part " : ""), rfc = "RFC3927";
-		if (x == 172 && (y & 0xF0) == 16)
+		if (i == 172 && (j & 0xF0) == 16)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
 				 len < 12 ? "In Part " : ""), rfc = "RFC1918";
 	}
-	if ((x & 0xe0) == 0xc0) {
+	if ((i & 0xe0) == 0xc0) {
 		ifi->v4ad.class = 'C';
 		ifi->v4ad.n_cnmask = 0xffffff00;
 
-		if (x == 192 && (y & 0xF8) == 168)
+		if (i == 192 && (j & 0xF8) == 168)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
 				 len < 16 ? "In Part " : ""), rfc = "RFC1918";
-		if (x == 192 && y == 88 && z == 99)
+		if (i == 192 && j == 88 && k == 99)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sIPv6 to IPv4 relay",
 				 len < 24 ? "In Part " : ""), rfc = "RFC3068";
-		if (x == 192 && y == 0 && z == 0)
+		if (i == 192 && j == 0 && k == 0)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sReserved, IANA",
 				 len < 24 ? "In Part " : ""), rfc = "RFC5735";
-		if (x == 192 && y == 0 && z == 2)
+		if (i == 192 && j == 0 && k == 2)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark),
 				 ", %sTEST-NET-1, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5735";
-		if (x == 198 && y == 18 && z == 0)
+		if (i == 198 && j == 18 && k == 0)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sNetwork benchmark tests",
 				 len < 15 ? "In Part " : ""), rfc = "RFC2544";
-		if (x == 198 && y == 51 && z == 100)
+		if (i == 198 && j == 51 && k == 100)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark),
 				 ", %sTEST-NET-2, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
-		if (x == 203 && y == 0 && z == 113)
+		if (i == 203 && j == 0 && k == 113)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark),
 				 ", %sTEST-NET-3, Documentation and examples", len < 24 ? "In Part " : ""), rfc = "RFC5737";
 	}
-	if ((x & 0xf0) == 0xe0) {
+	if ((i & 0xf0) == 0xe0) {
 		ifi->v4ad.class = 'D';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
 		snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Multicast"), rfc = "RFC3171";
 	}
-	if ((x & 0xf8) == 0xf0) {
+	if ((i & 0xf8) == 0xf0) {
 		ifi->v4ad.class = 'E';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
 		snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", Reserved for future use"), rfc = "RFC1700";
 	}
-	if (x == 255) {
+	if (i == 255) {
 		ifi->v4ad.class = 'I';
 		ifi->v4ad.n_cnmask = ifi->v4ad.n_nmask;
 
@@ -606,10 +590,10 @@ int get_addrv4(struct if_info *ifi)
  */
 int get_addrv6(struct if_info *ifi)
 {
-	int x;
+	int i;
 
-	x = mk_ipv6addr(&ifi->v6ad, ifi->p_v6addr);
-	if (x < 0)
+	i = mk_ipv6addr(&ifi->v6ad, ifi->p_v6addr);
+	if (i < 0)
 		return -1;
 
 	return 0;
@@ -618,7 +602,7 @@ int get_addrv6(struct if_info *ifi)
 int split_ipv6addr(char *addr, struct ipv6_split *spstr)
 {
 	char *split;
-	int x, y, z;
+	int i, j, k;
 
 	split = strstr(addr, "/");
 	if (split && (count(addr, '/') == 1)) {
@@ -628,48 +612,48 @@ int split_ipv6addr(char *addr, struct ipv6_split *spstr)
 		}
 	}
 
-	x = 0;
-	y = 0;
+	i = 0;
+	j = 0;
 	split = strstr(addr, ".");
 	if (split)
-		x = strlen(split);
+		i = strlen(split);
 	split = strstr(addr, ":");
 	if (split)
-		y = strlen(split);
-	if (x < y)
-		x = 1;
+		j = strlen(split);
+	if (i < j)
+		i = 1;
 	else
-		x = 0;
+		i = 0;
 
-	if (count(addr, '.') == 3 && x) {
+	if (count(addr, '.') == 3 && i) {
 		split = strstr(addr, ".");
-		x = strlen(addr) - strlen(split);
-		while (addr[x] != ':')
-			x--;
-		x++;
+		i = strlen(addr) - strlen(split);
+		while (addr[i] != ':')
+			i--;
+		i++;
 		split = strstr(addr, "/");
 		if (split)
-			y = strlen(addr) - strlen(split);
+			j = strlen(addr) - strlen(split);
 		else
-			y = strlen(addr);
-		if ((y - x >= 7) && (y - x <= 15)) {
-			for (z = 0; z < y - x; z++)
-				spstr->ipv4addr[z] = addr[x + z];
+			j = strlen(addr);
+		if ((j - i >= 7) && (j - i <= 15)) {
+			for (k = 0; k < j - i; k++)
+				spstr->ipv4addr[k] = addr[i + k];
 		}
 	}
 
-	x = strlen(addr) - (strlen(spstr->ipv4addr) + strlen(spstr->nmask));
+	i = strlen(addr) - (strlen(spstr->ipv4addr) + strlen(spstr->nmask));
 	if (strlen(spstr->nmask) > 0)
-		x--;
-	if (x > 1 && x < 40)
-		strncpy(spstr->ipv6addr, addr, x);
+		i--;
+	if (i > 1 && i < 40)
+		strncpy(spstr->ipv6addr, addr, i);
 
 	return 0;
 }
 
 int validate_s_v6addr(char *addr, int type)
 {
-	int x, y, z;
+	int i, j, k;
 	int numcolon;
 	int compressed;
 
@@ -679,51 +663,52 @@ int validate_s_v6addr(char *addr, int type)
 	if (strlen(addr) > 39)
 		return -1;
 
-	x = 0;
-	y = 0;
-	while (x < strlen(addr)) {
-		y = 0;
-		z = 0;
-		while (z < strlen(V6ADDR_VAL) && !y) {
-			if (addr[x] == V6ADDR_VAL[z])
-				y = 1;
-			z++;
+	i = 0;
+	j = 0;
+	while (i < strlen(addr)) {
+		j = 0;
+		
+		for (k = 0; k < strlen(V6ADDR_VAL) && !j; k++) {
+			if (addr[i] == V6ADDR_VAL[k])
+				j = 1;
 		}
-		if (!y)
+		if (!j)
 			return -1;
-		x++;
+		i++;
 	}
 
-	x = 0;
-	y = 0;
-	while (x < strlen(addr)) {
-		if (addr[x] == ':')
-			y++;
+	i = 0;
+	j = 0;
+	while (i < strlen(addr)) {
+		if (addr[i] == ':')
+			j++;
 		else
-			y = 0;
-		if (y == 3)
+			j = 0;
+
+		if (j == 3)
 			return -1;
 
-		x++;
+		i++;
 	}
 
 	if (addr[0] == ':' && addr[1] != ':')
 		return -1;
+
 	if (type == V6TYPE_STANDARD && addr[strlen(addr) - 1] == ':' && addr[strlen(addr) - 2] != ':')
 		return -1;
 
 	numcolon = 0;
-	for (x = 0; x < strlen(addr); x++) {
-		if (addr[x] == ':')
+	for (i = 0; i < strlen(addr); i++) {
+		if (addr[i] == ':')
 			numcolon++;
 	}
 
 	compressed = 0;
-	x = 0;
-	while (x < strlen(addr) - 1) {
-		if (addr[x] == ':' && addr[x + 1] == ':')
+	i = 0;
+	while (i < strlen(addr) - 1) {
+		if (addr[i] == ':' && addr[i + 1] == ':')
 			compressed++;
-		x++;
+		i++;
 	}
 
 	if (compressed > 1)
@@ -745,18 +730,18 @@ int validate_s_v6addr(char *addr, int type)
 			return -1;
 	}
 
-	y = 0;
-	for (x = 0; x < strlen(addr); x++) {
-		if (addr[x] != ':')
-			y++;
+	j = 0;
+	for (i = 0; i < strlen(addr); i++) {
+		if (addr[i] != ':')
+			j++;
 		else
-			y = 0;
+			j = 0;
 
-		if (y > 4)
+		if (j > 4)
 			break;
 	}
 
-	if (y > 4)
+	if (j > 4)
 		return -1;
 
 	return 0;
@@ -764,7 +749,7 @@ int validate_s_v6addr(char *addr, int type)
 
 int getcolon(char *addr, int pos, int type)
 {
-	int x, y;
+	int i, j;
 	int compressed;
 	int cstart, cend;
 	int max;
@@ -776,113 +761,94 @@ int getcolon(char *addr, int pos, int type)
 		max = 5;
 
 	compressed = 0;
-	x = 0;
-	while (x < strlen(addr) - 1) {
-		if (addr[x] == ':' && addr[x + 1] == ':')
+	for (i = 0; i < strlen(addr) - 1; i++) {
+		if (addr[i] == ':' && addr[i + 1] == ':')
 			compressed++;
-		x++;
 	}
 
 	if (compressed) {
 		cstart = 0;
-		x = 0;
-		while (x < strlen(addr) - 1) {
-			if (addr[x] == ':' && addr[x + 1] == ':')
+		for (i = 0; i < strlen(addr) - 1; i++) {
+			if (addr[i] == ':' && addr[i + 1] == ':')
 				break;
-			if (addr[x] == ':')
+
+			if (addr[i] == ':')
 				cstart++;
-			x++;
 		}
-		x += 2;
+		i += 2;
+
 		cend = 0;
-		while (x < strlen(addr)) {
-			if (addr[x] == ':')
+		while (i < strlen(addr)) {
+			if (addr[i] == ':')
 				cend++;
-			x++;
+			i++;
 		}
 		if (addr[strlen(addr) - 1] == ':' && addr[strlen(addr) - 2] != ':')
 			cend--;
 	}
 
 	if (!compressed) {
-		x = 0;
-		y = 0;
-		while (x < pos) {
-			if (addr[y] == ':')
-				x++;
-			y++;
+		i = 0;
+		for (j = 0; i < pos; j++) {
+			if (addr[j] == ':')
+				i++;
 		}
 
 		memset(str, 0, sizeof(str));
-		x = 0;
-		while (y < strlen(addr) && addr[y] != ':') {
-			str[x] = addr[y];
-			x++;
-			y++;
-		}
+		i = 0;
+		while (j < strlen(addr) && addr[j] != ':')
+			str[i++] = addr[j++];
 	}
 
 	if (compressed) {
 		memset(str, 0, sizeof(str));
 		if (pos <= cstart) {
-			x = 0;
-			y = 0;
-			while (x < pos) {
-				if (addr[y] == ':')
-					x++;
-				y++;
+			i = 0;
+			
+			for (j = 0; i < pos; j++) {
+				if (addr[j] == ':')
+					i++;
 			}
 
-			x = 0;
-			while (y < strlen(addr) && addr[y] != ':') {
-				str[x] = addr[y];
-				x++;
-				y++;
-			}
+			i = 0;
+			while (j < strlen(addr) && addr[j] != ':')
+				str[i++] = addr[j++];
 		}
 
-		if ((pos > cstart) && (pos < (max - cend))) {
+		if ((pos > cstart) && (pos < (max - cend)))
 			str[0] = '0';
-		}
 
 		if (pos >= (max - cend)) {
-			y = 0;
-			while (y < strlen(addr) - 1) {
-				if (addr[y] == ':' && addr[y + 1] == ':')
+			
+			for (j = 0; j < strlen(addr) - 1; j++) {
+				if (addr[j] == ':' && addr[j + 1] == ':')
 					break;
-				y++;
 			}
-			y += 2;
+			j += 2;
 
-			x = max - cend;
-			while (x < pos) {
-				if (addr[y] == ':')
-					x++;
-				y++;
+			i = max - cend;
+			while (i < pos) {
+				if (addr[j++] == ':')
+					i++;
 			}
 
 			memset(str, 0, sizeof(str));
-			x = 0;
-			while (y < strlen(addr) && addr[y] != ':') {
-				str[x] = addr[y];
-				x++;
-				y++;
-			}
+			for (i = 0; j < strlen(addr) && addr[j] != ':'; i++)
+				str[i] = addr[j++];
 		}
 
 	}
 
 	if (str[0] == '\0')
 		str[0] = '0';
-	x = strtol(str, (char **)NULL, 16);
 
-	return x;
+	return strtol(str, NULL, 16);
 }
 
 int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 {
 	int colon;
-	int x, y, z, n;
+	int i, j, k, n;
 	char buf[128];
 
 	colon = 0;
@@ -891,40 +857,32 @@ int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 	if (type == V6TYPE_V4INV6)
 		colon = 6;
 
-	for (x = 0; x < 4; x++) {
-		in6_addr->haddr.sip6_addr32[x] = 0;
-	}
+	for (i = 0; i < 4; i++)
+		in6_addr->haddr.sip6_addr32[i] = 0;
 
-	for (x = 0; x < colon; x++) {
-		y = getcolon(spstr.ipv6addr, x, type);
-		in6_addr->haddr.sip6_addr16[x] = y;
-	}
+	for (i = 0; i < colon; i++)
+		in6_addr->haddr.sip6_addr16[i] = getcolon(spstr.ipv6addr, i, type);
 
 	if (type == V6TYPE_V4INV6) {
 		memset(buf, 0, sizeof(buf));
-		x = 0;
-		while (spstr.ipv4addr[x] != '.') {
-			buf[x] = spstr.ipv4addr[x];
-			x++;
-		}
-		x++;
-		for (y = 0; y < 4; y++) {
-			if (y == 1) {
+		for (i = 0; spstr.ipv4addr[i] != '.'; i++)
+			buf[i] = spstr.ipv4addr[i];
+		i++;
+
+		for (j = 0; j < 4; j++) {
+			if (j == 1)
 				in6_addr->haddr.sip6_addr16[6] = (n << 8) | atoi(buf);
-			}
-			if (y == 3) {
+
+			if (j == 3)
 				in6_addr->haddr.sip6_addr16[7] = (n << 8) | atoi(buf);
-			}
+
 			n = atoi(buf);
 
 			memset(buf, 0, sizeof(buf));
-			z = 0;
-			while (spstr.ipv4addr[x] != '.' && spstr.ipv4addr[x] != '\0' && x < strlen(spstr.ipv4addr)) {
-				buf[z] = spstr.ipv4addr[x];
-				x++;
-				z++;
-			}
-			x++;
+			
+			for (k = 0; spstr.ipv4addr[i] != '.' && spstr.ipv4addr[i] != '\0' && i < strlen(spstr.ipv4addr); k++)
+				buf[k] = spstr.ipv4addr[i++];
+			i++;
 		}
 	}
 
@@ -933,24 +891,24 @@ int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 
 int v6masktonum(char *nmask, int *nmaskbits, struct sip_in6_addr *in6_addr)
 {
-	int x, y, z;
+	int i, j, k;
 
 	if (nmask[0] == '\0')
 		*nmaskbits = 128;
 	else
 		*nmaskbits = atoi(nmask);
 
-	for (x = 0; x < 4; x++)
-		in6_addr->sip6_addr32[x] = 0;
+	for (i = 0; i < 4; i++)
+		in6_addr->sip6_addr32[i] = 0;
 
-	y = 0;
-	z = 0;
-	for (x = 0; x < *nmaskbits; x++) {
-		in6_addr->sip6_addr16[y] = in6_addr->sip6_addr16[y] | (1 << (15 - z));
-		z++;
-		if (z == 16) {
-			z = 0;
-			y++;
+	j = 0;
+	k = 0;
+	for (i = 0; i < *nmaskbits; i++) {
+		in6_addr->sip6_addr16[j] = in6_addr->sip6_addr16[j] | (1 << (15 - k));
+		k++;
+		if (k == 16) {
+			k = 0;
+			j++;
 		}
 	}
 
@@ -963,7 +921,7 @@ int v6masktonum(char *nmask, int *nmaskbits, struct sip_in6_addr *in6_addr)
  */
 int validate_v6addr(char *addr)
 {
-	int x;
+	int i;
 	struct ipv6_split spstr;
 
 	memset(spstr.ipv6addr, 0, sizeof(spstr.ipv6addr));
@@ -975,16 +933,16 @@ int validate_v6addr(char *addr)
 	if (!spstr.ipv6addr[0])
 		return 0;
 
-	x = V6TYPE_STANDARD;
+	i = V6TYPE_STANDARD;
 	if (spstr.ipv4addr[0])
-		x = V6TYPE_V4INV6;
-	if (validate_s_v6addr(spstr.ipv6addr, x) < 0) {
+		i = V6TYPE_V4INV6;
+
+	if (validate_s_v6addr(spstr.ipv6addr, i) < 0)
 		return 0;
-	}
+
 	if (spstr.ipv4addr[0]) {
-		if (!validate_v4addr(spstr.ipv4addr)) {
+		if (!validate_v4addr(spstr.ipv4addr))
 			return 0;
-		}
 	}
 
 	return 1;
@@ -992,103 +950,100 @@ int validate_v6addr(char *addr)
 
 int v6addrtoprefix(struct v6addr *in6_addr)
 {
-	int x;
+	int i;
 
-	for (x = 0; x < 8; x++) {
-		in6_addr->prefix.sip6_addr16[x] = in6_addr->haddr.sip6_addr16[x] & in6_addr->nmask.sip6_addr16[x];
-	}
+	for (i = 0; i < 8; i++)
+		in6_addr->prefix.sip6_addr16[i] = in6_addr->haddr.sip6_addr16[i] & in6_addr->nmask.sip6_addr16[i];
 
 	return 0;
 }
 
 int v6addrtosuffix(struct v6addr *in6_addr)
 {
-	int x;
+	int i;
 
-	for (x = 0; x < 8; x++) {
-		in6_addr->suffix.sip6_addr16[x] = in6_addr->haddr.sip6_addr16[x] & (in6_addr->nmask.sip6_addr16[x] ^ 0xffff);
-	}
+	for (i = 0; i < 8; i++)
+		in6_addr->suffix.sip6_addr16[i] = in6_addr->haddr.sip6_addr16[i] & (in6_addr->nmask.sip6_addr16[i] ^ 0xffff);
 
 	return 0;
 }
 
 int v6addrtobroadcast(struct v6addr *in6_addr)
 {
-	int x;
+	int i;
 
-	for (x = 0; x < 8; x++) {
-		in6_addr->broadcast.sip6_addr16[x] = 0xffff - in6_addr->nmask.sip6_addr16[x] + in6_addr->prefix.sip6_addr16[x];
-	}
+	for (i = 0; i < 8; i++)
+		in6_addr->broadcast.sip6_addr16[i] = 0xffff - in6_addr->nmask.sip6_addr16[i] + in6_addr->prefix.sip6_addr16[i];
 
 	return 0;
 }
 
 void v6_type(struct v6addr *in6_addr)
 {
-	uint16_t a;
-
-	a = in6_addr->haddr.sip6_addr16[0];
+	uint16_t a = in6_addr->haddr.sip6_addr16[0];
+	char  *buf = in6_addr->class_remark;
+	size_t len = sizeof(in6_addr->class_remark);
 
 	if (a == 0)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Reserved");
+		snprintf(buf, len, "Reserved");
 	if (a == 2 || a == 3)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Reserved for NSAP Allocation");
+		snprintf(buf, len, "Reserved for NSAP Allocation");
 	if (a == 4 || a == 5)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Reserved for IPX Allocation");
+		snprintf(buf, len, "Reserved for IPX Allocation");
 	if ((a & 0xe000) == 0x2000)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Aggregatable Global Unicast Addresses");
+		snprintf(buf, len, "Aggregatable Global Unicast Addresses");
 	if ((a | 0x00ff) == 0x00ff)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Reserved");
+		snprintf(buf, len, "Reserved");
 	if ((a & 0xff00) == 0xff00)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Multicast Addresses");
+		snprintf(buf, len, "Multicast Addresses");
 	if ((a & 0xff80) == 0xfe80)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Link-Local Unicast Addresses");
+		snprintf(buf, len, "Link-Local Unicast Addresses");
 	if ((a & 0xffc0) == 0xfec0)
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Site-Local Unicast Addresses");
+		snprintf(buf, len, "Site-Local Unicast Addresses");
 
-	if (in6_addr->class_remark[0] == '\0')
-		snprintf(in6_addr->class_remark, sizeof(in6_addr->class_remark), "Unassigned");
+	if (buf[0] == '\0')
+		snprintf(buf, len, "Unassigned");
 
 	return;
 }
 
 void v6_comment(struct v6addr *in6_addr)
 {
-	int x, y;
+	int i, j;
 
-	y = 0;
-	for (x = 0; x < 8; x++) {
-		if (in6_addr->haddr.sip6_addr16[x])
-			y = 1;
+	j = 0;
+	for (i = 0; i < 8; i++) {
+		if (in6_addr->haddr.sip6_addr16[i])
+			j = 1;
 	}
-	if (!y)
+	if (!j)
 		snprintf(in6_addr->comment, sizeof(in6_addr->comment), "Unspecified");
 
-	y = 0;
-	for (x = 0; x < 7; x++) {
-		if (in6_addr->haddr.sip6_addr16[x])
-			y = 1;
+	j = 0;
+	for (i = 0; i < 7; i++) {
+		if (in6_addr->haddr.sip6_addr16[i])
+			j = 1;
 	}
-	if (!y)
+	if (!j) {
 		if (in6_addr->haddr.sip6_addr16[7] == 1)
 			snprintf(in6_addr->comment, sizeof(in6_addr->comment), "Loopback");
-
-	return;
+	}
 }
 
 int v6verifyv4(struct sip_in6_addr addr)
 {
-	int x, y;
+	int i, j;
 
-	y = 0;
-	for (x = 0; x < 5; x++) {
-		if (addr.sip6_addr16[x])
-			y = 1;
+	j = 0;
+	for (i = 0; i < 5; i++) {
+		if (addr.sip6_addr16[i])
+			j = 1;
 	}
 
-	if (!y) {
+	if (!j) {
 		if (!addr.sip6_addr16[5])
 			return 1;
+
 		if (addr.sip6_addr16[5] == 0xffff)
 			return 2;
 	}
@@ -1100,46 +1055,46 @@ char *get_comp_v6(struct sip_in6_addr addr)
 {
 	static char outad[44];
 	char tmpad[5];
-	int x, y, z;
+	int i, j, k;
 	int start, num;
 
 	memset(outad, 0, sizeof(outad));
 
 	start = -1;
 	num = 0;
-	y = 0;
-	z = 0;
-	for (x = 0; x < 8; x++) {
-		if (addr.sip6_addr16[x] == 0) {
-			if (y == -1)
-				y = x;
-			z++;
+	j = 0;
+	k = 0;
+	for (i = 0; i < 8; i++) {
+		if (addr.sip6_addr16[i] == 0) {
+			if (j == -1)
+				j = i;
+			k++;
 		} else {
-			if (z > num && z > 1) {
-				start = y;
-				num = z;
+			if (k > num && k > 1) {
+				start = j;
+				num = k;
 			}
-			y = -1;
-			z = 0;
+			j = -1;
+			k = 0;
 		}
 	}
 
-	if (z > num && z > 1) {
-		start = y;
-		num = z;
+	if (k > num && k > 1) {
+		start = j;
+		num = k;
 	}
 
-	for (x = 0; x < 8; x++) {
-		if (x == start) {
-			if (!x)
+	for (i = 0; i < 8; i++) {
+		if (i == start) {
+			if (!i)
 				strlcat(outad, ":", sizeof(outad));
 			strlcat(outad, ":", sizeof(outad));
-			x += num - 1;
+			i += num - 1;
 		} else {
 			memset(tmpad, 0, sizeof(tmpad));
-			snprintf(tmpad, sizeof(tmpad), "%x", addr.sip6_addr16[x]);
+			snprintf(tmpad, sizeof(tmpad), "%x", addr.sip6_addr16[i]);
 			strlcat(outad, tmpad, sizeof(outad));
-			if (x != 7)
+			if (i != 7)
 				strlcat(outad, ":", sizeof(outad));
 		}
 	}
@@ -1149,7 +1104,7 @@ char *get_comp_v6(struct sip_in6_addr addr)
 
 int mk_ipv6addr(struct v6addr *in6_addr, char *addr)
 {
-	int x, y, z;
+	int i, j, k;
 	struct ipv6_split spstr;
 
 	memset(spstr.ipv6addr, 0, sizeof(spstr.ipv6addr));
@@ -1161,37 +1116,35 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr)
 	if (!spstr.ipv6addr[0])
 		return -1;
 
-	x = V6TYPE_STANDARD;
+	i = V6TYPE_STANDARD;
 	if (spstr.ipv4addr[0])
-		x = V6TYPE_V4INV6;
-	if (validate_s_v6addr(spstr.ipv6addr, x) < 0) {
+		i = V6TYPE_V4INV6;
+
+	if (validate_s_v6addr(spstr.ipv6addr, i) < 0)
 		return -1;
-	}
-	if (spstr.ipv4addr[0]) {
-		if (!validate_v4addr(spstr.ipv4addr)) {
-			return -1;
+
+	if (spstr.ipv4addr[0] && !validate_v4addr(spstr.ipv4addr))
+		return -1;
+
+	i = 0;
+	j = 0;
+	while (i < strlen(spstr.nmask)) {
+		j = 0;
+		k = 0;
+		while (k < strlen(NETMASK_VAL) && !j) {
+			if (spstr.nmask[i] == NETMASK_VAL[k])
+				j = 1;
+			k++;
 		}
+		if (!j)
+			return -1;
+
+		i++;
 	}
 
-	x = 0;
-	y = 0;
-	while (x < strlen(spstr.nmask)) {
-		y = 0;
-		z = 0;
-		while (z < strlen(NETMASK_VAL) && !y) {
-			if (spstr.nmask[x] == NETMASK_VAL[z])
-				y = 1;
-			z++;
-		}
-		if (!y) {
-			return -1;
-		}
-		x++;
-	}
-	x = atoi(spstr.nmask);
-	if (x < 0 || x > 128) {
+	i = atoi(spstr.nmask);
+	if (i < 0 || i > 128)
 		return -1;
-	}
 
 	if (spstr.ipv4addr[0] == '\0')
 		in6_addr->type = V6TYPE_STANDARD;
