@@ -1,5 +1,6 @@
 IP network calculator
 =====================
+[![Travis Status][]][Travis]
 
 netcalc is a slimmed down clone of [sipcalc][], using the output format
 of [ipcalc][].  It is written in C and has very few dependencies.  Both
@@ -14,9 +15,11 @@ on major Linux distributions and works on *BSD and Solaris.
 [Use GitHub][github] to file bug reports, questions, feature requests or
 patches — preferably as pull requests!
 
-[ipcalc]:  http://jodies.de/ipcalc
-[sipcalc]: http://www.routemeister.net/
-[github]:  https://github.com/troglobit/netcalc
+[ipcalc]:          http://jodies.de/ipcalc
+[sipcalc]:         http://www.routemeister.net/
+[github]:          https://github.com/troglobit/netcalc
+[Travis]:          https://travis-ci.org/troglobit/netcalc
+[Travis Status]:   https://travis-ci.org/troglobit/netcalc.png?branch=master
 
 <!--
   -- Local Variables:
