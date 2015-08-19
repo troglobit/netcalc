@@ -1,4 +1,4 @@
-[v2.0][] - UNRELEASED
+[v2.0][] - 2015-08-19
 ---------------------
 
 First release of netcalc, cloned from sipcalc.
@@ -127,7 +127,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v1.1.6...HEAD
+[v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...v2.0
 [v1.1.6]: https://github.com/troglobit/netcalc/compare/v1.1.5...v1.1.6
 [v1.1.5]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.1.5.tar.gz
 [v1.1.4]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.1.4.tar.gz
