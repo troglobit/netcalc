@@ -4,3 +4,11 @@ language: c
 
 # We don't need to install packages, use dockerized build, quicker
 sudo: false
+
+# We don't store generated files (configure and Makefile) in GIT,
+# so we must customize the default build script to run ./autogen.sh
+script:
+  - ./autogen.sh
+  - ./configure
+  - make
+  - make test
