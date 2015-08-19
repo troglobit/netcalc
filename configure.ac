@@ -1,4 +1,5 @@
-AC_PREREQ([2.69])
+# Use v2.61 for backwards compat with Ubuntu 12.04 LTS
+AC_PREREQ([2.61])
 AC_INIT([netcalc],[2.0-beta1],[https://github.com/troglobit/netcalc/issues])
 AM_INIT_AUTOMAKE([foreign])
 AM_SILENT_RULES([yes])
