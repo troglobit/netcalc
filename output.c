@@ -144,6 +144,7 @@ char *print_comp_v6(struct sip_in6_addr addr, char *buf, size_t len)
 	int i, j, k;
 	int start, num;
 
+	memset(buf, 0, len);
 	start = -1;
 	num = 0;
 	j = 0;
