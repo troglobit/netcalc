@@ -1,7 +1,7 @@
 EXEC            = netcalc
 SYMLINK         = ipcalc
 TESTS           = testit.sh
-EXTRA_DIST      = configure README LICENSE
+EXTRA_DIST      = configure README LICENSE testit.sh
 doc_DATA        = README LICENSE
 dist_man1_MANS  = $(EXEC).1
 bin_PROGRAMS    = $(EXEC)
