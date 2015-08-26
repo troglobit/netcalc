@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2003-2013  Simon Ekstrand
  * Copyright (c) 2010-2015  Joachim Nilsson
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -12,7 +12,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- *  
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -293,7 +293,7 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 
 		/*
 		 * Nope, is it an ipv4 address with a /xx mask?
-		 * 
+		 *
 		 * NOTE: validate_netmask returns different values if it finds
 		 * other types of netmasks to, but we only match on the above
 		 * here.
@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
 
 	if (split_errv4 || split_errv6) {
  nothing:
-		warnx("No (valid) commands recieved, nothing to do.");
+		warnx("No (valid) commands received, nothing to do.");
 		free_boxargs(abox_start);
 		return 1;
 	}
