@@ -1,0 +1,31 @@
+Source: netcalc
+Section: net
+Priority: optional
+Maintainer: Joachim Nilsson <troglobit@gmail.com>
+Homepage: https://github.com/troglobit/netcalc
+Build-Depends: debhelper (>= 9~), autoconf
+Vcs-Git: https://github.com/troglobit/netcalc.git
+Vcs-Browser: https://github.com/troglobit/netcalc/commits/
+Standards-Version: 3.9.3
+
+Package: netcalc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Simplified clone of sipcalc with ipcalc looks
+ Netcalc is a slimmed down clone of sipcalc, using the output format of
+ ipcalc.  It is written in C and has very few dependencies.  Both IPv4
+ and IPv6 is supported.
+ .
+ Features include:
+  - IPv4
+   * Classfull and CIDR output.
+   * Multiple address and netmask input and output formats (dotted
+     quad, hex, number of bits).
+   * Output of broadcast address, network class, Cisco wildcard, hosts/range,
+     network range.
+   * The ability to "split" a network based on a smaller netmask, now also with
+     recursive runs on the generated subnets. (also IPv6)
+  - IPv6
+   * Compressed and expanded input and output addresses.
+   * Standard IPv6 network output.
+   * v4 in v6 output.
