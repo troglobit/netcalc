@@ -28,7 +28,9 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <ctype.h>		/* isxdigit() */
 #include <stdio.h>
+#include <stdlib.h>		/* atoi(), strtoul(), strtol() */
 #include <string.h>
 
 #include "netcalc.h"
