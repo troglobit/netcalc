@@ -55,7 +55,7 @@ strlcpy(char *dst, const char *src, size_t siz)
 
 /**
  * Local Variables:
- *  version-control: t
+ *  indent-tabs-mode: t
  *  c-file-style: "bsd"
  * End:
  */

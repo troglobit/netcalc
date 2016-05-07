@@ -1170,7 +1170,6 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:
