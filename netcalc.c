@@ -42,6 +42,7 @@
 
 #define ARGLEN 128
 
+char *ident = PACKAGE_NAME;
 extern char *optarg;
 extern int optind, opterr, optopt;
 
@@ -437,6 +438,19 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 	return ifarg_start;
 }
 
+static char *progname(char *arg0)
+{
+       char *nm;
+
+       nm = strrchr(arg0, '/');
+       if (nm)
+	       nm++;
+       else
+	       nm = arg0;
+
+       return nm;
+}
+
 int main(int argc, char *argv[])
 {
 	int x, y, z, m, v4args, v6args, argcount, first_err;
@@ -450,6 +464,7 @@ int main(int argc, char *argv[])
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
 	char *stdinarg[3];
 
+	ident = progname(argv[0]);
 	if (argc < 2)
 		return usage(1);
 

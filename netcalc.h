@@ -144,7 +144,7 @@ struct argbox {
 	struct argbox *next;
 };
 
-extern char *__progname;
+extern char *ident;
 
 /*
  * netcalc.c

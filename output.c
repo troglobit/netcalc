@@ -464,7 +464,7 @@ int usage(int code)
 	       "Copyright (C) 2010-2015  Joachim Nilsson\n"
 	       "\n"
 	       "This is free software, under the 3-clause BSD license: you are free to change\n"
-	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law\n", __progname);
+	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law\n", ident);
 
 	return code;
 }
