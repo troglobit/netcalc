@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-2013  Simon Ekstrand
- * Copyright (c) 2010-2015  Joachim Nilsson
+ * Copyright (c) 2010-2017  Joachim Nilsson
  */
 
 #ifndef NETCALC_OUTPUT_H_
