@@ -11,8 +11,10 @@ netcalc_SOURCES = netcalc.c netcalc.h output.c output.h misc.c strlcpy.c strlcat
 test: check
 
 # Hook in to install to add netcalc --> ipcalc symlink
+if SYMLINK
 install-exec-hook:
 	(cd $(DESTDIR)$(bindir); $(LN_S) $(EXEC) $(SYMLINK))
+endif
 
 build-deb:
 	gbp buildpackage --git-ignore-new --git-ignore-branch --git-no-create-orig \

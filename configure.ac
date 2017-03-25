@@ -17,4 +17,9 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
+AC_ARG_ENABLE(ipcalc-symlink,
+        AS_HELP_STRING([--disable-ipcalc-symlink], [Disable ipcalc symlink, default enabled]))
+
+AM_CONDITIONAL(SYMLINK, [test "x$enable_ipcalc_symlink" != "xno"])
+
 AC_OUTPUT
