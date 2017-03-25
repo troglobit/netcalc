@@ -438,6 +438,31 @@ struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
 	return ifarg_start;
 }
 
+static int usage(int code)
+{
+	printf("Usage: %s [OPTIONS] <NETWORK/LEN | - | NETWORK NETMASK>\n"
+	       "\n"
+	       "Global options:\n"
+	       "  -h       This help text\n"
+	       "  -v       Show version information\n"
+	       "\n"
+	       "IPv4 options:\n"
+	       "  -s MASK  Split the IPv4 network into subnets of MASK size\n"
+	       "\n"
+	       "IPv6 options:\n"
+	       "  -e       IPv4 compatible IPv6 information\n"
+	       "  -r       IPv6 reverse DNS output\n"
+	       "  -S MASK  Split the IPv6 network into subnets of MASK size\n"
+	       "\n"
+	       "Copyright (C) 2003-2013  Simon Ekstrand\n"
+	       "Copyright (C) 2010-2017  Joachim Nilsson\n"
+	       "\n"
+	       "This is free software, under the 3-clause BSD license: you are free to change\n"
+	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law\n", ident);
+
+	return code;
+}
+
 static char *progname(char *arg0)
 {
        char *nm;
