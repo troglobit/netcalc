@@ -72,8 +72,8 @@ void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args,
 		char buf[30];
 
 		snprintf(buf, sizeof(buf), "%s", numtoquad(start));
-		printf("Network  : \e[34m%-*s - %-15s\e[0m  ", (int)maxlen, buf, numtoquad(end));
-		printf("Netmask  : \e[34m%s\e[0m\n", numtoquad(splitmask));
+		cprintf("Network  : %34C%-*s - %-15s%0C  ", (int)maxlen, buf, numtoquad(end));
+		cprintf("Netmask  : %34C%s%0C\n", numtoquad(splitmask));
 
 		start += diff;
 		if (end == 0xffffffff || end >= ifi->v4ad.n_broadcast)
@@ -101,13 +101,10 @@ void print_cf_info_v4(struct if_info *ifi)
 		max = ifi->v4ad.n_broadcast - 1;
 	}
 
-	printf("Address  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(ifi->v4ad.n_haddr), numtobitmap(ifi->v4ad.n_haddr, len));
-//      printf ("Address (decimal): %u\n", ifi->v4ad.n_haddr);
-//      printf ("Address (hex)    : %X\n", ifi->v4ad.n_haddr);
+	cprintf("Address  : %34C%-20s%0C %33C%s%0C\n", numtoquad(ifi->v4ad.n_haddr), numtobitmap(ifi->v4ad.n_haddr, len));
 	snprintf(temp, sizeof(temp), "%s = %d", numtoquad(ifi->v4ad.n_nmask), ifi->v4ad.n_nmaskbits);
-	printf("Netmask  : \e[34m%-20s\e[0m \e[31m%s\e[0m\n", temp, numtobitmap(ifi->v4ad.n_nmask, len));
-//      printf ("Netmask (hex)  - %X\n", ifi->v4ad.n_cnmask);
-	printf("Wildcard : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(ifi->v4ad.n_nmask ^ 0xffffffff),
+	cprintf("Netmask  : %34C%-20s%0C %31C%s%0C\n", temp, numtobitmap(ifi->v4ad.n_nmask, len));
+	cprintf("Wildcard : %34C%-20s%0C %33C%s%0C\n", numtoquad(ifi->v4ad.n_nmask ^ 0xffffffff),
 	       numtobitmap(ifi->v4ad.n_nmask ^ 0xffffffff, len));
 
 	printf("=>\n");
@@ -119,24 +116,24 @@ void print_cf_info_v4(struct if_info *ifi)
 		char *net = numtobitmap(ifi->v4ad.n_cnaddr, len);
 
 		strncpy(buf, net, clen);
-		printf("Network  : \e[34m%-20s\e[0m \e[35m%s\e[0m\e[33m%s\e[0m\n", temp, buf, &net[clen]);
-		printf("HostMin  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(min), numtobitmap(min, len));
-		printf("HostMax  : \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(max), numtobitmap(max, len));
+		cprintf("Network  : %34C%-20s%0C %35C%s%0C%33C%s%0C\n", temp, buf, &net[clen]);
+		cprintf("HostMin  : %34C%-20s%0C %33C%s%0C\n", numtoquad(min), numtobitmap(min, len));
+		cprintf("HostMax  : %34C%-20s%0C %33C%s%0C\n", numtoquad(max), numtobitmap(max, len));
 		if (len < 31) {
 			bcast = ifi->v4ad.n_broadcast;
-			printf("Broadcast: \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(bcast), numtobitmap(bcast, len));
+			cprintf("Broadcast: %34C%-20s%0C %33C%s%0C\n", numtoquad(bcast), numtobitmap(bcast, len));
 		}
 	} else {
-		printf("HostRoute: \e[34m%-20s\e[0m \e[33m%s\e[0m\n", numtoquad(ifi->v4ad.n_cnaddr),
+		cprintf("HostRoute: %34C%-20s%0C %33C%s%0C\n", numtoquad(ifi->v4ad.n_cnaddr),
 		       numtobitmap(ifi->v4ad.n_cnaddr, len));
 	}
 
-	printf("Hosts/Net: \e[34m%-20u\e[0m  ", num);
+	cprintf("Hosts/Net: %34C%-20u%0C  ", num);
 	if (ifi->v4ad.class == 'I')	/* Invalid */
-		printf("\e[35mClass Invalid");
+		cprintf("%35CClass Invalid");
 	else
-		printf("\e[35mClass %c", ifi->v4ad.class);
-	printf("\e[0m%s\n", ifi->v4ad.class_remark);
+		cprintf("%35CClass %c", ifi->v4ad.class);
+	cprintf("%0C%s\n", ifi->v4ad.class_remark);
 }
 
 char *print_comp_v6(struct sip_in6_addr addr, char *buf, size_t len)
@@ -193,7 +190,7 @@ void print_exp_v4inv6(struct sip_in6_addr addr)
 {
 	unsigned char num;
 
-	printf("\e[34m%04x:%04x:%04x:%04x:%04x:%04x:", addr.sip6_addr16[0], addr.sip6_addr16[1],
+	cprintf("%34C%04x:%04x:%04x:%04x:%04x:%04x:", addr.sip6_addr16[0], addr.sip6_addr16[1],
 	       addr.sip6_addr16[2], addr.sip6_addr16[3], addr.sip6_addr16[4], addr.sip6_addr16[5]);
 
 	num = (addr.sip6_addr16[6] >> 8) & 0xff;
@@ -203,7 +200,7 @@ void print_exp_v4inv6(struct sip_in6_addr addr)
 	num = (addr.sip6_addr16[7] >> 8) & 0xff;
 	printf("%d.", num);
 	num = addr.sip6_addr16[7] & 0xff;
-	printf("%d\e[0m", num);
+	cprintf("%d%0C", num);
 }
 
 void print_comp_v4inv6(struct sip_in6_addr addr)
@@ -236,7 +233,7 @@ void print_comp_v4inv6(struct sip_in6_addr addr)
 		num = k;
 	}
 
-	printf("\e[34m");
+	cprintf("%34C");
 	for (i = 0; i < 6; i++) {
 		if (i == start) {
 			if (!i)
@@ -256,12 +253,12 @@ void print_comp_v4inv6(struct sip_in6_addr addr)
 	printf("%d.", v4num);
 	v4num = addr.sip6_addr16[7] & 0xff;
 	printf("%d", v4num);
-	printf("\e[0m");
+	cprintf("%0C");
 }
 
 void print_exp_v6(struct sip_in6_addr addr)
 {
-	printf("\e[34m%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x\e[0m",
+	cprintf("%34C%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x%0C",
 	       addr.sip6_addr16[0], addr.sip6_addr16[1], addr.sip6_addr16[2], addr.sip6_addr16[3],
 	       addr.sip6_addr16[4], addr.sip6_addr16[5], addr.sip6_addr16[6], addr.sip6_addr16[7]);
 }
@@ -300,24 +297,24 @@ void print_rev_v6(struct if_info *ifi)
 {
 	char buf[256];
 
-	printf("Reverse DNS     : \e[34m%s\e[0m\n", revdnsv6(ifi->v6ad.haddr, buf, sizeof(buf)));
+	cprintf("Reverse DNS     : %34C%s%0C\n", revdnsv6(ifi->v6ad.haddr, buf, sizeof(buf)));
 }
 
 void print_v6(struct if_info *ifi)
 {
 	char buf[42];
 
-	printf("Address ID      : \e[34m%s/%d\e[0m\n", print_mixed_v6(ifi->v6ad.suffix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
-	printf("Compressed IPv6 : \e[34m%s\e[0m\n", print_comp_v6(ifi->v6ad.haddr, buf, sizeof(buf)));
+	cprintf("Address ID      : %34C%s/%d%0C\n", print_mixed_v6(ifi->v6ad.suffix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	cprintf("Compressed IPv6 : %34C%s%0C\n", print_comp_v6(ifi->v6ad.haddr, buf, sizeof(buf)));
 	printf("Expanded IPv6   : "); print_exp_v6(ifi->v6ad.haddr);  printf("\n");
-	printf("Prefix address  : \e[34m%s\e[0m = length \e[34m%d\e[0m\n", print_mixed_v6(ifi->v6ad.nmask, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
-	printf("Address type    : \e[35m%s\e[0m", ifi->v6ad.class_remark);
+	cprintf("Prefix address  : %34C%s%0C = length %34C%d%0C\n", print_mixed_v6(ifi->v6ad.nmask, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	cprintf("Address type    : %35C%s%0C", ifi->v6ad.class_remark);
 	if (ifi->v6ad.comment[0])
 		printf(", %s\n", ifi->v6ad.comment);
 	else
 		printf("\n");
 	printf("=>\n");
-	printf("Network         : \e[34m%s/%d\e[0m\n", print_mixed_v6(ifi->v6ad.prefix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
+	cprintf("Network         : %34C%s/%d%0C\n", print_mixed_v6(ifi->v6ad.prefix, buf, sizeof(buf)), ifi->v6ad.nmaskbits);
 	printf("HostMin         : "); print_exp_v6(ifi->v6ad.prefix);    printf("\n");
 	printf("HostMax         : "); print_exp_v6(ifi->v6ad.broadcast); printf("\n");
 }

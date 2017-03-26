@@ -443,6 +443,7 @@ static int usage(int code)
 	printf("Usage: %s [OPTIONS] <NETWORK/LEN | - | NETWORK NETMASK>\n"
 	       "\n"
 	       "Global options:\n"
+	       "  -c       Disable colorized output\n"
 	       "  -h       This help text\n"
 	       "  -v       Show version information\n"
 	       "\n"
@@ -522,8 +523,12 @@ int main(int argc, char *argv[])
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
-	while ((ch = getopt(argc, argv, "ehrs:S:v")) != -1) {
+	while ((ch = getopt(argc, argv, "cehrs:S:v")) != -1) {
 		switch (ch) {
+		case 'c':
+			colorize = 0;
+			break;
+
 		case 'e':
 			v6args |= V4INV6;
 			break;
