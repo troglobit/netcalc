@@ -52,6 +52,19 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 {
 	int ret = 0;
 
+	if ((v4args & V4CHECK) == V4CHECK || (v6args & V6CHECK) == V6CHECK) {
+		if ((v4args & V4CHECK) == V4CHECK && strlen(ifarg_cur->p_v4addr) > 0) {
+			if (get_addrv4(ifarg_cur) == 0) {
+				printf("%s\n", ifarg_cur->p_v4addr);
+			}
+		} else if ((v6args & V6CHECK) == V6CHECK && strlen(ifarg_cur->p_v6addr) > 0) {
+			if (get_addrv6(ifarg_cur) == 0) {
+				printf("%s\n", ifarg_cur->p_v6addr);
+			}
+		}
+		return 0;
+	}
+
 	if (ifarg_cur->type == IFT_V4)
 		ret = get_addrv4(ifarg_cur);
 
@@ -443,8 +456,9 @@ static int usage(int code)
 	printf("Usage: %s [OPTIONS] <NETWORK/LEN | - | NETWORK NETMASK>\n"
 	       "\n"
 	       "Global options:\n"
-	       "  -c       Disable colorized output\n"
+	       "  -c       Validate the IPv4/IPv6 address, no output if invalid\n"
 	       "  -h       This help text\n"
+	       "  -n       Disable colorized output\n"
 	       "  -v       Show version information\n"
 	       "\n"
 	       "IPv4 options:\n"
@@ -523,14 +537,19 @@ int main(int argc, char *argv[])
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
-	while ((ch = getopt(argc, argv, "cehrs:S:v")) != -1) {
+	while ((ch = getopt(argc, argv, "cehnrs:S:v")) != -1) {
 		switch (ch) {
 		case 'c':
-			colorize = 0;
+			v4args |= V4CHECK;
+			v6args |= V6CHECK;
 			break;
 
 		case 'e':
 			v6args |= V4INV6;
+			break;
+
+		case 'n':
+			colorize = 0;
 			break;
 
 		case 'r':

@@ -70,6 +70,7 @@
 
 /* v4 args */
 #define V4_INFO     0x01
+#define V4CHECK     0x10
 #define V4SPLIT     0x20
 #define C_WILDCARD  0x40
 
@@ -78,6 +79,7 @@
 #define V4INV6      0x02
 #define V6SPLIT     0x04
 #define V6REV       0x08
+#define V6CHECK     0x10
 
 #define V6TYPE_STANDARD 1
 #define V6TYPE_V4INV6 2
