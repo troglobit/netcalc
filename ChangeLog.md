@@ -14,6 +14,7 @@ All notable changes to the project are documented in this file.
 - Add `-n` command line option to disable colorization of output
 - Add `-c` command line option to validate IP addreses.  Feature
   courtesy of Lonnie Abelbeck
+- Auto-disable colorization if run over a pipe, by Lonnie Abelbeck
 
 ### Fixes
 - Don't prefix "Compressed IPv6" with previous output, by Vincent Bernat
