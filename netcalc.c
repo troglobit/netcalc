@@ -54,14 +54,13 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 
 	if ((v4args & V4CHECK) == V4CHECK || (v6args & V6CHECK) == V6CHECK) {
 		if ((v4args & V4CHECK) == V4CHECK && strlen(ifarg_cur->p_v4addr) > 0) {
-			if (get_addrv4(ifarg_cur) == 0) {
+			if (get_addrv4(ifarg_cur) == 0)
 				printf("%s\n", ifarg_cur->p_v4addr);
-			}
 		} else if ((v6args & V6CHECK) == V6CHECK && strlen(ifarg_cur->p_v6addr) > 0) {
-			if (get_addrv6(ifarg_cur) == 0) {
+			if (get_addrv6(ifarg_cur) == 0)
 				printf("%s\n", ifarg_cur->p_v6addr);
-			}
 		}
+
 		return 0;
 	}
 
