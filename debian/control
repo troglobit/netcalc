@@ -11,6 +11,8 @@ Standards-Version: 3.9.3
 Package: netcalc
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: ipcalc
+Conflicts: ipcalc
 Description: Simplified clone of sipcalc with ipcalc looks
  Netcalc is a slimmed down clone of sipcalc, using the output format of
  ipcalc.  It is written in C and has very few dependencies.  Both IPv4

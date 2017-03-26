@@ -1,3 +1,12 @@
+netcalc (2.1-1) unstable; urgency=low
+
+  * New upstream release, v2.1
+  * New command line option, -n, to disable colorization of output
+  * New command line option, -c, to validate IP addresses
+  * Fix passing arguments on stdin
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Tue, 28 Mar 2017 20:30:00 +0100
+
 netcalc (2.0-1) unstable; urgency=low
 
   * New project, netcalc v2.0 is a clone of sipcalc v1.1.6.
