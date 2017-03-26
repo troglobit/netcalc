@@ -166,6 +166,7 @@ struct argbox {
 	struct argbox *next;
 };
 
+extern int   colorize;		/* cprintf.c */
 extern char *ident;
 
 /*
@@ -225,6 +226,11 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr);
  */
 size_t strlcpy(char *dst, const char *src, size_t siz);
 size_t strlcat(char *dst, const char *src, size_t siz);
+
+/*
+ * cprintf.c
+ */
+extern int cprintf(const char *fmt, ...);
 
 #endif /* NETCALC_H_ */
 
