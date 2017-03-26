@@ -588,6 +588,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
+		colorize = 0;
+
 	if (split_errv4 || split_errv6) {
  nothing:
 		warnx("No (valid) commands received, nothing to do.");
