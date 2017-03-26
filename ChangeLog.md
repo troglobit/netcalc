@@ -1,3 +1,29 @@
+Change Log
+==========
+
+All notable changes to the project are documented in this file.
+
+
+[v2.1][UNRELEASED] - 2017-03-XX
+-------------------------------
+
+### Changes
+- Added basic Debian packaging
+- Support for disabling `ipcalc` symlink in `configure` script
+- Add Tobias Waldekranz's awesome little AWK script to GIT
+- Add `-n` command line option to disable colorization of output
+- Add `-c` command line option to validate IP addreses.  Feature
+  courtesy of Lonnie Abelbeck
+
+### Fixes
+- Don't prefix "Compressed IPv6" with previous output, by Vincent Bernat
+- Issue #4: Unit test script missing from released tarball
+- Don't enforce automake v1.11, only check >= v1.11
+- Adaptions for musl libc
+- Fix issue #7: not all arguments supported on `stdin`, too small input
+  buffer(s), by Lonnie Abelbeck
+
+
 [v2.0][] - 2015-08-19
 ---------------------
 
@@ -127,7 +153,7 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v1.1.6...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.0...HEAD
 [v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...v2.0
 [v1.1.6]: https://github.com/troglobit/netcalc/compare/v1.1.5...v1.1.6
 [v1.1.5]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.1.5.tar.gz
