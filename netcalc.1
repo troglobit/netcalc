@@ -1,5 +1,5 @@
 .\" To process this file use: groff -man -Tascii netcalc.1
-.Dd 17 August, 2015
+.Dd 26 March, 2017
 .Dt NETCALC 1 
 .Os
 .Sh NAME
@@ -7,7 +7,7 @@
 .Nd IP subnet calculator
 .Sh SYNOPSIS
 .Nm
-.Op Fl ehrv
+.Op Fl cehnrv
 .Op Fl s Ar MASK
 .Op Fl S Ar MASK
 .Aq Ar ADDRESS/LEN | Ar - | Ar NETWORK Op Ar NETMASK
@@ -45,10 +45,14 @@ Support for v4 in v6 output
 .El
 .Sh OPTIONS
 .Bl -tag -width Ds
-.It Fl h
-Print a summary of the options and exit
+.It Fl c
+Validate (check) IP address argument.
 .It Fl e
 IPv4 compatible IPv6 information
+.It Fl h
+Print a summary of the options and exit
+.It Fl n
+Disable (no) colorization of output.
 .It Fl r
 IPv6 reverse DNS output
 .It Fl s Ar MASK
@@ -87,12 +91,6 @@ Use the project's GitHub page to file bug reports, feature requests or
 patches (preferably as GitHub pull requests!), or questions at
 .Aq https://github.com/troglobit/netcalc
 .Sh AUTHORS
-The original author of
-.Nm sipcalc
-was Simon Ekstrand
-.Aq mailto:simon@routemeister.net
-the mess that later became
-.Nm
-is entirely Joachim Nilsson
-.Aq mailto:troglobit@gmail.com
-to blame for.
+.Bl -tag -width "Simon Ekstrand mailto:simon@routemeister.net" -compact
+.It Simon Ekstrand Aq mailto:simon@routemeister.net Nm (sipcalc)
+.It Joachim Nilsson Aq mailto:troglobit@gmail.com Nm (netcalc)
