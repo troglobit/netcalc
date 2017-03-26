@@ -167,9 +167,9 @@ int get_stdin(char *args[])
 
 	memset(buf, 0, sizeof(buf));
 
-	argmax = (IFNAMSIZ + 1 > 19) ? IFNAMSIZ + 1 : 19;
-	arg1 = (char *)calloc(1, argmax);
-	arg2 = (char *)calloc(1, 16);
+	argmax = ARGLEN - 1;
+	arg1 = (char *)calloc(1, ARGLEN);
+	arg2 = (char *)calloc(1, ARGLEN);
 	memset(sbuf, 0, sizeof(sbuf));
 	memset(dbuf, 0, sizeof(dbuf));
 
@@ -221,7 +221,7 @@ int get_stdin(char *args[])
 	}
 	y++;
 	z = 0;
-	while (y < strlen(dbuf) && z < 15 && dbuf[y] != ' ') {
+	while (y < strlen(dbuf) && z < argmax && dbuf[y] != ' ') {
 		arg2[z] = dbuf[y];
 		y++;
 		z++;
