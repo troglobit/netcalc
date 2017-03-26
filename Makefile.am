@@ -17,9 +17,8 @@ install-exec-hook:
 	(cd $(DESTDIR)$(bindir); $(LN_S) $(EXEC) $(SYMLINK))
 endif
 
-build-deb:
-	gbp buildpackage --git-ignore-new --git-ignore-branch --git-no-create-orig \
-			 --git-upstream-branch=master
+package build-deb:
+	dpkg-buildpackage -uc -us -B
 
 ## Target to run when building a release
 release: dist build-deb
