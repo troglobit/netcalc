@@ -1,8 +1,8 @@
 EXEC            = netcalc
 SYMLINK         = ipcalc
 TESTS           = testit.sh
-EXTRA_DIST      = configure README LICENSE testit.sh
-doc_DATA        = README LICENSE
+EXTRA_DIST      = configure README.md LICENSE testit.sh
+doc_DATA        = README.md LICENSE ChangeLog.md
 dist_man1_MANS  = $(EXEC).1
 bin_PROGRAMS    = $(EXEC)
 netcalc_SOURCES = netcalc.c netcalc.h output.c output.h \
