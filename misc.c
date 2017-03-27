@@ -32,8 +32,9 @@
 #include <stdio.h>
 #include <stdlib.h>		/* atoi(), strtoul(), strtol() */
 #include <string.h>
-
 #include "netcalc.h"
+
+#define INTLEN_MAX 10
 
 
 int count(char *buf, char ch)
@@ -209,12 +210,11 @@ int validate_netmask(char *in_addr)
 	return 2;
 }
 
-int getrangeMinMax(char *buf, uint32_t *rangeMin, uint32_t *rangeMax)
+int getrange_min_max(char *buf, uint32_t *range_min, uint32_t *range_max)
 {
 	int i, j;
-	int LEN = 10;
-	char min[12], max[12];
-	uint32_t Min, Max;
+	char min_buf[12], max_buf[12];
+	uint32_t min, max;
 
 	if (strlen(buf) < 1)
 		return -1;
@@ -222,35 +222,29 @@ int getrangeMinMax(char *buf, uint32_t *rangeMin, uint32_t *rangeMax)
 	if (count(buf, ':') != 1)
 		return -1;
 
-	i = 0;
-	while (buf[i] != ':' && i < LEN) {
-		min[i] = buf[i];
-		i++;
-	}
-	min[i] = '\0';
+	for (i = 0; buf[i] != ':' && i < INTLEN_MAX; i++)
+		min_buf[i] = buf[i];
+	min_buf[i] = '\0';
 
-	i++;
-	j = 0;
-	while (buf[i] != '\0' && j < LEN) {
-		max[j++] = buf[i++];
-	}
-	max[j] = '\0';
+	for (j = 0; buf[i] != '\0' && j < INTLEN_MAX; i++, j++)
+		max_buf[j++] = buf[i++];
+	max_buf[j] = '\0';
 
-	i = atoi(min);
+	i = atoi(min_buf);
 	if (i < 1)
 		return -1;
-	Min = i;
+	min = i;
 
-	i = atoi(max);
+	i = atoi(max_buf);
 	if (i < 1)
 		return -1;
-	Max = i;
+	max = i;
 
-	if (Min >= Max)
+	if (min >= max)
 		return -1;
 
-	*rangeMin = Min;
-	*rangeMax = Max;
+	*range_min = min;
+	*range_max = max;
 
 	return 0;
 }

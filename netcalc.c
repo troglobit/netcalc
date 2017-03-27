@@ -102,7 +102,7 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4(ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
 		if ((v4args & V4RANGE) == V4RANGE)
-			show_network_ranges_v4(ifarg_cur, m_argv4.rangeMin, m_argv4.rangeMax);
+			show_network_ranges_v4(ifarg_cur, m_argv4.range_min, m_argv4.range_max);
 
 		printf("\n");
 	}
@@ -463,7 +463,7 @@ static int usage(int code)
 	       "  -v          Show version information\n"
 	       "\n"
 	       "IPv4 options:\n"
-	       "  -R Min:Max  Show offset IPv4 network Range from Min to Max\n"
+	       "  -R MIN:MAX  Show offset IPv4 network Range from MIN to MAX\n"
 	       "  -s MASK     Split the IPv4 network into subnets of MASK size\n"
 	       "\n"
 	       "IPv6 options:\n"
@@ -475,7 +475,7 @@ static int usage(int code)
 	       "Copyright (C) 2010-2017  Joachim Nilsson\n"
 	       "\n"
 	       "This is free software, under the 3-clause BSD license: you are free to change\n"
-	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law\n", ident);
+	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law.\n", ident);
 
 	return code;
 }
@@ -518,8 +518,8 @@ int main(int argc, char *argv[])
 	v6args = V6_INFO;
 	m_argv4.splitmask = 0;
 	m_argv4.numnets = 0;
-	m_argv4.rangeMin = 0;
-	m_argv4.rangeMax = 0;
+	m_argv4.range_min = 0;
+	m_argv4.range_max = 0;
 	m_argv6.splitmask = 0;
 	m_argv6.numnets = 0;
 	split_errv4 = 0;
@@ -562,7 +562,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'R':
-			y = getrangeMinMax(optarg, &m_argv4.rangeMin, &m_argv4.rangeMax);
+			y = getrange_min_max(optarg, &m_argv4.range_min, &m_argv4.range_max);
 			if (!y) {
 				v4args |= V4RANGE;
 			} else {
