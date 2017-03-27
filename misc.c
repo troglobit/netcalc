@@ -913,7 +913,7 @@ int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 			buf[i] = spstr.ipv4addr[i];
 		i++;
 
-		for (j = 0; j < 4; j++) {
+		for (j = 0, n = 0; j < 4; j++) {
 			if (j == 1)
 				in6_addr->haddr.sip6_addr16[6] = (n << 8) | atoi(buf);
 
