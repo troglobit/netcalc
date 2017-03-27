@@ -1040,6 +1040,10 @@ void v6_type(struct v6addr *in6_addr)
 		snprintf(buf, len, "Reserved");
 	if ((a & 0xff00) == 0xff00)
 		snprintf(buf, len, "Multicast Addresses");
+	if ((a & 0xfc00) == 0xfc00)
+		snprintf(buf, len, "Unique Local Unicast");
+	if ((a & 0xfd00) == 0xfd00)
+		snprintf(buf, len, "Locally-Assigned Unique Local Address");
 	if ((a & 0xff80) == 0xfe80)
 		snprintf(buf, len, "Link-Local Unicast Addresses");
 	if ((a & 0xffc0) == 0xfec0)
