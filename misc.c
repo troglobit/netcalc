@@ -34,8 +34,6 @@
 #include <string.h>
 #include "netcalc.h"
 
-#define INTLEN_MAX 10
-
 
 int count(char *buf, char ch)
 {
@@ -212,41 +210,43 @@ int validate_netmask(char *in_addr)
 
 int getrange_min_max(char *buf, uint32_t *range_min, uint32_t *range_max)
 {
-	int i, j;
-	char min_buf[12], max_buf[12];
+	int i;
+	char *dup, *ptr;
 	uint32_t min, max;
 
-	if ((int)strlen(buf) < 1)
+	if (!buf || strlen(buf) < 3)
 		return -1;
 
-	if (count(buf, ':') != 1)
+	dup = strdup(buf);
+	if (!dup)
 		return -1;
 
-	for (i = 0; buf[i] != ':' && i < INTLEN_MAX; i++)
-		min_buf[i] = buf[i];
-	min_buf[i] = '\0';
+	ptr = strchr(dup, ':');
+	if (!ptr)
+		goto error;
 
-	for (j = 0; buf[i] != '\0' && j < INTLEN_MAX; i++, j++)
-		max_buf[j++] = buf[i++];
-	max_buf[j] = '\0';
-
-	i = atoi(min_buf);
+	*ptr++ = 0;
+	i = atoi(dup);
 	if (i < 1)
-		return -1;
+		goto error;
 	min = i;
 
-	i = atoi(max_buf);
+	i = atoi(ptr);
 	if (i < 1)
-		return -1;
+		goto error;
 	max = i;
 
 	if (min >= max)
-		return -1;
+		goto error;
 
 	*range_min = min;
 	*range_max = max;
+	free(dup);
 
 	return 0;
+error:
+	free(dup);
+	return -1;
 }
 
 int getsplitnumv4(char *buf, uint32_t *splitmask)
