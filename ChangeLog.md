@@ -15,6 +15,8 @@ All notable changes to the project are documented in this file.
 - Add `-c` command line option to validate IP addreses.  Feature
   courtesy of Lonnie Abelbeck
 - Auto-disable colorization if run over a pipe, by Lonnie Abelbeck
+- Add `-R MIN:MAX` command line option to show an offset IPv4 network
+  range, from MIN to MAX.  Feature courtesy of Lonnie Abelbeck
 
 ### Fixes
 - Don't prefix "Compressed IPv6" with previous output, by Vincent Bernat
