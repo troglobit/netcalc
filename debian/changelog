@@ -3,6 +3,7 @@ netcalc (2.1-1) unstable; urgency=low
   * New upstream release, v2.1
   * New command line option, -n, to disable colorization of output
   * New command line option, -c, to validate IP addresses
+  * New command line option, -R MIN:MAX, to show IPv4 network range
   * Fix passing arguments on stdin
 
  -- Joachim Nilsson <troglobit@gmail.com>  Tue, 28 Mar 2017 20:30:00 +0100
