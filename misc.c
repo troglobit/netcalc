@@ -42,7 +42,7 @@ int count(char *buf, char ch)
 	int i, j;
 
 	j = 0;
-	for (i = 0; i < strlen(buf); i++) {
+	for (i = 0; i < (int)strlen(buf); i++) {
 		if (buf[i] == ch)
 			j++;
 	}
@@ -64,7 +64,7 @@ int validate_v4addr(char *addr)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(addr)) {
+	while (i < (int)strlen(addr)) {
 		if (addr[i++] == '.')
 			j++;
 	}
@@ -73,10 +73,10 @@ int validate_v4addr(char *addr)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(addr)) {
+	while (i < (int)strlen(addr)) {
 		k = 0;
 		j = 0;
-		while (k < strlen(V4ADDR_VAL) && !j) {
+		while (k < (int)strlen(V4ADDR_VAL) && !j) {
 			if (addr[i] == V4ADDR_VAL[k])
 				j = 1;
 			k++;
@@ -90,7 +90,7 @@ int validate_v4addr(char *addr)
 		return 0;
 
 	i = 0;
-	while (i < (strlen(addr) - 1)) {
+	while (i < ((int)strlen(addr) - 1)) {
 		if (addr[i] == '.' && addr[i + 1] == '.')
 			return 0;
 		i++;
@@ -100,7 +100,7 @@ int validate_v4addr(char *addr)
 	for (i = 0; i < 4; i++) {
 		k = 0;
 		memset(buf, 0, sizeof(buf));
-		while (addr[j] != '.' && j < strlen(addr))
+		while (addr[j] != '.' && j < (int)strlen(addr))
 			buf[k++] = addr[j++];
 
 		if (k > 3)
@@ -131,7 +131,7 @@ int validate_netmask(char *in_addr)
 	if (strlen(in_addr) > 18)
 		return 0;
 
-	while (i < strlen(in_addr) && !j) {
+	while (i < (int)strlen(in_addr) && !j) {
 		if (!isxdigit(in_addr[i]) && in_addr[i] != 'x' && in_addr[i] != 'X')
 			j = 1;
 		if (in_addr[i] == 'x' || in_addr[i] == 'X') {
@@ -190,10 +190,10 @@ int validate_netmask(char *in_addr)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(sl)) {
+	while (i < (int)strlen(sl)) {
 		k = 0;
 		j = 0;
-		while (k < strlen(V4ADDR_VAL) && !j) {
+		while (k < (int)strlen(V4ADDR_VAL) && !j) {
 			if (sl[i] == V4ADDR_VAL[k])
 				j = 1;
 			k++;
@@ -216,7 +216,7 @@ int getrange_min_max(char *buf, uint32_t *range_min, uint32_t *range_max)
 	char min_buf[12], max_buf[12];
 	uint32_t min, max;
 
-	if (strlen(buf) < 1)
+	if ((int)strlen(buf) < 1)
 		return -1;
 
 	if (count(buf, ':') != 1)
@@ -333,7 +333,7 @@ int quadtonum(char *quad, uint32_t *num)
 
 		*num = *num | (k << (8 * (3 - j)));
 		memset(buf, 0, sizeof(buf));
-		for (k = 0; quad[i] != '.' && quad[i] != '\0' && i < strlen(quad); k++)
+		for (k = 0; quad[i] != '.' && quad[i] != '\0' && i < (int)strlen(quad); k++)
 			buf[k] = quad[i++];
 		i++;
 	}
@@ -367,11 +367,13 @@ char *numtobitmap(uint32_t num, uint32_t prefix_len)
 			bitmap[k] = '0';
 		else
 			bitmap[k] = '1';
+
 		if (j == 8 && k < 34) {
 			bitmap[++k] = '.';
 			j = 0;
 		}
-		if (i == prefix_len - 1)
+
+		if (i == (int)prefix_len - 1)
 			bitmap[++k] = ' ';
 		j++;
 		k++;
@@ -421,9 +423,9 @@ int parse_addr(struct if_info *ifi)
 
 			i = 0;
 			j = 0;
-			while (i < strlen(s_find)) {
+			while (i < (int)strlen(s_find)) {
 				j = 0;
-				for (k = 0; k < strlen(NETMASK_VAL) && !j; k++) {
+				for (k = 0; k < (int)strlen(NETMASK_VAL) && !j; k++) {
 					if (s_find[i] == NETMASK_VAL[k])
 						j = 1;
 				}
@@ -707,10 +709,10 @@ int validate_s_v6addr(char *addr, int type)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(addr)) {
+	while (i < (int)strlen(addr)) {
 		j = 0;
 		
-		for (k = 0; k < strlen(V6ADDR_VAL) && !j; k++) {
+		for (k = 0; k < (int)strlen(V6ADDR_VAL) && !j; k++) {
 			if (addr[i] == V6ADDR_VAL[k])
 				j = 1;
 		}
@@ -721,7 +723,7 @@ int validate_s_v6addr(char *addr, int type)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(addr)) {
+	while (i < (int)strlen(addr)) {
 		if (addr[i] == ':')
 			j++;
 		else
@@ -740,14 +742,14 @@ int validate_s_v6addr(char *addr, int type)
 		return -1;
 
 	numcolon = 0;
-	for (i = 0; i < strlen(addr); i++) {
+	for (i = 0; i < (int)strlen(addr); i++) {
 		if (addr[i] == ':')
 			numcolon++;
 	}
 
 	compressed = 0;
 	i = 0;
-	while (i < strlen(addr) - 1) {
+	while (i < (int)strlen(addr) - 1) {
 		if (addr[i] == ':' && addr[i + 1] == ':')
 			compressed++;
 		i++;
@@ -773,7 +775,7 @@ int validate_s_v6addr(char *addr, int type)
 	}
 
 	j = 0;
-	for (i = 0; i < strlen(addr); i++) {
+	for (i = 0; i < (int)strlen(addr); i++) {
 		if (addr[i] != ':')
 			j++;
 		else
@@ -803,14 +805,14 @@ int getcolon(char *addr, int pos, int type)
 		max = 5;
 
 	compressed = 0;
-	for (i = 0; i < strlen(addr) - 1; i++) {
+	for (i = 0; i < (int)strlen(addr) - 1; i++) {
 		if (addr[i] == ':' && addr[i + 1] == ':')
 			compressed++;
 	}
 
 	if (compressed) {
 		cstart = 0;
-		for (i = 0; i < strlen(addr) - 1; i++) {
+		for (i = 0; i < (int)strlen(addr) - 1; i++) {
 			if (addr[i] == ':' && addr[i + 1] == ':')
 				break;
 
@@ -820,7 +822,7 @@ int getcolon(char *addr, int pos, int type)
 		i += 2;
 
 		cend = 0;
-		while (i < strlen(addr)) {
+		while (i < (int)strlen(addr)) {
 			if (addr[i] == ':')
 				cend++;
 			i++;
@@ -838,7 +840,7 @@ int getcolon(char *addr, int pos, int type)
 
 		memset(str, 0, sizeof(str));
 		i = 0;
-		while (j < strlen(addr) && addr[j] != ':')
+		while (j < (int)strlen(addr) && addr[j] != ':')
 			str[i++] = addr[j++];
 	}
 
@@ -853,7 +855,7 @@ int getcolon(char *addr, int pos, int type)
 			}
 
 			i = 0;
-			while (j < strlen(addr) && addr[j] != ':')
+			while (j < (int)strlen(addr) && addr[j] != ':')
 				str[i++] = addr[j++];
 		}
 
@@ -862,7 +864,7 @@ int getcolon(char *addr, int pos, int type)
 
 		if (pos >= (max - cend)) {
 			
-			for (j = 0; j < strlen(addr) - 1; j++) {
+			for (j = 0; j < (int)strlen(addr) - 1; j++) {
 				if (addr[j] == ':' && addr[j + 1] == ':')
 					break;
 			}
@@ -875,7 +877,7 @@ int getcolon(char *addr, int pos, int type)
 			}
 
 			memset(str, 0, sizeof(str));
-			for (i = 0; j < strlen(addr) && addr[j] != ':'; i++)
+			for (i = 0; j < (int)strlen(addr) && addr[j] != ':'; i++)
 				str[i] = addr[j++];
 		}
 
@@ -922,7 +924,7 @@ int v6addrtonum(struct ipv6_split spstr, struct v6addr *in6_addr, int type)
 
 			memset(buf, 0, sizeof(buf));
 			
-			for (k = 0; spstr.ipv4addr[i] != '.' && spstr.ipv4addr[i] != '\0' && i < strlen(spstr.ipv4addr); k++)
+			for (k = 0; spstr.ipv4addr[i] != '.' && spstr.ipv4addr[i] != '\0' && i < (int)strlen(spstr.ipv4addr); k++)
 				buf[k] = spstr.ipv4addr[i++];
 			i++;
 		}
@@ -1170,10 +1172,10 @@ int mk_ipv6addr(struct v6addr *in6_addr, char *addr)
 
 	i = 0;
 	j = 0;
-	while (i < strlen(spstr.nmask)) {
+	while (i < (int)strlen(spstr.nmask)) {
 		j = 0;
 		k = 0;
-		while (k < strlen(NETMASK_VAL) && !j) {
+		while (k < (int)strlen(NETMASK_VAL) && !j) {
 			if (spstr.nmask[i] == NETMASK_VAL[k])
 				j = 1;
 			k++;

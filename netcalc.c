@@ -130,7 +130,7 @@ int cleanline(char *sbuf, char *dbuf)
 {
 	int x, y;
 
-	for (x = 0; x < strlen(sbuf); x++) {
+	for (x = 0; x < (int)strlen(sbuf); x++) {
 		if (sbuf[x] == '\n')
 			sbuf[x] = ' ';
 		if (sbuf[x] == '\t')
@@ -148,18 +148,21 @@ int cleanline(char *sbuf, char *dbuf)
 
 	x = 0;
 	y = 0;
-	while (x < strlen(sbuf)) {
+	while (x < (int)strlen(sbuf)) {
 		if (sbuf[x] == ' ' && x) {
 			dbuf[y] = ' ';
 			y++;
 		}
-		while (sbuf[x] == ' ' && x < strlen(sbuf))
+
+		while (sbuf[x] == ' ' && x < (int)strlen(sbuf))
 			x++;
-		while (sbuf[x] != ' ' && x < strlen(sbuf)) {
+
+		while (sbuf[x] != ' ' && x < (int)strlen(sbuf)) {
 			dbuf[y] = sbuf[x];
 			y++;
 			x++;
 		}
+
 		if (dbuf[y - 1] == ' ')
 			return 0;
 	}
@@ -167,9 +170,10 @@ int cleanline(char *sbuf, char *dbuf)
 		dbuf[strlen(dbuf) - 1] = '\0';
 
 	y = 1;
-	for (x = 0; x < strlen(dbuf); x++)
+	for (x = 0; x < (int)strlen(dbuf); x++) {
 		if (dbuf[x] == ' ')
 			y++;
+	}
 
 	return y;
 }
@@ -196,7 +200,7 @@ int get_stdin(char *args[])
 			if (x == 1)
 				sbuf[y] = buf[0];
 			y++;
-		} while (x > 0 && buf[0] != '\n' && y < (sizeof(sbuf) - 1));
+		} while (x > 0 && buf[0] != '\n' && y < ((int)sizeof(sbuf) - 1));
 		if (x < 0) {
 			free(arg1);
 			free(arg2);
@@ -229,13 +233,13 @@ int get_stdin(char *args[])
 	}
 
 	y = 0;
-	while (y < strlen(dbuf) && y < argmax && dbuf[y] != ' ') {
+	while (y < (int)strlen(dbuf) && y < argmax && dbuf[y] != ' ') {
 		arg1[y] = dbuf[y];
 		y++;
 	}
 	y++;
 	z = 0;
-	while (y < strlen(dbuf) && z < argmax && dbuf[y] != ' ') {
+	while (y < (int)strlen(dbuf) && z < argmax && dbuf[y] != ' ') {
 		arg2[z] = dbuf[y];
 		y++;
 		z++;
@@ -403,7 +407,7 @@ static struct if_info *parse_abox(struct argbox *abox)
 			if (tmpstr != NULL && (strlen(tmpstr) > 0)) {
 				tmpstr++;
 				x = 0;
-				while (x < 15 && tmpstr[x] != ' ' && x < strlen(tmpstr)) {
+				while (x < 15 && tmpstr[x] != ' ' && x < (int)strlen(tmpstr)) {
 					ifarg_cur->p_v4nmask[x] = tmpstr[x];
 					x++;
 				}

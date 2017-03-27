@@ -43,8 +43,9 @@ void show_network_ranges_v4(struct if_info *ifi, uint32_t range_min, uint32_t ra
 		if (len == 31) {
 			num = 2;
 			min = ifi->v4ad.n_naddr;
-		} else
+		} else {
 			num = 1;
+		}
 	} else {
 		min = ifi->v4ad.n_naddr + 1;
 	}
