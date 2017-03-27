@@ -33,6 +33,32 @@
 
 #include "netcalc.h"
 
+void show_network_ranges_v4(struct if_info *ifi, uint32_t rangeMin, uint32_t rangeMax)
+{
+	uint32_t num, len, min;
+
+	num = ifi->v4ad.n_broadcast - ifi->v4ad.n_naddr - 1;
+	len = ifi->v4ad.n_nmaskbits;
+	if (len > 30) {
+		if (len == 31) {
+			num = 2;
+			min = ifi->v4ad.n_naddr;
+		} else
+			num = 1;
+	} else {
+		min = ifi->v4ad.n_naddr + 1;
+	}
+
+	if (rangeMax > num) {
+		warnx("The Range Max (%u) must not exceed the Hosts/Net (%u).", rangeMax, num);
+		return;
+	}
+
+	printf("\n[Range %u:%u]\n", rangeMin, rangeMax);
+
+	cprintf("RangeMin : %34C%-20s%0C\n", numtoquad(min + rangeMin - 1));
+	cprintf("RangeMax : %34C%-20s%0C\n", numtoquad(min + rangeMax - 1));
+}
 
 void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4)
 {

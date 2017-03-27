@@ -70,6 +70,7 @@
 
 /* v4 args */
 #define V4_INFO     0x01
+#define V4RANGE     0x08
 #define V4CHECK     0x10
 #define V4SPLIT     0x20
 #define C_WILDCARD  0x40
@@ -153,6 +154,8 @@ struct misc_args {
 	uint32_t splitmask;
 	struct sip_in6_addr v6splitmask;
 	int v6splitnum;
+	uint32_t rangeMin;
+	uint32_t rangeMax;
 };
 
 struct ipv6_split {
@@ -189,6 +192,7 @@ int count(char *buf, char ch);
 int validate_v4addr (char *addr);
 int validate_netmask(char *in_addr);
 
+int getrangeMinMax(char *buf, uint32_t *rangeMin, uint32_t *rangeMax);
 int getsplitnumv4(char *buf, uint32_t * splitmask);
 int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum);
 
