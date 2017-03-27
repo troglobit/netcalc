@@ -50,8 +50,8 @@ void show_network_ranges_v4(struct if_info *ifi, uint32_t range_min, uint32_t ra
 		min = ifi->v4ad.n_naddr + 1;
 	}
 
-	if (range_max > num) {
-		warnx("The Range Max (%u) must not exceed the Hosts/Net (%u).", range_max, num);
+	if (range_max > num || num == 1) {
+		warnx("The Range MAX (%u) must not exceed the Hosts/Net (%u).", range_max, num);
 		return;
 	}
 

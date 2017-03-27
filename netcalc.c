@@ -564,7 +564,7 @@ int main(int argc, char *argv[])
 			if (!y) {
 				v4args |= V4RANGE;
 			} else {
-				warnx("Invalid Range Min:Max values, required Min > 0 and Min < Max.");
+				warnx("Invalid Range MIN:MAX values, required MIN > 0 and MIN < MAX.");
 				range_err = 1;
 			}
 			break;
