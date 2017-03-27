@@ -7,6 +7,7 @@ dist_man1_MANS  = $(EXEC).1
 bin_PROGRAMS    = $(EXEC)
 netcalc_SOURCES = netcalc.c netcalc.h output.c output.h \
 		  misc.c strlcpy.c strlcat.c cprintf.c
+netcalc_CFLAGS  = -W -Wall -Wextra
 
 # Compat rule for Travis, default automake is "make check" for autotests
 test: check
