@@ -101,6 +101,8 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 			print_cf_info_v4(ifarg_cur);
 		if ((v4args & V4SPLIT) == V4SPLIT)
 			show_split_networks_v4(ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
+		if ((v4args & V4RANGE) == V4RANGE)
+			show_network_ranges_v4(ifarg_cur, m_argv4.rangeMin, m_argv4.rangeMax);
 
 		printf("\n");
 	}
@@ -455,18 +457,19 @@ static int usage(int code)
 	printf("Usage: %s [OPTIONS] <NETWORK/LEN | - | NETWORK NETMASK>\n"
 	       "\n"
 	       "Global options:\n"
-	       "  -c       Validate the IPv4/IPv6 address, no output if invalid\n"
-	       "  -h       This help text\n"
-	       "  -n       Disable colorized output\n"
-	       "  -v       Show version information\n"
+	       "  -c          Validate the IPv4/IPv6 address, no output if invalid\n"
+	       "  -h          This help text\n"
+	       "  -n          Disable colorized output\n"
+	       "  -v          Show version information\n"
 	       "\n"
 	       "IPv4 options:\n"
-	       "  -s MASK  Split the IPv4 network into subnets of MASK size\n"
+	       "  -R Min:Max  Show offset IPv4 network Range from Min to Max\n"
+	       "  -s MASK     Split the IPv4 network into subnets of MASK size\n"
 	       "\n"
 	       "IPv6 options:\n"
-	       "  -e       IPv4 compatible IPv6 information\n"
-	       "  -r       IPv6 reverse DNS output\n"
-	       "  -S MASK  Split the IPv6 network into subnets of MASK size\n"
+	       "  -e          IPv4 compatible IPv6 information\n"
+	       "  -r          IPv6 reverse DNS output\n"
+	       "  -S MASK     Split the IPv6 network into subnets of MASK size\n"
 	       "\n"
 	       "Copyright (C) 2003-2013  Simon Ekstrand\n"
 	       "Copyright (C) 2010-2017  Joachim Nilsson\n"
@@ -497,7 +500,7 @@ int main(int argc, char *argv[])
 	struct if_info *ifarg_start, *ifarg_cur, *ifarg_old;
 	int ch, parse_stdin, index;
 	struct misc_args m_argv4, m_argv6;
-	int split_errv4, split_errv6;
+	int split_errv4, split_errv6, range_err;
 	char expaddr[ARGLEN] = "";
 	char oldcmdstr[ARGLEN] = "";
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
@@ -515,10 +518,13 @@ int main(int argc, char *argv[])
 	v6args = V6_INFO;
 	m_argv4.splitmask = 0;
 	m_argv4.numnets = 0;
+	m_argv4.rangeMin = 0;
+	m_argv4.rangeMax = 0;
 	m_argv6.splitmask = 0;
 	m_argv6.numnets = 0;
 	split_errv4 = 0;
 	split_errv6 = 0;
+	range_err = 0;
 	first_err = 1;
 	ifarg_start = NULL;
 	ifarg_old = NULL;
@@ -536,7 +542,7 @@ int main(int argc, char *argv[])
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
-	while ((ch = getopt(argc, argv, "cehnrs:S:v")) != -1) {
+	while ((ch = getopt(argc, argv, "cehnrR:s:S:v")) != -1) {
 		switch (ch) {
 		case 'c':
 			v4args |= V4CHECK;
@@ -553,6 +559,16 @@ int main(int argc, char *argv[])
 
 		case 'r':
 			v6args |= V6REV;
+			break;
+
+		case 'R':
+			y = getrangeMinMax(optarg, &m_argv4.rangeMin, &m_argv4.rangeMax);
+			if (!y) {
+				v4args |= V4RANGE;
+			} else {
+				warnx("Invalid Range Min:Max values, required Min > 0 and Min < Max.");
+				range_err = 1;
+			}
 			break;
 
 		case 's':
@@ -591,7 +607,7 @@ int main(int argc, char *argv[])
 	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
 		colorize = 0;
 
-	if (split_errv4 || split_errv6) {
+	if (split_errv4 || split_errv6 || range_err) {
  nothing:
 		warnx("No (valid) commands received, nothing to do.");
 		free_boxargs(abox_start);

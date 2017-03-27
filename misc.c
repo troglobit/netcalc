@@ -209,6 +209,52 @@ int validate_netmask(char *in_addr)
 	return 2;
 }
 
+int getrangeMinMax(char *buf, uint32_t *rangeMin, uint32_t *rangeMax)
+{
+	int i, j;
+	int LEN = 10;
+	char min[12], max[12];
+	uint32_t Min, Max;
+
+	if (strlen(buf) < 1)
+		return -1;
+
+	if (count(buf, ':') != 1)
+		return -1;
+
+	i = 0;
+	while (buf[i] != ':' && i < LEN) {
+		min[i] = buf[i];
+		i++;
+	}
+	min[i] = '\0';
+
+	i++;
+	j = 0;
+	while (buf[i] != '\0' && j < LEN) {
+		max[j++] = buf[i++];
+	}
+	max[j] = '\0';
+
+	i = atoi(min);
+	if (i < 1)
+		return -1;
+	Min = i;
+
+	i = atoi(max);
+	if (i < 1)
+		return -1;
+	Max = i;
+
+	if (Min >= Max)
+		return -1;
+
+	*rangeMin = Min;
+	*rangeMax = Max;
+
+	return 0;
+}
+
 int getsplitnumv4(char *buf, uint32_t *splitmask)
 {
 	int i, j;
