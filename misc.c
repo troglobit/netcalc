@@ -292,7 +292,7 @@ int getsplitnumv4(char *buf, uint32_t *splitmask)
 
 int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum)
 {
-	int i, j;
+	int i;
 
 	if (strlen(buf) < 1)
 		return -1;
@@ -302,12 +302,12 @@ int getsplitnumv6(char *buf, struct sip_in6_addr *splitmask, int *v6splitnum)
 	if (buf[0] == '/')
 		buf++;
 
-	j = atoi(buf);
-	if (j < 1 || j > 128)
+	i = atoi(buf);
+	if (i < 1 || i > 128)
 		return -1;
 
-	*v6splitnum = j;
-	i = v6masktonum(buf, &j, splitmask);
+	*v6splitnum = i;
+	v6masktonum(buf, &i, splitmask);
 
 	return 0;
 }

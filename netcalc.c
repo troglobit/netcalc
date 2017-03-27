@@ -48,7 +48,7 @@ extern int optind, opterr, optopt;
 
 int
 out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
-	    int v6args, struct misc_args m_argv6, int recurse, int index)
+	    int v6args, struct misc_args m_argv6)
 {
 	int ret = 0;
 
@@ -100,7 +100,7 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 		if ((v4args & V4_INFO) == V4_INFO)
 			print_cf_info_v4(ifarg_cur);
 		if ((v4args & V4SPLIT) == V4SPLIT)
-			show_split_networks_v4(ifarg_cur, m_argv4.splitmask, v4args, m_argv4);
+			show_split_networks_v4(ifarg_cur, m_argv4.splitmask);
 		if ((v4args & V4RANGE) == V4RANGE)
 			show_network_ranges_v4(ifarg_cur, m_argv4.range_min, m_argv4.range_max);
 
@@ -118,7 +118,7 @@ out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
 		if ((v6args & V6REV) == V6REV)
 			print_rev_v6(ifarg_cur);
 		if ((v6args & V6SPLIT) == V6SPLIT)
-			show_split_networks_v6(ifarg_cur, m_argv6.v6splitmask, v6args, m_argv6);
+			show_split_networks_v6(ifarg_cur, m_argv6.v6splitmask);
 
 		printf("\n");
 	}
@@ -389,13 +389,11 @@ void free_if(struct if_info *if_cur)
 	}
 }
 
-struct if_info *parse_abox(struct argbox *abox, struct if_info *if_start)
+static struct if_info *parse_abox(struct argbox *abox)
 {
 	struct if_info *ifarg_start, *ifarg_cur, *ifarg_old;
-	struct if_info *if_cur;
-	struct dnsresp *d_resp_start, *d_resp_cur;
 	char *tmpstr;
-	int x, if_found;
+	int x;
 
 	ifarg_old = ifarg_cur = ifarg_start = (struct if_info *)calloc(1, sizeof(struct if_info));
 
@@ -495,13 +493,11 @@ static char *progname(char *arg0)
 
 int main(int argc, char *argv[])
 {
-	int x, y, z, m, v4args, v6args, argcount, first_err;
-	struct if_info *if_start, *if_cur;
-	struct if_info *ifarg_start, *ifarg_cur, *ifarg_old;
-	int ch, parse_stdin, index;
+	int x, y, z, m, v4args, v6args, argcount;
+	struct if_info *ifarg_start, *ifarg_cur;
+	int ch, parse_stdin;
 	struct misc_args m_argv4, m_argv6;
 	int split_errv4, split_errv6, range_err;
-	char expaddr[ARGLEN] = "";
 	char oldcmdstr[ARGLEN] = "";
 	struct argbox *abox_start, *abox_cur, *abox_tmp;
 	char *stdinarg[3];
@@ -525,9 +521,7 @@ int main(int argc, char *argv[])
 	split_errv4 = 0;
 	split_errv6 = 0;
 	range_err = 0;
-	first_err = 1;
 	ifarg_start = NULL;
-	ifarg_old = NULL;
 
 	/*
 	 * abox == argument box == a box that holds (commandline) arguments :)
@@ -648,27 +642,15 @@ int main(int argc, char *argv[])
 	 * This will try to gather information about the network interfaces
 	 * present on the local machine.
 	 */
-	if_start = NULL;
-	if_cur = NULL;
-
 	if (!parse_stdin)
-		ifarg_cur = ifarg_start = parse_abox(abox_start, if_start);
+		ifarg_cur = ifarg_start = parse_abox(abox_start);
 
 	if (!ifarg_start && !parse_stdin)
 		goto nothing;
 
-	index = 0;
 	ifarg_cur = ifarg_start;
 	while (ifarg_cur && !parse_stdin) {
-		if (strlen(ifarg_cur->cmdstr) > 0) {
-			if (!strcmp(ifarg_cur->cmdstr, oldcmdstr))
-				index++;
-			else
-				index = 0;
-		} else {
-			index = 0;
-		}
-		out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
+		out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6);
 		strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 		ifarg_cur = ifarg_cur->next;
 	}
@@ -696,20 +678,11 @@ int main(int argc, char *argv[])
 			free(abox_cur);
 			abox_cur = NULL;
 
-			ifarg_cur = ifarg_start = parse_abox(abox_start, if_start);
+			ifarg_cur = ifarg_start = parse_abox(abox_start);
 			if (ifarg_start) {
-				index = 0;
 				ifarg_cur = ifarg_start;
 				while (ifarg_cur) {
-					if (strlen(ifarg_cur->cmdstr) > 0) {
-						if (!strcmp(ifarg_cur->cmdstr, oldcmdstr))
-							index++;
-						else
-							index = 0;
-					} else {
-						index = 0;
-					}
-					out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6, 0, index);
+					out_cmdline(ifarg_cur, v4args, m_argv4, v6args, m_argv6);
 					strlcpy(oldcmdstr, ifarg_cur->cmdstr, sizeof(oldcmdstr));
 					ifarg_cur = ifarg_cur->next;
 				}
@@ -739,7 +712,6 @@ int main(int argc, char *argv[])
 
 	if (!parse_stdin)
 		free_if(ifarg_start);
-	free_if(if_start);
 
 	return 0;
 }

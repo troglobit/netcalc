@@ -60,7 +60,7 @@ void show_network_ranges_v4(struct if_info *ifi, uint32_t range_min, uint32_t ra
 	cprintf("RangeMax : %34C%-20s%0C\n", numtoquad(min + range_max - 1));
 }
 
-void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask, int v4args, struct misc_args m_argv4)
+void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask)
 {
 	uint32_t diff, start, end;
 	size_t maxlen = 0;
@@ -389,7 +389,7 @@ int v6plus(struct sip_in6_addr *a, struct sip_in6_addr *b)
 	return 0;
 }
 
-void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask, int v6args, struct misc_args m_argv6)
+void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask)
 {
 	int i, j, k;
 	struct sip_in6_addr sdiff, ediff, start, end, tmpaddr;
