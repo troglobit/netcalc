@@ -5,8 +5,9 @@ netcalc (2.1-1) unstable; urgency=low
   * New command line option, -c, to validate IP addresses
   * New command line option, -R MIN:MAX, to show IPv4 network range
   * Fix passing arguments on stdin
+  * Add supoprt for Unique Local Address, IPv6 address type
 
- -- Joachim Nilsson <troglobit@gmail.com>  Tue, 28 Mar 2017 20:30:00 +0100
+ -- Joachim Nilsson <troglobit@gmail.com>  Tue, 28 Mar 2017 19:48:00 +0100
 
 netcalc (2.0-1) unstable; urgency=low
 

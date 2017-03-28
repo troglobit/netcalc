@@ -4,11 +4,11 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.1][UNRELEASED] - 2017-03-XX
--------------------------------
+[v2.1][] - 2017-03-28
+---------------------
 
 ### Changes
-- Added basic Debian packaging
+- Added basic Debian packaging, no ext. library dependencies
 - Support for disabling `ipcalc` symlink in `configure` script
 - Add Tobias Waldekranz's awesome little AWK script to GIT
 - Add `-n` command line option to disable colorization of output
@@ -25,6 +25,7 @@ All notable changes to the project are documented in this file.
 - Adaptions for musl libc
 - Fix issue #7: not all arguments supported on `stdin`, too small input
   buffer(s), by Lonnie Abelbeck
+- Fix issue #13: Add IPv6 *Unique Local Address* address types
 
 
 [v2.0][] - 2015-08-19
@@ -156,7 +157,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.0...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1...HEAD
+[v2.1]: https://github.com/troglobit/netcalc/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...v2.0
 [v1.1.6]: https://github.com/troglobit/netcalc/compare/v1.1.5...v1.1.6
 [v1.1.5]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.1.5.tar.gz
