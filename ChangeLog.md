@@ -12,7 +12,7 @@ All notable changes to the project are documented in this file.
 - Support for disabling `ipcalc` symlink in `configure` script
 - Add Tobias Waldekranz's awesome little AWK script to GIT
 - Add `-n` command line option to disable colorization of output
-- Add `-c` command line option to validate IP addreses.  Feature
+- Add `-c` command line option to validate IP addresses.  Feature
   courtesy of Lonnie Abelbeck
 - Auto-disable colorization if run over a pipe, by Lonnie Abelbeck
 - Add `-R MIN:MAX` command line option to show an offset IPv4 network
