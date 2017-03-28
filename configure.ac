@@ -1,4 +1,4 @@
-AC_INIT([netcalc],[2.1],[https://github.com/troglobit/netcalc/issues])
+AC_INIT([netcalc],[2.1.1],[https://github.com/troglobit/netcalc/issues])
 AM_INIT_AUTOMAKE([1.11 foreign])
 
 AC_CONFIG_SRCDIR([netcalc.c])

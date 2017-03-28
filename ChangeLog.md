@@ -4,6 +4,13 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.1.1][] - 2017-03-28
+-----------------------
+
+### Fixes
+- Fix #14: ChangeLog.md missing from release tarball
+
+
 [v2.1][] - 2017-03-28
 ---------------------
 
@@ -157,7 +164,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.1...HEAD
+[v2.1.1]: https://github.com/troglobit/netcalc/compare/v2.1...v2.1.1
 [v2.1]: https://github.com/troglobit/netcalc/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...v2.0
 [v1.1.6]: https://github.com/troglobit/netcalc/compare/v1.1.5...v1.1.6

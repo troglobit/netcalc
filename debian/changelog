@@ -1,3 +1,9 @@
+netcalc (2.1.1-1) unstable; urgency=low
+
+  * New upstream release, v2.1.1, missing ChangeLog.md in release tarball
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Tue, 28 Mar 2017 23:22:00 +0100
+
 netcalc (2.1-1) unstable; urgency=low
 
   * New upstream release, v2.1
