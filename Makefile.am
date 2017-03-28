@@ -22,7 +22,7 @@ package build-deb:
 	dpkg-buildpackage -uc -us -B
 
 ## Target to run when building a release
-release: dist build-deb
+release: distcheck dist build-deb
 	@for file in $(DIST_ARCHIVES); do	\
 		md5sum $$file > ../$$file.md5;	\
 	done
