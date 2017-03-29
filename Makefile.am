@@ -28,12 +28,12 @@ release: distcheck dist build-deb
 	done
 	@mv $(DIST_ARCHIVES) ../
 	@echo
-	@echo "Resulting release files:"
+	@echo "Resulting release files in ../"
 	@echo "================================================================="
 	@for file in $(DIST_ARCHIVES); do					\
-		printf "$$file    \tDistribution tarball\n";			\
-		printf "$$file.md5\t"; cat ../$$file.md5 | cut -f1 -d' ';	\
+		printf "%-32s Distribution tarball\n" $$file;			\
+		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';	\
 	done
-	@for file in `ls ../$(PACKAGE)_$(VERSION)-*`; do			\
-		printf "$$file    \tDebian/Ubuntu file\n";			\
+	@for file in `cd ..; ls $(PACKAGE)_$(VERSION)-*`; do			\
+		printf "%-32s Debian/Ubuntu file\n" $$file;			\
 	done
