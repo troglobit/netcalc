@@ -530,7 +530,7 @@ int main(int argc, char *argv[])
 	/*
 	 * abox == argument box == a box that holds (commandline) arguments :)
 	 * This is the structure we use to store all user input parsed into
-	 * (hopefully) managable chunks.
+	 * (hopefully) manageable chunks.
 	 * This excludes most of the -[a-z] flags, they're generally handled by
 	 * v[4,6]args.
 	 */
