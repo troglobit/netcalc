@@ -86,7 +86,7 @@
 #define V6TYPE_V4INV6 2
 
 /*
- * Easier to define this ourselves then to use all the different
+ * Easier to define this ourselves than to use all the different
  * versions from different platforms.
  */
 struct sip_in6_addr {
@@ -117,7 +117,7 @@ struct v4addr {
 };
 
 /*
- * Broadcast in this structure is sort of missleading, since ipv6 networks
+ * Broadcast in this structure is sort of misleading, since ipv6 networks
  * don't have broadcast addresses, but it's as good a name as any for the
  * top address of a subnet.
  *
