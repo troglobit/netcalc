@@ -7,3 +7,7 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog.md
+
+override_dh_auto_install:
+	dh_auto_install
+	find debian/ -name LICENSE -delete
