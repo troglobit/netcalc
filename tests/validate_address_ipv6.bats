@@ -2,13 +2,19 @@
 
 # Test IPv6 address formats that should be valid
 
-@test "netcalc -c 1:2:3:4:5:6:7:8" {
+@test "netcalc -c IPv6 ordinary address" {
   run ./netcalc -c 1:2:3:4:5:6:7:8
   [ $status -eq 0 ]
   [[ $output = "1:2:3:4:5:6:7:8" ]]
 }
 
-@test "netcalc -c fe80::12ab:34cd:56:78d" {
+@test "netcalc -c IPv6 ordinary address with some zeroes uncompressed" {
+  run ./netcalc -c 1:2:0:4:5:0:0:8
+  [ $status -eq 0 ]
+  [[ $output = "1:2:0:4:5:0:0:8" ]]
+}
+
+@test "netcalc -c IPv6 ordinary address with ::" {
   run ./netcalc -c fe80::12ab:34cd:56:78d
   [ $status -eq 0 ]
   [[ $output = "fe80::12ab:34cd:56:78d" ]]
