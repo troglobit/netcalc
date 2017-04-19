@@ -2,31 +2,31 @@
 
 # Test IPv4 address formats that should be valid
 
-@test "netcalc -c 1.2.3.4" {
+@test "netcalc -c IPv4 ordinary address (1)" {
   run ./netcalc -c 1.2.3.4
   [ $status -eq 0 ]
   [[ $output = "1.2.3.4" ]]
 }
 
-@test "netcalc -c 192.168.1.1" {
+@test "netcalc -c IPv4 ordinary address (2)" {
   run ./netcalc -c 192.168.1.1
   [ $status -eq 0 ]
   [[ $output = "192.168.1.1" ]]
 }
 
-@test "netcalc -c 192.168.1.1/0" {
+@test "netcalc -c IPv4 address with 0 CIDR" {
   run ./netcalc -c 192.168.1.1/0
   [ $status -eq 0 ]
   [[ $output = "192.168.1.1" ]]
 }
 
-@test "netcalc -c 192.168.1.1/24" {
+@test "netcalc -c IPv4 address with 24 CIDR" {
   run ./netcalc -c 192.168.1.1/24
   [ $status -eq 0 ]
   [[ $output = "192.168.1.1" ]]
 }
 
-@test "netcalc -c 192.168.1.1/32" {
+@test "netcalc -c IPv4 address with 32 CIDR" {
   run ./netcalc -c 192.168.1.1/32
   [ $status -eq 0 ]
   [[ $output = "192.168.1.1" ]]
