@@ -5,6 +5,13 @@ language: c
 # We don't need to install packages, use dockerized build, quicker
 sudo: false
 
+# Get and install the Bash Automated Testing System (bats)
+before_script:
+  - git clone https://github.com/sstephenson/bats.git /tmp/bats
+  - mkdir -p /tmp/local
+  - bash /tmp/bats/install.sh /tmp/local
+  - export PATH=$PATH:/tmp/local/bin
+
 # We don't store generated files (configure and Makefile) in GIT,
 # so we must customize the default build script to run ./autogen.sh
 script:
@@ -12,3 +19,4 @@ script:
   - ./configure
   - make
   - make test
+  - bats tests

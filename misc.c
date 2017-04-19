@@ -538,7 +538,7 @@ int get_addrv4(struct if_info *ifi)
 				 len < 8 ? "In Part " : ""), rfc = "RFC1700";
 		if (i == 10)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
-				 len < 8 ? "In Part " : ""), rfc = "RFC1928";
+				 len < 8 ? "In Part " : ""), rfc = "RFC1918";
 		if (i == 127)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLoopback network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC5735";
