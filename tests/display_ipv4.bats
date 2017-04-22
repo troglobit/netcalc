@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+load helper_ipv4
+
 # Address  : 192.168.1.0          11000000.10101000.00000001. 00000000
 # Netmask  : 255.255.255.0 = 24   11111111.11111111.11111111. 00000000
 # Wildcard : 0.0.0.255            00000000.00000000.00000000. 11111111
@@ -11,24 +13,20 @@
 # Hosts/Net: 254                   Class C, Private network (RFC1918)
 
 @test "netcalc display IPv4 class C private address" {
-  line0exp="^Address[[:blank:]]*:[[:blank:]]+192.168.1.0[[:blank:]]+11000000.10101000.00000001.[[:blank:]]+00000000"
-  line1exp="^Netmask[[:blank:]]*:[[:blank:]]+255.255.255.0[[:blank:]]+=[[:blank:]]+24[[:blank:]]+11111111.11111111.11111111.[[:blank:]]+00000000"
-  line2exp="^Wildcard[[:blank:]]*:[[:blank:]]+0.0.0.255[[:blank:]]+00000000.00000000.00000000.[[:blank:]]+11111111"
-  line4exp="^Network[[:blank:]]*:[[:blank:]]+192.168.1.0/24[[:blank:]]+11000000.10101000.00000001.[[:blank:]]+00000000"
-  line5exp="^HostMin[[:blank:]]*:[[:blank:]]+192.168.1.1[[:blank:]]+11000000.10101000.00000001.[[:blank:]]+00000001"
-  line6exp="^HostMax[[:blank:]]*:[[:blank:]]+192.168.1.254[[:blank:]]+11000000.10101000.00000001.[[:blank:]]+11111110"
-  line7exp="^Broadcast[[:blank:]]*:[[:blank:]]+192.168.1.255[[:blank:]]+11000000.10101000.00000001.[[:blank:]]+11111111"
-  line8exp="^Hosts/Net[[:blank:]]*:[[:blank:]]+254[[:blank:]]+Class[[:blank:]]*C[[:punct:]][[:blank:]]*Private[[:blank:]]*network[[:blank:]]*[[:punct:]]RFC1918[[:punct:]]"
   run ./netcalc -n 192.168.1.0/24
   [ $status -eq 0 ]
-  [[ ${lines[0]} =~ $line0exp ]]
-  [[ ${lines[1]} =~ $line1exp ]]
-  [[ ${lines[2]} =~ $line2exp ]]
-  [[ ${lines[4]} =~ $line4exp ]]
-  [[ ${lines[5]} =~ $line5exp ]]
-  [[ ${lines[6]} =~ $line6exp ]]
-  [[ ${lines[7]} =~ $line7exp ]]
-  [[ ${lines[8]} =~ $line8exp ]]
+  check_ipv4_display_output \
+    "11000000.10101000.00000001." \
+    "192.168.1.0 00000000" \
+    "255.255.255.0 24 11111111.11111111.11111111. 00000000" \
+    "0.0.0.255 00000000.00000000.00000000. 11111111" \
+    "192.168.1.0/24 00000000" \
+    "192.168.1.1 00000001" \
+    "192.168.1.254 11111110" \
+    "192.168.1.255 11111111" \
+    "254" \
+    "Class C, Private network (RFC1918)" \
+    lines
 }
 
 # Address  : 172.17.0.0           10101100.00010001. 00000000.00000000
@@ -42,24 +40,20 @@
 # Hosts/Net: 65534                 Class B, Private network (RFC1918)
 
 @test "netcalc display IPv4 class B private address" {
-  line0exp="^Address[[:blank:]]*:[[:blank:]]+172.17.0.0[[:blank:]]+10101100.00010001.[[:blank:]]+00000000.00000000"
-  line1exp="^Netmask[[:blank:]]*:[[:blank:]]+255.255.0.0[[:blank:]]+=[[:blank:]]+16[[:blank:]]+11111111.11111111.[[:blank:]]+00000000.00000000"
-  line2exp="^Wildcard[[:blank:]]*:[[:blank:]]+0.0.255.255[[:blank:]]+00000000.00000000.[[:blank:]]+11111111.11111111"
-  line4exp="^Network[[:blank:]]*:[[:blank:]]+172.17.0.0/16[[:blank:]]+10101100.00010001.[[:blank:]]+00000000.00000000"
-  line5exp="^HostMin[[:blank:]]*:[[:blank:]]+172.17.0.1[[:blank:]]+10101100.00010001.[[:blank:]]+00000000.00000001"
-  line6exp="^HostMax[[:blank:]]*:[[:blank:]]+172.17.255.254[[:blank:]]+10101100.00010001.[[:blank:]]+11111111.11111110"
-  line7exp="^Broadcast[[:blank:]]*:[[:blank:]]+172.17.255.255[[:blank:]]+10101100.00010001.[[:blank:]]+11111111.11111111"
-  line8exp="^Hosts/Net[[:blank:]]*:[[:blank:]]+65534[[:blank:]]+Class[[:blank:]]*B[[:punct:]][[:blank:]]*Private[[:blank:]]*network[[:blank:]]*[[:punct:]]RFC1918[[:punct:]]"
   run ./netcalc -n 172.17.0.0/16
   [ $status -eq 0 ]
-  [[ ${lines[0]} =~ $line0exp ]]
-  [[ ${lines[1]} =~ $line1exp ]]
-  [[ ${lines[2]} =~ $line2exp ]]
-  [[ ${lines[4]} =~ $line4exp ]]
-  [[ ${lines[5]} =~ $line5exp ]]
-  [[ ${lines[6]} =~ $line6exp ]]
-  [[ ${lines[7]} =~ $line7exp ]]
-  [[ ${lines[8]} =~ $line8exp ]]
+  check_ipv4_display_output \
+    "10101100.00010001." \
+    "172.17.0.0 00000000.00000000" \
+    "255.255.0.0 16 11111111.11111111. 00000000.00000000" \
+    "0.0.255.255 00000000.00000000. 11111111.11111111" \
+    "172.17.0.0/16 00000000.00000000" \
+    "172.17.0.1 00000000.00000001" \
+    "172.17.255.254 11111111.11111110" \
+    "172.17.255.255 11111111.11111111" \
+    "65534" \
+    "Class B, Private network (RFC1918)" \
+    lines
 }
 
 # Address  : 10.0.0.0             00001010. 00000000.00000000.00000000
@@ -73,22 +67,18 @@
 # Hosts/Net: 16777214              Class A, Private network (RFC1918)
 
 @test "netcalc display IPv4 class A private address" {
-  line0exp="^Address[[:blank:]]*:[[:blank:]]+10.0.0.0[[:blank:]]+00001010.[[:blank:]]+00000000.00000000"
-  line1exp="^Netmask[[:blank:]]*:[[:blank:]]+255.0.0.0[[:blank:]]+=[[:blank:]]+8[[:blank:]]+11111111.[[:blank:]]+00000000.00000000.00000000"
-  line2exp="^Wildcard[[:blank:]]*:[[:blank:]]+0.255.255.255[[:blank:]]+00000000.[[:blank:]]+11111111.11111111.11111111"
-  line4exp="^Network[[:blank:]]*:[[:blank:]]+10.0.0.0/8[[:blank:]]+00001010.[[:blank:]]+00000000.00000000.00000000"
-  line5exp="^HostMin[[:blank:]]*:[[:blank:]]+10.0.0.1[[:blank:]]+00001010.[[:blank:]]+00000000.00000000.00000001"
-  line6exp="^HostMax[[:blank:]]*:[[:blank:]]+10.255.255.254[[:blank:]]+00001010.[[:blank:]]+11111111.11111111.11111110"
-  line7exp="^Broadcast[[:blank:]]*:[[:blank:]]+10.255.255.255[[:blank:]]+00001010.[[:blank:]]+11111111.11111111.11111111"
-  line8exp="^Hosts/Net[[:blank:]]*:[[:blank:]]+16777214[[:blank:]]+Class[[:blank:]]*A[[:punct:]][[:blank:]]*Private[[:blank:]]*network[[:blank:]]*[[:punct:]]RFC1918[[:punct:]]"
   run ./netcalc -n 10.0.0.0/8
   [ $status -eq 0 ]
-  [[ ${lines[0]} =~ $line0exp ]]
-  [[ ${lines[1]} =~ $line1exp ]]
-  [[ ${lines[2]} =~ $line2exp ]]
-  [[ ${lines[4]} =~ $line4exp ]]
-  [[ ${lines[5]} =~ $line5exp ]]
-  [[ ${lines[6]} =~ $line6exp ]]
-  [[ ${lines[7]} =~ $line7exp ]]
-  [[ ${lines[8]} =~ $line8exp ]]
+  check_ipv4_display_output \
+    "00001010." \
+    "10.0.0.0 00000000.00000000.00000000" \
+    "255.0.0.0 8 11111111. 00000000.00000000.00000000" \
+    "0.255.255.255 00000000. 11111111.11111111.11111111" \
+    "10.0.0.0/8 00000000.00000000.00000000" \
+    "10.0.0.1 00000000.00000000.00000001" \
+    "10.255.255.254 11111111.11111111.11111110" \
+    "10.255.255.255 11111111.11111111.11111111" \
+    "16777214" \
+    "Class A, Private network (RFC1918)" \
+    lines
 }
