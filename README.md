@@ -22,9 +22,3 @@ patches — preferably as pull requests.
 [License Badge]: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
 [Travis]:        https://travis-ci.org/troglobit/netcalc
 [Travis Status]: https://travis-ci.org/troglobit/netcalc.png?branch=master
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->
