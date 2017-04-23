@@ -4,6 +4,15 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.1.2][] - 2017-04-23
+-----------------------
+
+### Fixes
+- Issue #15: Minor spelling fixes, by Phil Davis
+- Issue #16: [BATS](https://github.com/sstephenson/bats) testing
+  framework, and fix to wrong RFC reference, by Phil Davis
+
+
 [v2.1.1][] - 2017-03-28
 -----------------------
 
@@ -164,7 +173,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.1...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.2...HEAD
+[v2.1.2]: https://github.com/troglobit/netcalc/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/troglobit/netcalc/compare/v2.1...v2.1.1
 [v2.1]: https://github.com/troglobit/netcalc/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/netcalc/compare/v1.1.6...v2.0
