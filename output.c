@@ -136,14 +136,9 @@ void print_cf_info_v4(struct if_info *ifi)
 
 	printf("=>\n");
 
-	snprintf(temp, sizeof(temp), "%s/%d", numtoquad(ifi->v4ad.n_cnaddr), ifi->v4ad.n_nmaskbits);
+	snprintf(temp, sizeof(temp), "%s/%d", numtoquad(ifi->v4ad.n_naddr), ifi->v4ad.n_nmaskbits);
 	if (num >= 2) {
-		size_t clen = ifi->v4ad.class - 'A' + 1;
-		char buf['Z' - 'A'] = { 0 };
-		char *net = numtobitmap(ifi->v4ad.n_cnaddr, len);
-
-		strncpy(buf, net, clen);
-		cprintf("Network  : %34C%-20s%0C %35C%s%0C%33C%s%0C\n", temp, buf, &net[clen]);
+		cprintf("Network  : %34C%-20s%0C %33C%s%0C\n", temp, numtobitmap(ifi->v4ad.n_naddr, len));
 		cprintf("HostMin  : %34C%-20s%0C %33C%s%0C\n", numtoquad(min), numtobitmap(min, len));
 		cprintf("HostMax  : %34C%-20s%0C %33C%s%0C\n", numtoquad(max), numtobitmap(max, len));
 		if (len < 31) {
