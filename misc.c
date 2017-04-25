@@ -558,7 +558,7 @@ int get_addrv4(struct if_info *ifi)
 		ifi->v4ad.class = 'C';
 		ifi->v4ad.n_cnmask = 0xffffff00;
 
-		if (i == 192 && (j & 0xF8) == 168)
+		if (i == 192 && j == 168)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
 				 len < 16 ? "In Part " : ""), rfc = "RFC1918";
 		if (i == 192 && j == 88 && k == 99)
