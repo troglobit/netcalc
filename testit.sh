@@ -21,7 +21,7 @@ testit()
 }
 
 # Filter out ANSI escape codes so testit() doesn't barf on those
-./netcalc 192.168.1.0/24 -s 25 | sed -r "s:\x1B\[[0-9;]*[mK]::g" > $TMP
+./src/netcalc 192.168.1.0/24 -s 25 | sed -r "s:\x1B\[[0-9;]*[mK]::g" > $TMP
 
 testit "Netmask  :" "255.255.255.0 = 24"
 testit "HostMin  :" "192.168.1.1"
