@@ -3,8 +3,8 @@ IP network calculator
 [![License Badge][]][License] [![Travis Status][]][Travis]
 
 netcalc is a slimmed down clone of [sipcalc][], using the output format
-of [ipcalc][].  It is written in C and has very few dependencies.  Both
-IPv4 and IPv6 are supported.
+of [ipcalc][].  It is written in C and only depends on a POSIX compliant
+C library.  Both IPv4 and IPv6 are supported.
 
 ![Image netcalc example run](example.png "netcalc in action!")
 
