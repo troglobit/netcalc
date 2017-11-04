@@ -22,4 +22,4 @@ script:
   - ./configure
   - make
   - make test
-  - bats tests
+  - PATH=$PATH:./src bats tests
