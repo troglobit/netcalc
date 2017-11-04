@@ -1,9 +1,9 @@
 AC_INIT([netcalc],[2.1.2],[https://github.com/troglobit/netcalc/issues])
 AM_INIT_AUTOMAKE([1.11 foreign])
 
-AC_CONFIG_SRCDIR([netcalc.c])
+AC_CONFIG_SRCDIR([src/netcalc.c])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 
 AC_PROG_CC
 AC_PROG_LN_S
@@ -17,6 +17,11 @@ AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
+# Check for usually missing API's
+AC_REPLACE_FUNCS([strlcat strlcpy])
+AC_CONFIG_LIBOBJ_DIR([lib])
+
+# Check configure options
 AC_ARG_ENABLE(ipcalc-symlink,
         AS_HELP_STRING([--disable-ipcalc-symlink], [Disable ipcalc symlink, default enabled]))
 

@@ -1,22 +1,11 @@
-EXEC            = netcalc
-SYMLINK         = ipcalc
+SUBDIRS         = src
 TESTS           = testit.sh
 EXTRA_DIST      = README.md LICENSE ChangeLog.md testit.sh
 doc_DATA        = README.md LICENSE
-dist_man1_MANS  = $(EXEC).1
-bin_PROGRAMS    = $(EXEC)
-netcalc_SOURCES = netcalc.c netcalc.h output.c output.h \
-		  misc.c strlcpy.c strlcat.c cprintf.c
-netcalc_CFLAGS  = -W -Wall -Wextra
+dist_man1_MANS  = netcalc.1
 
 # Compat rule for Travis, default automake is "make check" for autotests
 test: check
-
-# Hook in to install to add netcalc --> ipcalc symlink
-if SYMLINK
-install-exec-hook:
-	(cd $(DESTDIR)$(bindir); $(LN_S) $(EXEC) $(SYMLINK))
-endif
 
 package build-deb:
 	dpkg-buildpackage -uc -us -B
