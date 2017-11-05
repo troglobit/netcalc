@@ -1,10 +1,7 @@
 SUBDIRS         = src tests
-EXTRA_DIST      = README.md LICENSE ChangeLog.md testit.sh
+EXTRA_DIST      = README.md LICENSE ChangeLog.md
 doc_DATA        = README.md LICENSE
 dist_man1_MANS  = netcalc.1
-
-# Compat rule for Travis, default automake is "make check" for autotests
-test: check
 
 package build-deb:
 	dpkg-buildpackage -uc -us -B
