@@ -13,7 +13,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class C, Private network (RFC1918)
 
 @test "netcalc display IPv4 class C private address" {
-  run ./netcalc -n 192.168.1.0/24
+  run ../src/netcalc -n 192.168.1.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000000.10101000.00000001." \
@@ -40,7 +40,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class C, Private network (RFC1918)
 
 @test "netcalc display IPv4 just past class C private address" {
-  run ./netcalc -n 192.169.0.0/24
+  run ../src/netcalc -n 192.169.0.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000000.10101001.00000000." \
@@ -67,7 +67,7 @@ load helper_ipv4
 # Hosts/Net: 65534                 Class B, Private network (RFC1918)
 
 @test "netcalc display IPv4 class B private address" {
-  run ./netcalc -n 172.17.0.0/16
+  run ../src/netcalc -n 172.17.0.0/16
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10101100.00010001." \
@@ -94,7 +94,7 @@ load helper_ipv4
 # Hosts/Net: 65534                 Class B
 
 @test "netcalc display IPv4 just past class B private address" {
-  run ./netcalc -n 172.32.0.0/16
+  run ../src/netcalc -n 172.32.0.0/16
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10101100.00100000." \
@@ -121,7 +121,7 @@ load helper_ipv4
 # Hosts/Net: 16777214              Class A, Private network (RFC1918)
 
 @test "netcalc display IPv4 class A private address" {
-  run ./netcalc -n 10.0.0.0/8
+  run ../src/netcalc -n 10.0.0.0/8
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "00001010." \
@@ -138,7 +138,7 @@ load helper_ipv4
 }
 
 @test "netcalc display IPv4 just past class A private address" {
-  run ./netcalc -n 11.0.0.0/8
+  run ../src/netcalc -n 11.0.0.0/8
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "00001011." \
@@ -165,7 +165,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class C
 
 @test "netcalc display IPv4 class C address" {
-  run ./netcalc -n 199.42.7.0/24
+  run ../src/netcalc -n 199.42.7.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000111.00101010.00000111." \
@@ -192,7 +192,7 @@ load helper_ipv4
 # Hosts/Net: 65534                 Class B
 
 @test "netcalc display IPv4 class B address" {
-  run ./netcalc -n 133.45.0.0/16
+  run ../src/netcalc -n 133.45.0.0/16
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10000101.00101101." \
@@ -219,7 +219,7 @@ load helper_ipv4
 # Hosts/Net: 16777214              Class A
 
 @test "netcalc display IPv4 class A address" {
-  run ./netcalc -n 69.0.0.0/8
+  run ../src/netcalc -n 69.0.0.0/8
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "01000101." \
@@ -246,7 +246,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class C, Reserved, IANA (RFC5735)
 
 @test "netcalc display IPv4 class C first address" {
-  run ./netcalc -n 192.0.0.0/24
+  run ../src/netcalc -n 192.0.0.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000000.00000000.00000000." \
@@ -263,7 +263,7 @@ load helper_ipv4
 }
 
 @test "netcalc display IPv4 class C first ordinary address" {
-  run ./netcalc -n 192.0.1.0/24
+  run ../src/netcalc -n 192.0.1.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000000.00000000.00000001." \
@@ -290,7 +290,7 @@ load helper_ipv4
 # Hosts/Net: 510                   Class C, In Part Reserved, IANA (RFC5735)
 
 @test "netcalc display IPv4 class C first addresses overlapped" {
-  run ./netcalc -n 192.0.0.0/23
+  run ../src/netcalc -n 192.0.0.0/23
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11000000.00000000.0000000" \
@@ -317,7 +317,7 @@ load helper_ipv4
 # Hosts/Net: 65534                 Class B
 
 @test "netcalc display IPv4 class B first address" {
-  run ./netcalc -n 128.0.0.0/16
+  run ../src/netcalc -n 128.0.0.0/16
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10000000.00000000." \
@@ -344,7 +344,7 @@ load helper_ipv4
 # Hosts/Net: 131070                Class B
 
 @test "netcalc display IPv4 class B first addresses overlapped" {
-  run ./netcalc -n 128.0.0.0/15
+  run ../src/netcalc -n 128.0.0.0/15
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10000000.0000000" \
@@ -371,7 +371,7 @@ load helper_ipv4
 # Hosts/Net: 16777214              Class A, Current network (RFC1700)
 
 @test "netcalc display IPv4 class A first address" {
-  run ./netcalc -n 0.0.0.0/8
+  run ../src/netcalc -n 0.0.0.0/8
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "00000000." \
@@ -388,7 +388,7 @@ load helper_ipv4
 }
 
 @test "netcalc display IPv4 class A first ordinary address" {
-  run ./netcalc -n 1.0.0.0/8
+  run ../src/netcalc -n 1.0.0.0/8
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "00000001." \
@@ -405,7 +405,7 @@ load helper_ipv4
 }
 
 @test "netcalc display IPv4 class A first addresses overlapped" {
-  run ./netcalc -n 0.0.0.0/7
+  run ../src/netcalc -n 0.0.0.0/7
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "0000000" \
@@ -432,7 +432,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class A
 
 @test "netcalc display IPv4 24 CIDR in class A address space" {
-  run ./netcalc -n 6.7.8.0/24
+  run ../src/netcalc -n 6.7.8.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "00000110.00000111.00001000." \
@@ -459,7 +459,7 @@ load helper_ipv4
 # Hosts/Net: 254                   Class B
 
 @test "netcalc display IPv4 24 CIDR in class B address space" {
-  run ./netcalc -n 156.43.14.0/24
+  run ../src/netcalc -n 156.43.14.0/24
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "10011100.00101011.00001110." \
@@ -486,7 +486,7 @@ load helper_ipv4
 # Hosts/Net: 14                    Class C
 
 @test "netcalc display IPv4 28 CIDR in class C address space" {
-  run ./netcalc -n 207.99.11.16/28
+  run ../src/netcalc -n 207.99.11.16/28
   [ $status -eq 0 ]
   check_ipv4_display_output \
     "11001111.01100011.00001011.0001" \
