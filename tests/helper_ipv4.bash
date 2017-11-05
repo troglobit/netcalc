@@ -104,7 +104,7 @@ check_ipv4_display_output() {
 
   paramdata=$2
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<< $paramdata
   paramdata_exp="^Address[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${netmask}[[:blank:]]+${paramdata_arr[1]}$"
   if ! [[ ${output_lines[0]} =~ $paramdata_exp ]]
   then
@@ -114,7 +114,7 @@ check_ipv4_display_output() {
 
   paramdata=$3
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^Netmask[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+=[[:blank:]]+${paramdata_arr[1]}[[:blank:]]+${paramdata_arr[2]}[[:blank:]]+${paramdata_arr[3]}$"
   if ! [[ ${output_lines[1]} =~ $paramdata_exp ]]
   then
@@ -124,7 +124,7 @@ check_ipv4_display_output() {
 
   paramdata=$4
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^Wildcard[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${paramdata_arr[1]}[[:blank:]]+${paramdata_arr[2]}$"
   if ! [[ ${output_lines[2]} =~ $paramdata_exp ]]
   then
@@ -134,7 +134,7 @@ check_ipv4_display_output() {
 
   paramdata=$5
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^Network[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${netmask}[[:blank:]]+${paramdata_arr[1]}$"
   if ! [[ ${output_lines[4]} =~ $paramdata_exp ]]
   then
@@ -144,7 +144,7 @@ check_ipv4_display_output() {
 
   paramdata=$6
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^HostMin[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${netmask}[[:blank:]]+${paramdata_arr[1]}$"
   if ! [[ ${output_lines[5]} =~ $paramdata_exp ]]
   then
@@ -154,7 +154,7 @@ check_ipv4_display_output() {
 
   paramdata=$7
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^HostMax[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${netmask}[[:blank:]]+${paramdata_arr[1]}$"
   if ! [[ ${output_lines[6]} =~ $paramdata_exp ]]
   then
@@ -164,7 +164,7 @@ check_ipv4_display_output() {
 
   paramdata=$8
   paramdata="${paramdata//./[.]}"
-  read -ra paramdata_arr <<<$paramdata
+  IFS=$' \t\n' read -ra paramdata_arr <<<$paramdata
   paramdata_exp="^Broadcast[[:blank:]]*:[[:blank:]]+${paramdata_arr[0]}[[:blank:]]+${netmask}[[:blank:]]+${paramdata_arr[1]}$"
   if ! [[ ${output_lines[7]} =~ $paramdata_exp ]]
   then
