@@ -4,7 +4,7 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/netcalc.c])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
 
 AC_PROG_CC
 AC_PROG_LN_S

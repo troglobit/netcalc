@@ -1,5 +1,4 @@
-SUBDIRS         = src
-TESTS           = testit.sh
+SUBDIRS         = src tests
 EXTRA_DIST      = README.md LICENSE ChangeLog.md testit.sh
 doc_DATA        = README.md LICENSE
 dist_man1_MANS  = netcalc.1
