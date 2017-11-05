@@ -4,6 +4,19 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.1.3][] - 2017-11-05
+-----------------------
+
+### Changes
+- Source code relocated to a `src/` sub-directory, supporting API files
+  (`strlcpy.c` + `strlcat.c`) moved to `lib/`.
+- Unit test suite now officially BATS `tests/`, removed `testit.sh`
+
+### Fixes
+- Fix base network calculation to be based on the requested CIDR
+- Fix display IPv4 just past class C private address
+
+
 [v2.1.2][] - 2017-04-23
 -----------------------
 
@@ -173,7 +186,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.2...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.3...HEAD
+[v2.1.3]: https://github.com/troglobit/netcalc/compare/v2.1.2...v2.1.3
 [v2.1.2]: https://github.com/troglobit/netcalc/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/troglobit/netcalc/compare/v2.1...v2.1.1
 [v2.1]: https://github.com/troglobit/netcalc/compare/v2.0...v2.1
@@ -188,9 +202,3 @@ sipcalc-www needs more cleaning.
 [v1.0.3]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.0.3.tar.gz
 [v1.0.2]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.0.2.tar.gz
 [v1.0.1]: http://www.routemeister.net/projects/sipcalc/files/sipcalc-1.0.1.tar.gz
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->
