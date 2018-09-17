@@ -1,3 +1,9 @@
+netcalc (2.1.4) unstable; urgency=medium
+
+  * New upstream release, v2.1.4
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 16 Sep 2018 11:24:25 +0200
+
 netcalc (2.1.3-1) unstable; urgency=low
 
   * New upstream release, v2.1.3

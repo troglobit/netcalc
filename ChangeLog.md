@@ -4,6 +4,18 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.1.4][] - 2018-09-17
+-----------------------
+
+### Changes
+- Synchronize license with official 3-clause BSD, minor changes
+
+### Fixes
+- Fix #20: Build issue on macOS, and possibly other UNIX systems that
+  have `strlcpy()` and `strlcat()`, with slightly different declarations
+  than the original OpenBSD.  Regression introduced in v2.1.3
+
+
 [v2.1.3][] - 2017-11-05
 -----------------------
 
@@ -186,7 +198,8 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.3...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.4...HEAD
+[v2.1.4]: https://github.com/troglobit/netcalc/compare/v2.1.3...v2.1.4
 [v2.1.3]: https://github.com/troglobit/netcalc/compare/v2.1.2...v2.1.3
 [v2.1.2]: https://github.com/troglobit/netcalc/compare/v2.1.1...v2.1.2
 [v2.1.1]: https://github.com/troglobit/netcalc/compare/v2.1...v2.1.1
