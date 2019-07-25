@@ -68,6 +68,8 @@
 #define IFT_INTV6 4
 #define IFT_UNKWN 5
 
+#define ARGLEN 128
+
 /* v4 args */
 #define V4_INFO     0x01
 #define V4RANGE     0x08
@@ -165,7 +167,7 @@ struct ipv6_split {
 };
 
 struct argbox {
-	char str[128];
+	char str[2 * ARGLEN + 2];
 	int type;
 	int resolv;
 	struct argbox *next;

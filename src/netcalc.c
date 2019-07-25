@@ -40,8 +40,6 @@
 #include "netcalc.h"
 #include "output.h"
 
-#define ARGLEN 128
-
 char *ident = PACKAGE_NAME;
 extern char *optarg;
 extern int optind, opterr, optopt;
@@ -343,10 +341,10 @@ struct argbox *get_boxargs(int argc, char *argv[], int argcount, struct argbox *
 			 * 3 == hex netmask
 			 */
 			if (y == 1 || y == 3) {
-				snprintf(abox_cur->str, 34, "%s %s", expaddr, argv[argcount + 1]);
+				snprintf(abox_cur->str, sizeof(abox_cur->str), "%s %s", expaddr, argv[argcount + 1]);
 				argcount++;
 			} else
-				snprintf(abox_cur->str, 18, "%s", expaddr);
+				snprintf(abox_cur->str, sizeof(abox_cur->str), "%s", expaddr);
 			abox_cur->type = AT_V4;
 			abox_cur->resolv = 0;
 			abox_cur = new_arg(abox_cur);
