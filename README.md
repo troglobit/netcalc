@@ -6,7 +6,7 @@ netcalc is a slimmed down clone of [sipcalc][], using the output format
 of [ipcalc][].  It is written in C and only depends on a POSIX compliant
 C library.  Both IPv4 and IPv6 are supported.
 
-![Image netcalc example run](example.png "netcalc in action!")
+![Image netcalc example run](./example.png "netcalc in action!")
 
 
 Build & Install
@@ -18,6 +18,18 @@ Build & Install
     echo "deb [arch=amd64] https://deb.troglobit.com/debian stable main" | sudo tee /etc/apt/sources.list.d/troglobit.list
     sudo apt-get update && sudo apt-get install netcalc
 
+### Docker
+
+Automatically built images available here:
+
+* https://hub.docker.com/r/troglobit/netcalc
+
+A Dockerfile is provided to simplify building and running `netcalc`.
+
+    docker build -t netcalc:latest .
+    docker run --rm netcalc:latest netcalc 172.16.10.10/16
+
+
 ### Building from Source
 
 First download the latest official release from GitHub:
@@ -26,6 +38,7 @@ First download the latest official release from GitHub:
 
 Always use the versioned tarballs, they contain all required files to be
 able to build.
+
 
 ### Configure & Build
 
@@ -38,8 +51,7 @@ then be installed in `/usr/bin`:
     $ sudo make install-strip
 
 
-Building from GIT
------------------
+### Building from GIT
 
 If you want to contribute, or simply just try out the latest but
 unreleased features, then you need to know a few things about the
