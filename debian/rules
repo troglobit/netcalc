@@ -1,10 +1,12 @@
 #!/usr/bin/make -f
 # export DH_VERBOSE=1
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_CONFIGURE_EXTRA_FLAGS = --disable-ipcalc-symlink
 
 %:
 	dh $@ --with autoreconf
+
+override_dh_auto_configure:
+	./configure --prefix=/usr --disable-ipcalc-symlink
 
 override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog.md
