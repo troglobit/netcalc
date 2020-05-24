@@ -20,7 +20,7 @@ addons:
 # so we must customize the default build script to run ./autogen.sh
 script:
   - ./autogen.sh
-  - ./configure --prefix=
+  - ./configure --prefix= --disable-ipcalc-symlink
   - make clean
   - make V=1
   - DESTDIR=~/tmp make install-strip
