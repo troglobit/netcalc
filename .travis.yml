@@ -5,6 +5,11 @@ language: c
 # We don't need to install packages, use dockerized build, quicker
 sudo: false
 
+# Test build with both GCC and Clang (LLVM)
+compiler:
+  - gcc
+  - clang
+
 # Get and install the Bash Automated Testing System (bats)
 before_script:
   - git clone https://github.com/sstephenson/bats.git /tmp/bats
