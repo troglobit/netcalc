@@ -10,17 +10,21 @@ compiler:
   - gcc
   - clang
 
-# Get and install the Bash Automated Testing System (bats)
-before_script:
-  - git clone https://github.com/sstephenson/bats.git /tmp/bats
-  - mkdir -p /tmp/local
-  - bash /tmp/bats/install.sh /tmp/local
-  - export PATH=$PATH:/tmp/local/bin
+addons:
+  apt:
+    packages:
+      - tree
+      - bats
 
 # We don't store generated files (configure and Makefile) in GIT,
 # so we must customize the default build script to run ./autogen.sh
 script:
   - ./autogen.sh
-  - ./configure
+  - ./configure --prefix=
+  - make clean
   - make V=1
+  - DESTDIR=~/tmp make install-strip
+  - tree ~/tmp
+  - ldd ~/tmp/bin/netcalc
+  - size ~/tmp/bin/netcalc
   - make check
