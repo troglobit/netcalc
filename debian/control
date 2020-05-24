@@ -3,10 +3,10 @@ Section: net
 Priority: optional
 Maintainer: Joachim Nilsson <troglobit@gmail.com>
 Homepage: https://github.com/troglobit/netcalc
-Build-Depends: debhelper (>= 9~), autoconf
+Build-Depends: debhelper (>= 10), bats
+Standards-Version: 4.3.0
 Vcs-Git: https://github.com/troglobit/netcalc.git
 Vcs-Browser: https://github.com/troglobit/netcalc/commits/
-Standards-Version: 3.9.3
 
 Package: netcalc
 Architecture: any
