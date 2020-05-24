@@ -29,30 +29,10 @@
 #ifndef NETCALC_H_
 #define NETCALC_H_
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
-#ifdef HAVE_STDINT_H
 #include <stdint.h>
-#else
-#include <sys/types.h>		/* u_intN_t */
-#endif
 #include <err.h>		/* warnx() et al */
 #include <net/if.h>		/* IFNAMSIZ */
-
-/*** Fallback to older types before stdint.h was defined ***/
-#ifndef HAVE_UINT8_T
-#define uint8_t u_int8_t
-#endif
-
-#ifndef HAVE_UINT16_T
-#define uint16_t u_int16_t
-#endif
-
-#ifndef HAVE_UINT32_T
-#define uint32_t u_int32_t
-#endif
-/*** End of fallback ***/
 
 #define V4ADDR_VAL "0123456789."
 #define V6ADDR_VAL "0123456789ABCDEFabcdef:"
