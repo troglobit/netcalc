@@ -2,9 +2,6 @@
 # Defaults to GNU GCC and autotools: ./configure && make && make test
 language: c
 
-# Use newer Travis "trusty" image to get newer bash 4.3.*
-dist: trusty
-
 # We don't need to install packages, use dockerized build, quicker
 sudo: false
 
