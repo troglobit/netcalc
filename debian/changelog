@@ -2,6 +2,7 @@ netcalc (2.1.5) stable; urgency=medium
 
   * Fix GCC 8 warnning, too small destination buffers
   * Issue #21: update debian packaging and disable ipcalc symlink
+  * Update debian packaging to standards version 4.3.0
 
  -- Joachim Nilsson <troglobit@gmail.com>  Sun, 24 May 2020 12:20:42 +0200
 
