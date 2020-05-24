@@ -7,9 +7,13 @@ All notable changes to the project are documented in this file.
 [v2.1.5][] - 2020-05-24
 -----------------------
 
+### Changes
+- Add Dockerfile with automatic build on Docker Hub
+
 ### Fixes
 - Fix GCC 8 warnning, too small destination buffers
 - Issue #21: update debian packaging and disable ipcalc symlink
+- Fix build on Alpine Linux, musl libc
 
 
 [v2.1.4][] - 2018-09-17
