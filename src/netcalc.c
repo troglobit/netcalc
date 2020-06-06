@@ -539,17 +539,6 @@ int main(int argc, char *argv[])
 	ifarg_start = NULL;
 
 	/*
-	 * abox == argument box == a box that holds (commandline) arguments :)
-	 * This is the structure we use to store all user input parsed into
-	 * (hopefully) manageable chunks.
-	 * This excludes most of the -[a-z] flags, they're generally handled by
-	 * v[4,6]args.
-	 */
-	abox_start = abox_cur = (struct argbox *)calloc(1, sizeof(struct argbox));
-	if (!abox_start)
-		err(1, "Fatal error");
-
-	/*
 	 * v[4,6]args holds flags based on commandline arguments for what we
 	 * want to output.
 	 */
@@ -614,6 +603,17 @@ int main(int argc, char *argv[])
 			return usage(1);
 		}
 	}
+
+	/*
+	 * abox == argument box == a box that holds (commandline) arguments :)
+	 * This is the structure we use to store all user input parsed into
+	 * (hopefully) manageable chunks.
+	 * This excludes most of the -[a-z] flags, they're generally handled by
+	 * v[4,6]args.
+	 */
+	abox_start = abox_cur = (struct argbox *)calloc(1, sizeof(struct argbox));
+	if (!abox_start)
+		err(1, "Fatal error");
 
 	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
 		colorize = 0;
@@ -734,6 +734,7 @@ int main(int argc, char *argv[])
 
 	if (!parse_stdin)
 		free_if(ifarg_start);
+	free_boxargs(abox_start);
 
 	return 0;
 }
