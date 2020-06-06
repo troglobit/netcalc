@@ -3,6 +3,7 @@ EXTRA_DIST      = README.md LICENSE ChangeLog.md
 doc_DATA        = README.md LICENSE
 dist_man1_MANS  = netcalc.1
 
+# lintian --profile debian -i -I --show-overrides ../$PKG.changes
 package:
 	dpkg-buildpackage -uc -us -B
 
