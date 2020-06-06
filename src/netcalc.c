@@ -238,7 +238,7 @@ int get_stdin(char *args[])
 	}
 	y++;
 	z = 0;
-	while (y < (int)strlen(dbuf) && z < argmax && dbuf[y] != ' ') {
+	while (y < (int)strlen(dbuf) && z < argmax && y < argmax && dbuf[y] != ' ') {
 		arg2[z] = dbuf[y];
 		y++;
 		z++;
