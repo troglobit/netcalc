@@ -41,7 +41,7 @@ int count(char *buf, char ch)
 	int i, j;
 
 	j = 0;
-	for (i = 0; i < (int)strlen(buf); i++) {
+	for (i = 0; buf[i]; i++) {
 		if (buf[i] == ch)
 			j++;
 	}
