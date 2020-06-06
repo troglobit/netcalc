@@ -10,11 +10,28 @@ compiler:
   - gcc
   - clang
 
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "Ivx6mD05crVK7Ry/8ewqCCP7PenpTSRo99Cls7/o56IHEAwoo/McByDw+XXr4jkbCS4XQoG+p5TPAcXT5K1y+3FDi7Uo4ADUbP8g1oInV+LqfLkgPolbzDfN0vS98RoXnVvD//H5MXbmakoamZkPlA5vMXagcIZ5/nhtb2NazETpEl5DkTsr7qqBRznl1g+S567vVMYD5j/OX/X+TapXXP6i/yPZOLMNkc5nJ7ZGl0HbTp23+cWSMxlbsZ0094VPKIJINFQgNuFEuVPJ2Mi5gPoX0u22bP+gSvRqr4MJmDGDyQyv0YPwnUKvCQpWYE7KJClLtu4q8bdyl55mJsRL/t5ua/B7B1McESUM5hCAEFi/p2yae7trvwxIO0V1h+95Lh3yydBqReyOQGckOOuOwsKjW6R7BzLHh66IGicVylxazsnwUFBWjuMe+H/SSSJnxJFG3TKJ2s92Pbm6VijKze58/vsZlfyar1QrULZndP91yLKn2WbovY/BcVPPslvChLVmawCZEv6A4qJ2PIsSbwZt5Wn+GLSqlqj9MY1g5ilUEVYg/3PH/3r+G730OWzejAW3DLKonrTxWpqeKiy/6CdG+JcRea1rrn9EgMMM+BgOXh9twjISKSfBGDV6vjVzBoC/gBLuuqKmcyDXzB//wuj1hOkvdE7GOoaKkZAJJnc="
+
+before_install:
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 addons:
   apt:
     packages:
       - tree
       - bats
+  coverity_scan:
+    project:
+      name: "troglobit/netcalc"
+      description: "Simplified clone of sipcalc with ipcalc looks"
+    notification_email: troglobit@gmail.com
+    build_command_prepend: ./autogen.sh && ./configure
+    build_command: make -j5 clean all
+    branch_pattern: dev
 
 # We don't store generated files (configure and Makefile) in GIT,
 # so we must customize the default build script to run ./autogen.sh
