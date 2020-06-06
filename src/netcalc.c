@@ -399,6 +399,8 @@ static struct if_info *parse_abox(struct argbox *abox)
 	int x;
 
 	ifarg_old = ifarg_cur = ifarg_start = (struct if_info *)calloc(1, sizeof(struct if_info));
+	if (!ifarg_start)
+		err(1, "Fatal error");
 
 	while (abox) {
 		if (abox->type == AT_V4 && !abox->resolv) {
@@ -441,9 +443,11 @@ static struct if_info *parse_abox(struct argbox *abox)
 		ifarg_cur = new_if(ifarg_cur);
 	}
 
-	ifarg_old->next = NULL;
-	free(ifarg_cur);
-	ifarg_cur = NULL;
+	if (ifarg_old != ifarg_start) {
+		ifarg_old->next = NULL;
+		free(ifarg_cur);
+		ifarg_cur = NULL;
+	}
 
 	if (ifarg_start == ifarg_cur) {
 		free(ifarg_start);
