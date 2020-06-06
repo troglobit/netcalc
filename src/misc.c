@@ -672,7 +672,10 @@ int split_ipv6addr(char *addr, struct ipv6_split *spstr)
 
 	if (count(addr, '.') == 3 && i) {
 		split = strstr(addr, ".");
-		i = strlen(addr) - strlen(split);
+		if (split)
+			i = strlen(addr) - strlen(split);
+		else
+			i = strlen(addr); /* dummy, at least one '.' exists */
 		while (addr[i] != ':')
 			i--;
 		i++;
