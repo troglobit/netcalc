@@ -407,8 +407,7 @@ void show_split_networks_v6(struct if_info *ifi, struct sip_in6_addr splitmask)
 	}
 
 	for (i = 0; i < 8; i++) {
-		if (splitmask.sip6_addr16)
-			sdiff.sip6_addr16[i] = 0xffffffff - splitmask.sip6_addr16[i];
+		sdiff.sip6_addr16[i] = 0xffffffff - splitmask.sip6_addr16[i];
 		start.sip6_addr16[i] = ifi->v6ad.prefix.sip6_addr16[i];
 		end.sip6_addr16[i] = ifi->v6ad.prefix.sip6_addr16[i] + sdiff.sip6_addr16[i];
 		ediff.sip6_addr16[i] = sdiff.sip6_addr16[i];
