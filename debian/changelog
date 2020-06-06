@@ -1,3 +1,11 @@
+netcalc (2.1.6) stable; urgency=medium
+
+  * Fix memory leaks found by Valgrind
+  * Fix use-after-free, and other minor issues, found by Coverity Scan
+  * Check return value of calloc()
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sat, 06 Jun 2020 23:56:57 +0200
+
 netcalc (2.1.5) stable; urgency=medium
 
   * Fix GCC 8 warnning, too small destination buffers

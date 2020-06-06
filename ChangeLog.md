@@ -3,6 +3,15 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
+[v2.1.6][] - 2020-06-06
+-----------------------
+
+### Fixes
+- Memory leaks found by Valgrind
+- Use-after-free found by Coverity Scan
+- Misc. fixes to minor issues found by Coverity Scan
+- Check return value of `calloc()`
+
 
 [v2.1.5][] - 2020-05-24
 -----------------------
