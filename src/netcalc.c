@@ -187,6 +187,8 @@ int get_stdin(char *args[])
 	argmax = ARGLEN - 1;
 	arg1 = (char *)calloc(1, ARGLEN);
 	arg2 = (char *)calloc(1, ARGLEN);
+	if (!arg1 || !arg2)
+		err(1, "Fatal error");
 	memset(sbuf, 0, sizeof(sbuf));
 	memset(dbuf, 0, sizeof(dbuf));
 
@@ -255,10 +257,14 @@ int get_stdin(char *args[])
 
 struct argbox *new_arg(struct argbox *abox)
 {
-	abox->next = (struct argbox *)calloc(1, sizeof(struct argbox));
-	abox = abox->next;
+	if (!abox)
+		err(1, "Fatal error");
 
-	return abox;
+	abox->next = (struct argbox *)calloc(1, sizeof(struct argbox));
+	if (!abox->next)
+		err(1, "Fatal error");
+
+	return abox->next;
 }
 
 void free_boxargs(struct argbox *abox)
@@ -376,6 +382,8 @@ struct if_info *new_if(struct if_info *ifarg_cur)
 	struct if_info *n_if;
 
 	n_if = (struct if_info *)calloc(1, sizeof(struct if_info));
+	if (!n_if)
+		err(1, "Fatal error");
 	ifarg_cur->next = n_if;
 
 	return n_if;
@@ -538,6 +546,8 @@ int main(int argc, char *argv[])
 	 * v[4,6]args.
 	 */
 	abox_start = abox_cur = (struct argbox *)calloc(1, sizeof(struct argbox));
+	if (!abox_start)
+		err(1, "Fatal error");
 
 	/*
 	 * v[4,6]args holds flags based on commandline arguments for what we
@@ -668,6 +678,9 @@ int main(int argc, char *argv[])
 		stdinarg[0] = (char *)calloc(1, ARGLEN);
 		stdinarg[1] = (char *)calloc(1, ARGLEN);
 		stdinarg[2] = NULL;
+		if (!stdinarg[0] || !stdinarg[1])
+			err(1, "Fatal error");
+
 		y = get_stdin(stdinarg);
 		if (y > 0) {
 			m = 2;
@@ -699,6 +712,8 @@ int main(int argc, char *argv[])
 			free_if(ifarg_start);
 			free_boxargs(abox_start);
 			abox_start = abox_cur = (struct argbox *)calloc(1, sizeof(struct argbox));
+			if (!abox_start)
+				err(1, "Fatal error");
 		}
 		for (x = 0; x < 2; x++) {
 			if (stdinarg[x]) {
