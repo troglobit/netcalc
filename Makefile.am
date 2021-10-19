@@ -3,23 +3,22 @@ EXTRA_DIST      = README.md LICENSE ChangeLog.md
 doc_DATA        = README.md LICENSE
 dist_man1_MANS  = netcalc.1
 
-# lintian --profile debian -i -I --show-overrides ../$PKG.changes
+## Generate .deb package
 package:
-	dpkg-buildpackage -uc -us -B
+	@debuild -uc -us -B --lintian-opts --profile debian -i -I --show-overrides
 
 ## Target to run when building a release
-release: distcheck package
-	@for file in $(DIST_ARCHIVES); do	\
-		md5sum $$file > ../$$file.md5;	\
+release: distcheck
+	@for file in $(DIST_ARCHIVES); do		\
+		md5sum    $$file > ../$$file.md5;	\
+		sha256sum $$file > ../$$file.sha256;	\
 	done
 	@mv $(DIST_ARCHIVES) ../
 	@echo
-	@echo "Resulting release files in ../"
+	@echo "Resulting release files:"
 	@echo "================================================================="
-	@for file in $(DIST_ARCHIVES); do					\
-		printf "%-32s Distribution tarball\n" $$file;			\
-		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';	\
-	done
-	@for file in `cd ..; ls $(PACKAGE)_$(VERSION)*`; do			\
-		printf "%-32s Debian/Ubuntu file\n" $$file;			\
+	@for file in $(DIST_ARCHIVES); do						\
+		printf "%-32s Distribution tarball\n" $$file;				\
+		printf "%-32s " $$file.md5;    cat ../$$file.md5    | cut -f1 -d' ';	\
+		printf "%-32s " $$file.sha256; cat ../$$file.sha256 | cut -f1 -d' ';	\
 	done
