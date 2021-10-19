@@ -14,9 +14,8 @@ env:
 jobs:
   coverity:
     runs-on: ubuntu-latest
-    env:
-      MAKEFLAGS: -j3
     steps:
+      - uses: actions/checkout@v2
       - name: Fetch latest Coverity Scan MD5
         id: var
         env:
@@ -51,14 +50,6 @@ jobs:
           fi
           mkdir coverity
           tar xzf coverity-latest.tar.gz --strip 1 -C coverity
-      - name: Install dependencies
-        run: |
-          curl -sS https://deb.troglobit.com/pubkey.gpg | sudo apt-key add -
-          echo "deb [arch=amd64] https://deb.troglobit.com/debian stable main" \
-               | sudo tee /etc/apt/sources.list.d/troglobit.list
-          sudo apt-get -y update
-          sudo apt-get -y install pkg-config libuev-dev libite-dev
-      - uses: actions/checkout@v2
       - name: Configure
         run: |
           ./autogen.sh
