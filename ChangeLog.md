@@ -3,6 +3,14 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
+[v2.1.7][UNRELEASED]
+-----------------------
+
+### Fixes
+- Allow colorized output over pipes, use `-n` instead.  This
+  reverts the auto-disable in pipes, introduced in v2.1
+
+
 [v2.1.6][] - 2020-06-06
 -----------------------
 

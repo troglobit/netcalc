@@ -615,9 +615,6 @@ int main(int argc, char *argv[])
 	if (!abox_start)
 		err(1, "Fatal error");
 
-	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
-		colorize = 0;
-
 	if (split_errv4 || split_errv6 || range_err) {
  nothing:
 		warnx("No (valid) commands received, nothing to do.");
