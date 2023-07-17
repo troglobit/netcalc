@@ -1,4 +1,4 @@
-AC_INIT([netcalc], [2.1.6], [https://github.com/troglobit/netcalc/issues])
+AC_INIT([netcalc], [2.1.7-beta1], [https://github.com/troglobit/netcalc/issues])
 AM_INIT_AUTOMAKE([1.11 foreign])
 AM_SILENT_RULES([yes])
 
