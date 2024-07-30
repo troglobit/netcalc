@@ -46,6 +46,7 @@ void show_network_ranges_v4(struct if_info *ifi, uint32_t range_min, uint32_t ra
 			min = ifi->v4ad.n_naddr;
 		} else {
 			num = 1;
+			min = 1;
 		}
 	} else {
 		min = ifi->v4ad.n_naddr + 1;
@@ -122,8 +123,11 @@ void print_cf_info_v4(struct if_info *ifi)
 			num = 2;
 			min = ifi->v4ad.n_naddr;
 			max = min + 1;
-		} else
+		} else {
 			num = 1;
+			min = 1;
+			max = 1;
+		}
 	} else {
 		min = ifi->v4ad.n_naddr + 1;
 		max = ifi->v4ad.n_broadcast - 1;
