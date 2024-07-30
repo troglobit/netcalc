@@ -112,7 +112,7 @@ void show_split_networks_v4(struct if_info *ifi, uint32_t splitmask)
 
 void print_cf_info_v4(struct if_info *ifi)
 {
-	uint32_t num, bcast, len, min, max;
+	uint32_t num, len, min, max;
 	char temp[21];
 
 	num = ifi->v4ad.n_broadcast - ifi->v4ad.n_naddr - 1;
@@ -143,7 +143,7 @@ void print_cf_info_v4(struct if_info *ifi)
 		cprintf("HostMin  : %34C%-20s%0C %33C%s%0C\n", numtoquad(min), numtobitmap(min, len));
 		cprintf("HostMax  : %34C%-20s%0C %33C%s%0C\n", numtoquad(max), numtobitmap(max, len));
 		if (len < 31) {
-			bcast = ifi->v4ad.n_broadcast;
+			uint32_t bcast = ifi->v4ad.n_broadcast;
 			cprintf("Broadcast: %34C%-20s%0C %33C%s%0C\n", numtoquad(bcast), numtobitmap(bcast, len));
 		}
 	} else {
