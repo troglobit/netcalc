@@ -695,7 +695,7 @@ int main(int argc, char *argv[])
 			free(abox_cur);
 			abox_cur = NULL;
 
-			ifarg_cur = ifarg_start = parse_abox(abox_start);
+			ifarg_start = parse_abox(abox_start);
 			if (ifarg_start) {
 				ifarg_cur = ifarg_start;
 				while (ifarg_cur) {
