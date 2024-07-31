@@ -7,14 +7,26 @@
 .Nd IP subnet calculator
 .Sh SYNOPSIS
 .Nm
+.Op opts
+.Op Ar args
+.Ss Options
+.Nm
 .Op Fl cehnrv
-.Op Fl s Ar MASK
-.Op Fl S Ar MASK
-.Aq Ar ADDRESS/LEN | Ar - | Ar NETWORK Op Ar NETMASK
+.Op Fl s Ar MASKLEN
+.Op Fl S Ar LEN
+.Op ..
+.Ss Arguments
+.Nm
+.Op opts
+.Ar NETWORK Oo Ar NETMASK Oc Op ..
+.Nm
+.Op opts
+.Ar NETWORK/LEN Op ..
+.Nm cat FILE | Nm Oo opts Oc Ar -
 .Sh DESCRIPTION
 .Nm
 is a simple network calculator derived from
-.Nm sipcalc.
+.Xr sipcalc 1 .
 .Nm
 takes an IP address and a subnet mask, or an IP address and prefix mask
 in CIDR notation and outputs information about the subnet.  Both IPv4
@@ -33,7 +45,7 @@ Output of multiple types of bitmaps
 .It
 Support for multiple networks input from commandline
 .It
-Support for reading newline separated list of networks from standard input (STDIN)
+Support for reading networks from standard input (newline separated)
 .It
 Ability to split a network into smaller ones
 .It
@@ -57,10 +69,12 @@ Disable (no) colorization of output
 IPv6 reverse DNS output
 .It Fl R Ar MIN:MAX
 Show offset IPv4 network Range from MIN to MAX
-.It Fl s Ar MASK
-Split the IPv4 network into subnets of MASK size
-.It Fl S Ar MASK
-Split the IPv6 network into subnets of MASK size
+.It Fl s Ar MASKLEN
+Split the IPv4 network into subnets of MASKLEN size, where MASKLEN is
+either in netmask (dotted quad) or prefix length format (/LEN)
+.It Fl S Ar LEN
+Split the IPv6 network into subnets of LEN size, where LEN is in prefix
+length format (/LEN)
 .It Fl v
 Show version information
 .El
@@ -84,15 +98,14 @@ netmask range from n >= 0 <= 128, default value if netmask is omitted is
 128.
 .Pp
 .Nm
-also accepts arguments from stdin, this can be useful for using
+also supports reading networks from stdin, this can be useful for using
 .Xr cat 1
 on a list of addresses stored in a file.  Each line should contain an
-address netmask pair or address/len tuple.  In this mode colorization
-is automatically disabled.
+address netmask pair or address/len tuple.
 .Sh BUGS
-Use the project's GitHub page to file bug reports, feature requests or
-patches (preferably as GitHub pull requests!), or questions at
-.Aq https://github.com/troglobit/netcalc
+Use the project page to file bug reports, feature requests, patches, or
+questions at
+.Lk https://github.com/troglobit/netcalc GitHub
 .Sh AUTHORS
 .An Simon Ekstrand Ao mailto:simon@routemeister.net Ac Nm (sipcalc)
 .An Joachim Wiberg Ao mailto:troglobit@gmail.com Ac Nm (netcalc)
