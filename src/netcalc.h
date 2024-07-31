@@ -29,11 +29,15 @@
 #ifndef NETCALC_H_
 #define NETCALC_H_
 
-#include <config.h>
+#include "config.h"
+
 #include <stdint.h>
 #include <err.h>		/* warnx() et al */
 #ifdef __APPLE__
 #include <sys/socket.h> /* Has to be included before net/if.h */
+#endif
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>		/* u_long on NetBSD */
 #endif
 #include <net/if.h>		/* IFNAMSIZ */
 
