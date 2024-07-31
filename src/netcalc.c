@@ -27,13 +27,16 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
+#endif
+#ifdef HAVE_GETOPT_H
+# include <getopt.h>
 #endif
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #endif
 #ifdef STDC_HEADERS
-#include <stdlib.h>
+# include <stdlib.h>
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -42,8 +45,6 @@
 #include "output.h"
 
 char *ident = PACKAGE_NAME;
-extern char *optarg;
-extern int optind, opterr, optopt;
 
 int
 out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
