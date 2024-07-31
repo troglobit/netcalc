@@ -45,6 +45,7 @@
 #include "output.h"
 
 char *ident = PACKAGE_NAME;
+int colorize = 1;
 
 
 int out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,

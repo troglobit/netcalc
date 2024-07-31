@@ -32,15 +32,19 @@
 #include <string.h>
 #include <stdlib.h>
 
-int colorize = 1;
+#include "netcalc.h"
+
 
 int cprintf(const char *fmt, ...)
 {
+	char *format, ansi[10];
+	const char *num, *ptr;
 	int i = 0, ret;
-	char *format, *num, *ptr, ansi[10];
 	va_list ap;
+	size_t len;
 
-	format = calloc(strlen(fmt) + 10, sizeof(char));
+	len = strlen(fmt) + 10;
+	format = calloc(len, sizeof(char));
 	if (!format)
 		return 0;
 
@@ -60,7 +64,7 @@ int cprintf(const char *fmt, ...)
 					code = atoi(num);
 
 				snprintf(ansi, sizeof(ansi), "\e[%dm", code);
-				strcat(format, ansi);
+				strlcat(format, ansi, len);
 				i += strlen(ansi);
 			skip:
 				fmt = ++ptr;
