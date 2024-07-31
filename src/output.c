@@ -320,7 +320,7 @@ static char *revdnsv6(struct sip_in6_addr addr, char *buf, size_t len)
 	return buf;
 }
 
-void print_rev_v6(struct if_info *ifi)
+void print_rev_v6(const struct if_info *ifi)
 {
 	char buf[256];
 
@@ -346,7 +346,7 @@ void print_v6(struct if_info *ifi)
 	printf("HostMax         : "); print_exp_v6(ifi->v6ad.broadcast); printf("\n");
 }
 
-void print_v4inv6(struct if_info *ifi)
+void print_v4inv6(const struct if_info *ifi)
 {
 	if (ifi->v6ad.type == V6TYPE_V4INV6 && !ifi->v6ad.real_v4) {
 		printf("Address was submitted as an IPv4-compatible IPv6 address, but\n");
