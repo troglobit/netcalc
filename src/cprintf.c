@@ -51,7 +51,7 @@ int cprintf(const char *fmt, ...)
 	while (*fmt) {
 		if (*fmt == '%') {
 			num = ptr = (char *)&fmt[1];
-			while (*ptr && isdigit(*ptr))
+			while (*ptr && isdigit((int)*ptr))
 				ptr++;
 
 			if (*ptr == 'C') {

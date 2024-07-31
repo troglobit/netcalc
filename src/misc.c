@@ -131,7 +131,7 @@ int validate_netmask(char *in_addr)
 		return 0;
 
 	while (i < (int)strlen(in_addr) && !j) {
-		if (!isxdigit(in_addr[i]) && in_addr[i] != 'x' && in_addr[i] != 'X')
+		if (!isxdigit((int)in_addr[i]) && in_addr[i] != 'x' && in_addr[i] != 'X')
 			j = 1;
 		if (in_addr[i] == 'x' || in_addr[i] == 'X') {
 			k++;
