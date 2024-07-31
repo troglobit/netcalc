@@ -370,8 +370,10 @@ int v6plus(struct sip_in6_addr *a, struct sip_in6_addr *b)
 			j = i - 1;
 			k = 0;
 			while (j >= 0 && !k) {
+				uint32_t addr = (uint32_t)a->sip6_addr16[j];
+
 				k = 1;
-				if (a->sip6_addr16[j] + 1 > 0xffff) {
+				if (addr + 1 > 0xffff) {
 					a->sip6_addr16[j] = 0;
 					k = 0;
 				} else {
