@@ -1,6 +1,6 @@
 /* cprintf(): Take input printf() syntax and colorize
  *
- * Copyright (c) 2017-2020  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (c) 2017-2024  Joachim Wiberg <troglobit@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

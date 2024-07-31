@@ -1,7 +1,7 @@
 Source: netcalc
 Section: net
 Priority: optional
-Maintainer: Joachim Nilsson <troglobit@gmail.com>
+Maintainer: Joachim Wiberg <troglobit@gmail.com>
 Homepage: https://github.com/troglobit/netcalc
 Build-Depends: debhelper (>= 10), bats
 Standards-Version: 4.3.0

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-2013  Simon Ekstrand
- * Copyright (c) 2010-2020  Joachim Nilsson
+ * Copyright (c) 2010-2024  Joachim Wiberg
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -487,7 +487,7 @@ static int usage(int code)
 	       "  -S MASK     Split the IPv6 network into subnets of MASK size\n"
 	       "\n"
 	       "Copyright (C) 2003-2013  Simon Ekstrand\n"
-	       "Copyright (C) 2010-2020  Joachim Nilsson\n"
+	       "Copyright (C) 2010-2024  Joachim Wiberg\n"
 	       "\n"
 	       "This is free software, under the 3-clause BSD license: you are free to change\n"
 	       "and redistribute it.  There is NO WARRANTY, to the extent permitted by law.\n", ident);

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-2013  Simon Ekstrand
- * Copyright (c) 2010-2020  Joachim Nilsson
+ * Copyright (c) 2010-2024  Joachim Wiberg
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

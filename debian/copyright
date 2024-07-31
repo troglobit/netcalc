@@ -5,11 +5,11 @@ Source: https://github.com/troglobit/netcalc
 
 Files: *
 Copyright: 2003-2013 Simon Ekstrand <simon@routemeister.net>
-   2010-2020 Joachim Nilsson <troglobit@gmail.!com>
+   2010-2024 Joachim Wiberg <troglobit@gmail.!com>
 License: BSD
 
 Files: debian/*
-Copyright: 2015-2020 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2015-2024 Joachim Wiberg <troglobit@gmail.com>
 License: BSD
 
 License: BSD
