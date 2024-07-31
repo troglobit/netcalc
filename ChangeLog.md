@@ -3,7 +3,7 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
-[v2.1.7][UNRELEASED]
+[v2.1.7][] - 2024-07-31
 -----------------------
 
 ### Changes
@@ -233,7 +233,10 @@ sipcalc-www needs more cleaning.
 - First commit of web (cgi) support.
 - Initial commit, 2001-02-10 16:55:14 CEST!
 
-[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.4...HEAD
+[UNRELEASED]: https://github.com/troglobit/netcalc/compare/v2.1.7...HEAD
+[v2.1.7]: https://github.com/troglobit/netcalc/compare/v2.1.6...v2.1.7
+[v2.1.6]: https://github.com/troglobit/netcalc/compare/v2.1.5...v2.1.6
+[v2.1.5]: https://github.com/troglobit/netcalc/compare/v2.1.4...v2.1.5
 [v2.1.4]: https://github.com/troglobit/netcalc/compare/v2.1.3...v2.1.4
 [v2.1.3]: https://github.com/troglobit/netcalc/compare/v2.1.2...v2.1.3
 [v2.1.2]: https://github.com/troglobit/netcalc/compare/v2.1.1...v2.1.2
