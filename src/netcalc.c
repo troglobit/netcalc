@@ -46,9 +46,9 @@
 
 char *ident = PACKAGE_NAME;
 
-int
-out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
-	    int v6args, struct misc_args m_argv6)
+
+int out_cmdline(struct if_info *ifarg_cur, int v4args, struct misc_args m_argv4,
+		int v6args, struct misc_args m_argv6)
 {
 	int ret = 0;
 
