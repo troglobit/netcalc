@@ -6,9 +6,15 @@ All notable changes to the project are documented in this file.
 [v2.1.7][UNRELEASED]
 -----------------------
 
-### Fixes
-- Allow colorized output over pipes, use `-n` instead.  This
+### Changes
+- Allow colorized output over pipes, use `-n` to disable.  This
   reverts the auto-disable in pipes, introduced in v2.1
+
+### Fixes
+- Fix #25: Add missing include file for macOS
+- Fix compiler warnings on NetBSD, possibly other BSDs
+- Add missing include file for NetBSD, possibly other BSDs
+- Various minor GCC 13 and Clang 18 warnings
 
 
 [v2.1.6][] - 2020-06-06
