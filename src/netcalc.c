@@ -153,10 +153,10 @@ int cleanline(char *sbuf, char *dbuf)
 			y++;
 		}
 
-		while (sbuf[x] == ' ' && x < (int)strlen(sbuf))
+		while (x < (int)strlen(sbuf) && sbuf[x] == ' ')
 			x++;
 
-		while (sbuf[x] != ' ' && x < (int)strlen(sbuf)) {
+		while (x < (int)strlen(sbuf) && sbuf[x] != ' ') {
 			dbuf[y] = sbuf[x];
 			y++;
 			x++;
