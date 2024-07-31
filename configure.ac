@@ -12,6 +12,7 @@ AC_PROG_INSTALL
 
 dnl - Configuration.
 AC_HEADER_STDC
+AC_CHECK_HEADERS([sys/socket.h])
 
 dnl Check for uint[8,16,32]_t
 AC_TYPE_UINT8_T

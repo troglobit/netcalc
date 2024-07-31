@@ -33,8 +33,8 @@
 
 #include <stdint.h>
 #include <err.h>		/* warnx() et al */
-#ifdef __APPLE__
-#include <sys/socket.h> /* Has to be included before net/if.h */
+#ifdef HAVE_SYS_SOCKET_H
+# include <sys/socket.h>	/* Before net/if.h on Darwin */
 #endif
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>		/* u_long on NetBSD */
