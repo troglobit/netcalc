@@ -1,3 +1,11 @@
+netcalc (2.1.7) stable; urgency=medium
+
+  * Allow colorized output over pipes, use '-n' to disable.  This reverts
+    the auto-disble of colored output for pipes, introduced in v2.1-1
+  * Various minor GCC 13 and Clang 18 warnings
+
+ -- Joachim Wiberg <troglobit@gmail.com>  Wed, 31 Jul 2024 11:22:00 +0100
+
 netcalc (2.1.6) stable; urgency=medium
 
   * Fix memory leaks found by Valgrind

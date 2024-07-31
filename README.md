@@ -14,7 +14,7 @@ Build & Install
 
 ### Debian/Ubuntu
 
-    curl -sS https://deb.troglobit.com/pubkey.gpg | sudo apt-key add -
+    curl -sS https://deb.troglobit.com/pubkey.gpg | sudo tee /etc/apt/trusted.gpg.d/troglobit.asc
     echo "deb [arch=amd64] https://deb.troglobit.com/debian stable main" | sudo tee /etc/apt/sources.list.d/troglobit.list
     sudo apt-get update && sudo apt-get install netcalc
 
