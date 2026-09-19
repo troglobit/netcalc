@@ -540,6 +540,9 @@ int get_addrv4(struct if_info *ifi)
 		if (i == 10)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sPrivate network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC1918";
+		if (i == 100 && (j & 0xC0) == 64)
+			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sCGNAT Shared Address Space",
+				 len < 10 ? "In Part " : ""), rfc = "RFC6598";
 		if (i == 127)
 			snprintf(ifi->v4ad.class_remark, sizeof(ifi->v4ad.class_remark), ", %sLoopback network",
 				 len < 8 ? "In Part " : ""), rfc = "RFC5735";
